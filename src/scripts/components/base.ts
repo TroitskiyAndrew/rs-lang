@@ -41,7 +41,6 @@ export default class BaseComponent {
     this.elem.innerHTML = '';
     this.elem.dataset.inited = 'true';
     this.addLoading();
-    this.disableLinks();
     this.createHTML();
     this.pasteHTML();
     const initialization = this.oninit();
@@ -93,7 +92,7 @@ export default class BaseComponent {
 
   }
 
-  private disableLinks(): void {
+  public disableLinks(): void {
     if (this.name) {
       const allLinks: NodeListOf<HTMLButtonElement> = document.querySelectorAll('[data-direction]');
 
@@ -124,6 +123,10 @@ export default class BaseComponent {
   }
 
   public setActions(): void {
+
+  }
+
+  public remoteControle(): void {
 
   }
 
