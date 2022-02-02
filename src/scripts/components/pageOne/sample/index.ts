@@ -33,7 +33,7 @@ export default class Sample extends BaseComponent {
 
   public remoteControle(): void {
     const newDiv = createDiv({ className: 'component__new-div' });
-    const newSpan = createSpan({ className: 'component__new-span', text: 'Новый Спан' });
+    const newSpan = createSpan({ className: 'component__new-span', text: 'new span' });
 
     newDiv.append(newSpan);
     this.elem.append(newDiv);
