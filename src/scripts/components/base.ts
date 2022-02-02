@@ -130,4 +130,8 @@ export default class BaseComponent {
   public remoteControle(): void {
 
   }
+
+  // public colorSpan(): void {
+
+  // }
 }

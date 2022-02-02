@@ -1,5 +1,6 @@
 import BaseComponent from '../../base';
 import { createDiv, createInput, createButton, createSpan } from '../../../utils';
+import { instances } from '../../components';
 
 export default class WordCard extends BaseComponent {
   input: HTMLInputElement | undefined;
@@ -20,6 +21,10 @@ export default class WordCard extends BaseComponent {
     (this.elem.querySelector('.word') as HTMLElement).addEventListener('click', () => {
       this.sendEvent('spanAffected');
     });
+  }
+
+  public colorSpan(): void {
+    (this.elem.querySelector('.word') as HTMLElement).style.color = 'red';
   }
 
 }
