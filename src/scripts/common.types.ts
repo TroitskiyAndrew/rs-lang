@@ -1,3 +1,5 @@
+// Здесь все типы и интерфейсы
+
 export type DataSet = {
   [name: string]: string,
 };

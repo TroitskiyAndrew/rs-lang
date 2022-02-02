@@ -13,7 +13,8 @@
 @import "layout/header", "layout/footer";
 
 // 5. Components
-@import "components/button";
+@import "components/button", "../scripts/components/pageOne/style.scss", "../scripts/components/pageTwo/style.scss", 
+"../scripts/components/pageOne/sample/style.scss";
 
 // 6. Page-specific styles
 @import "pages/home";
