@@ -1,0 +1,4 @@
+.header {
+  @include flex($jc: space-between);
+  width: 100%;
+}

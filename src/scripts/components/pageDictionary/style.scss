@@ -1,0 +1,6 @@
+.dictionary {
+  position: relative;
+  span {
+    @include position;
+  }
+}

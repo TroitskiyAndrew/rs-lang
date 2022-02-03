@@ -1,4 +1,5 @@
 import { components, instances } from './components/components';
+import { updateState } from './state';
 
 
 
@@ -37,4 +38,12 @@ export function initChildren(elem: HTMLElement): void {
     }
     updateContent(child, child.getAttribute('data-widget') as string);
   }
+}
+
+export function pageChenging(elem: HTMLElement, page: string): void {
+  const container = document.querySelector('.header__page') as HTMLElement;
+
+  updateState({ currentPage: page });
+  container.innerHTML = '';
+  container.append(elem);
 }
