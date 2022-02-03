@@ -1,5 +1,6 @@
 import BaseComponent from '../../base';
-import { createDiv } from '../../../utils';
+import { createDiv, createSpan } from '../../../utils';
+import { pageChenging } from '../../../rooting';
 
 export default class AudioGame extends BaseComponent {
   constructor(elem: HTMLElement) {
@@ -7,6 +8,8 @@ export default class AudioGame extends BaseComponent {
     this.name = 'audioGame';
   }
 
-  public createHTML(): void {
+  public oninit(): Promise<void> {
+    pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
+    return Promise.resolve();
   }
 }

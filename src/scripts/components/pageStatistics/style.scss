@@ -1,0 +1,6 @@
+.statistics {
+  position: relative;
+  span {
+    @include position;
+  }
+}

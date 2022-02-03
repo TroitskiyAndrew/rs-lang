@@ -1,5 +1,6 @@
 import BaseComponent from '../../base';
-import { createDiv } from '../../../utils';
+import { createDiv, createSpan } from '../../../utils';
+import { pageChenging } from '../../../rooting';
 
 export default class SprintGame extends BaseComponent {
   constructor(elem: HTMLElement) {
@@ -7,7 +8,8 @@ export default class SprintGame extends BaseComponent {
     this.name = 'sprintGame';
   }
 
-  public createHTML(): void {
+  public oninit(): Promise<void> {
+    pageChenging(createSpan({ text: 'Спринт Игра' }), this.name);
+    return Promise.resolve();
   }
-
 }
