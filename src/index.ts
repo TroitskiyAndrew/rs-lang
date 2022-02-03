@@ -1,6 +1,5 @@
 import './styles/main.scss';
 import { updateContent } from './scripts/rooting';
-import './scripts/api/testingApiMethods';
 
 window.onload = () => {
   const header: HTMLElement = document.querySelector('header') as HTMLElement;
