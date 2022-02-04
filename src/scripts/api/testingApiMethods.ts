@@ -1,4 +1,6 @@
 import { apiService, baseUrl } from './apiMethods';
+import { getState } from '../state';
+
 import { createButton, createSpan, createDiv } from '../utils';
 
 // todo
@@ -16,7 +18,7 @@ btnTest.onclick = async () => {
   await apiService.loginUser({ 'email': 'hello6@user.com', 'password': 'hello111' });
 
   // const user = await apiService.getUser(apiService.state.userId);
-  console.log(apiService.state);
+  console.log(getState());
 
   // console.log('getting NewUserTokens...');
   // await apiService.getNewUserTokens(apiService.state.userId);
@@ -65,7 +67,7 @@ btnTest.onclick = async () => {
 
   // get UserWord
   console.log('getting user word...');
-  const userWord = await apiService.getUserWord(apiService.state.userId, '61fbde05b8642c14341588c5');
+  const userWord = await apiService.getUserWord(getState().userId, '61fbde05b8642c14341588c5');
   console.log(userWord);
 
 
@@ -103,7 +105,7 @@ btnTest.onclick = async () => {
   //   });
   // get statistics
   console.log('getting statistics...');
-  const statistics = await apiService.getUserStatistics(apiService.state.userId);
+  const statistics = await apiService.getUserStatistics(getState().userId);
   console.log(statistics);
 
 };

@@ -35,19 +35,19 @@ export interface UserWord {
     [key: string]: string | boolean;
   };
 }
-export interface State {
-  page: number,
-  group: number,
-  aggregatedWords: {
-    page: number,
-    group: number,
-    wordsPerPage: number,
-    filter: string,
-  },
-  userId: string,
-  token: string,
-  refreshToken: string,
-}
+// export interface State {
+//   page: number,
+//   group: number,
+//   aggregatedWords: {
+//     page: number,
+//     group: number,
+//     wordsPerPage: number,
+//     filter: string,
+//   },
+//   userId: string,
+//   token: string,
+//   refreshToken: string,
+// }
 export interface PaginatedResults {
   paginatedResults: WordCard[],
   totalCount: [

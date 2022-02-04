@@ -1,9 +1,11 @@
 import BaseComponent from '../base';
 import { createSpan, createDiv } from '../../utils';
-// import '../../api/testingApiMethods';
+import '../../api/testingApiMethods';
 
 export default class User extends BaseComponent {
   modalWindow: HTMLDivElement | undefined;
+
+  modalOverlay: HTMLDivElement | undefined;
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -16,47 +18,28 @@ export default class User extends BaseComponent {
       className: 'logoUser',
     });
     this.modalWindow = createDiv({ className: 'modal-user' });
+    this.modalOverlay = createDiv({ className: 'modal-overlay' });
 
 
-
-
+    document.body.append(this.modalOverlay);
     this.fragment.append(this.modalWindow);
     this.fragment.append(logoUser);
   }
 
   public listenEvents(): void {
     (this.elem.querySelector('.logoUser') as HTMLElement).addEventListener('click', this.openModalWindow.bind(this));
+    (this.modalOverlay as HTMLElement).addEventListener('click', this.closeModalWindow.bind(this));
+
   }
 
   openModalWindow() {
-    document.body.addEventListener('click', this.toggleModalWindow.bind(this));
+    this.modalWindow?.classList.add('show');
+    this.modalOverlay?.classList.add('show');
   }
 
-  toggleModalWindow(event: Event) {
-    console.log(this.modalWindow);
-
-    // const modalWindow = (document.querySelector('.modal-user') as HTMLElement);
-    if ((event.target as Element).closest('.logoUser')) {
-      if (this.modalWindow?.classList.contains('show')) {
-        console.log('remove 1');
-
-        this.modalWindow?.classList.remove('show');
-      } else {
-        console.log('show 1');
-
-        this.modalWindow?.classList.add('show');
-      }
-    }
-
-    if (!(event.target as Element).closest('.modal-user')) {
-      if (!(event.target as Element).classList.contains('logoUser')) {
-        console.log('remove 2');
-
-        this.modalWindow?.classList.remove('show');
-      }
-    }
-    document.body.removeEventListener('click', this.toggleModalWindow.bind(this));
-
+  closeModalWindow() {
+    this.modalWindow?.classList.remove('show');
+    this.modalOverlay?.classList.remove('show');
   }
 
 }

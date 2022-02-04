@@ -1,34 +1,13 @@
-import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, State } from './api.types';
+import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics } from './api.types';
+import { updateState, getState } from '../state';
 
-export const baseUrl = 'http://127.0.0.1:3000';
-// export const baseUrl = 'https://rs-learning-words.herokuapp.com';
+// export const baseUrl = 'http://127.0.0.1:3000';
+export const baseUrl = 'https://rs-learning-words.herokuapp.com';
 const signIn = `${baseUrl}/signin`;
 const users = `${baseUrl}/users`;
 const words = `${baseUrl}/words`;
 
 class ApiResourceService {
-
-  private _state: State = {
-    page: 0,
-    group: 0,
-    aggregatedWords: {
-      page: 0,
-      group: 1,
-      wordsPerPage: 3,
-      filter: '{"$or":[{"userWord.difficulty":"easy"},{"userWord":null}]}',
-    },
-    userId: '',
-    token: '',
-    refreshToken: '',
-  };
-
-  get state(): State {
-    return this._state;
-  }
-
-  set state(newState: State) {
-    this._state = newState;
-  }
 
   // !Words
   // Всего 6 групп(от 0 до 5) и в каждой группе по 30 страниц(от 0 до 29). В каждой странице по 20 слов. Группы разбиты по сложности от самой простой(0) до самой сложной(5)
@@ -61,7 +40,7 @@ class ApiResourceService {
       },
       body: JSON.stringify(user),
     });
-    const content = await rawResponse.json();
+    await rawResponse.json();
 
     // console.log(content);
   }
@@ -77,9 +56,12 @@ class ApiResourceService {
     });
     const authorization: Authorization = await rawResponse.json();
     const { refreshToken, token, userId } = authorization;
-    this.state.token = token;
-    this.state.refreshToken = refreshToken;
-    this.state.userId = userId;
+
+    updateState({
+      token: token,
+      refreshToken: refreshToken,
+      userId: userId,
+    });
 
     return authorization;
   }
@@ -88,7 +70,7 @@ class ApiResourceService {
     const rawResponse = await fetch(`${users}/${userId}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
       },
     });
@@ -100,7 +82,7 @@ class ApiResourceService {
     const rawResponse = await fetch(`${users}/${userId}`, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
@@ -114,14 +96,17 @@ class ApiResourceService {
     await fetch(`${users}/${userId}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
       },
     });
 
-    this.state.userId = '';
-    this.state.token = '';
-    this.state.refreshToken = '';
+
+    updateState({
+      token: '',
+      refreshToken: '',
+      userId: '',
+    });
   }
 
   async getNewUserTokens(userId: string): Promise<Authorization> {
@@ -134,8 +119,11 @@ class ApiResourceService {
     });
     const authorization: Authorization = await rawResponse.json();
     const { refreshToken, token } = authorization;
-    this.state.token = token;
-    this.state.refreshToken = refreshToken;
+
+    updateState({
+      token: token,
+      refreshToken: refreshToken,
+    });
 
     return authorization;
   }
@@ -145,7 +133,7 @@ class ApiResourceService {
     const rawResponse = await fetch(`${users}/${userId}/words`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
@@ -160,22 +148,20 @@ class ApiResourceService {
     const rawResponse = await fetch(`${users}//${userId}/words/${wordId}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(wordBody),
     });
-    const content = await rawResponse.json();
-
-    // console.log(content);
+    await rawResponse.json();
   }
 
   async getUserWord(userId: string, wordId: string): Promise<UserWord> {
     const rawResponse = await fetch(`${users}/${userId}/words/${wordId}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
@@ -190,7 +176,7 @@ class ApiResourceService {
     const rawResponse = await fetch(`${users}/${userId}/words/${wordId}`, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
@@ -204,7 +190,7 @@ class ApiResourceService {
     await fetch(`${users}/${userId}/words/${wordId}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
       },
     });
@@ -212,14 +198,14 @@ class ApiResourceService {
 
   // !Users/AggregatedWords
   async getAllUserAggregatedWords(userId: string): Promise<PaginatedResults> {
-    const group = this.state.aggregatedWords.group ? `&group=${this.state.aggregatedWords.group}` : '';
-    const page = this.state.aggregatedWords.page ? `&page=${this.state.aggregatedWords.page}` : '';
-    const wordsPerPage = this.state.aggregatedWords.wordsPerPage ? `&wordsPerPage=${this.state.aggregatedWords.wordsPerPage}` : '';
-    const filters = this.state.aggregatedWords.filter ? `&filter=${this.state.aggregatedWords.filter}` : '';
+    const group = getState().aggregatedWords.group ? `&group=${getState().aggregatedWords.group}` : '';
+    const page = getState().aggregatedWords.page ? `&page=${getState().aggregatedWords.page}` : '';
+    const wordsPerPage = getState().aggregatedWords.wordsPerPage ? `&wordsPerPage=${getState().aggregatedWords.wordsPerPage}` : '';
+    const filters = getState().aggregatedWords.filter ? `&filter=${getState().aggregatedWords.filter}` : '';
     const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?${group}${page}${wordsPerPage}${filters}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
@@ -234,7 +220,7 @@ class ApiResourceService {
     const rawResponse = await fetch(`${users}/${userId}/aggregatedWords/${wordId}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
@@ -250,7 +236,7 @@ class ApiResourceService {
     const rawResponse = await fetch(`${users}/${userId}/statistics`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
@@ -265,7 +251,7 @@ class ApiResourceService {
     const rawResponse = await fetch(`${users}/${userId}/statistics`, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${this.state.token}`,
+        'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },

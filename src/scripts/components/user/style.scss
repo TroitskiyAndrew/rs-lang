@@ -15,3 +15,14 @@
 .modal-user.show {
   left: 50%;
 }
+
+.modal-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgb(0, 0, 0, 0.4);
+  display: none;
+}
+.modal-overlay.show {
+  display: block;
+}
