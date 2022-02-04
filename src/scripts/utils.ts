@@ -53,6 +53,12 @@ export function createInput(options: InputOptions): HTMLInputElement {
   if (options.type) {
     input.type = options.type;
   }
+  if (options.placeholder) {
+    input.placeholder = options.placeholder;
+  }
+  if (options.value) {
+    input.value = options.value;
+  }
   return input;
 }
 
