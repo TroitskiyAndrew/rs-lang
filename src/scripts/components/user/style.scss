@@ -11,6 +11,11 @@
   height: 300px;
   background: red;
   transition: all 0.3s ease 0s;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .modal-user.show {
   left: 50%;
@@ -25,4 +30,23 @@
 }
 .modal-overlay.show {
   display: block;
+}
+
+.registration {
+  display: block;
+}
+.registration.show {
+  display: none;
+}
+.login {
+  display: none;
+}
+.login.show {
+  display: block;
+}
+
+.modal-user__change-modal {
+  background: inherit;
+  border: none;
+  color: white;
 }

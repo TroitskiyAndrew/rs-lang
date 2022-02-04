@@ -34,7 +34,7 @@ btnTest.onclick = async () => {
   // });
 
   // getWords(on page\group)
-  // await apiService.getChunkOfWords(apiService.state.page, apiService.state.group);
+  await apiService.getChunkOfWords(getState().dictionaryPage, getState().dictionaryGroup);
 
   // getWord
   const WordNumberExample = '5e9f5ee35eb9e72bc21af4a0';
