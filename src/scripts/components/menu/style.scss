@@ -15,10 +15,6 @@
   white-space: nowrap;
 }
 
-.menu__button::before {
-  color: $brand-color;
-}
-
 .menu__overlay {
   position: absolute;
   display: none;
