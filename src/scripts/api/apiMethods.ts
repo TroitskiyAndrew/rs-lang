@@ -1,7 +1,7 @@
 import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, State } from './api.types';
 
-const baseUrl = 'http://127.0.0.1:3000';
-// const baseUrl = 'https://rs-learning-words.herokuapp.com'
+export const baseUrl = 'http://127.0.0.1:3000';
+// export const baseUrl = 'https://rs-learning-words.herokuapp.com';
 const signIn = `${baseUrl}/signin`;
 const users = `${baseUrl}/users`;
 const words = `${baseUrl}/words`;
@@ -122,6 +122,22 @@ class ApiResourceService {
     this.state.userId = '';
     this.state.token = '';
     this.state.refreshToken = '';
+  }
+
+  async getNewUserTokens(userId: string): Promise<Authorization> {
+    const rawResponse = await fetch(`${users}/${userId}/tokens`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+    const authorization: Authorization = await rawResponse.json();
+    const { refreshToken, token } = authorization;
+    this.state.token = token;
+    this.state.refreshToken = refreshToken;
+
+    return authorization;
   }
 
   // !Users/Words
