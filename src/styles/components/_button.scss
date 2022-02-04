@@ -13,41 +13,8 @@ button {
   color: white;
 }
 
-.icon-button.home-button::before {
-  content: "\f015";
-}
-.icon-button.tree-button::before {
-  content: "\f1bb";
-}
-.icon-button.toy-button::before {
-  content: "\f0a6";
-}
-.icon-button.volume-button {
-  width: 2.5rem;
-}
-.icon-button.volume-button::before {
-  content: "\f6a9";
-}
-.icon-button.volume-button._volume-on::before {
-  content: "\f028";
-}
-.icon-button.favorites::before {
-  content: "\f005";
-}
-.icon-button.clear::before {
-  content: "\f00d";
-}
-.icon-button.settings-clear::before {
-  content: "\f013";
-}
-.icon-button.filter-clear::before {
-  content: "\f0b0";
-}
-.icon-button.snow::before {
-  content: "\f2dc";
-}
-.icon-button.add::before {
-  content: "\f067";
+.icon-button.menu__button::before {
+  content: "\f11b";
 }
 
 .icon-button._crossed {

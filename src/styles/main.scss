@@ -14,6 +14,16 @@
 
 // 5. Components
 @import "components/button";
+@import "../scripts/components/games/audioGame/style.scss";
+@import "../scripts/components/games/sprintGame/style.scss";
+@import "../scripts/components/header/style.scss";
+@import "../scripts/components/menu/style.scss";
+@import "../scripts/components/pageDictionary/style.scss";
+@import "../scripts/components/pageDictionary/wordCard/style.scss";
+@import "../scripts/components/pageGames/style.scss";
+@import "../scripts/components/pageHome/style.scss";
+@import "../scripts/components/pageStatistics/style.scss";
+@import "../scripts/components/user/style.scss";
 
 // 6. Page-specific styles
 @import "pages/home";

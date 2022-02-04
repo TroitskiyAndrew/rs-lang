@@ -28,3 +28,8 @@ export interface ButtonOptions extends HTMLElementOptions {
 export interface InputOptions extends HTMLElementOptions {
   type?: string
 }
+
+export type Link = {
+  caption: string,
+  direction: string
+};
