@@ -1,6 +1,7 @@
 import './styles/main.scss';
 import { updateContent } from './scripts/rooting';
 import { getState } from './scripts/state';
+import { closeMenu } from './scripts/utils';
 
 window.onload = () => {
   document.addEventListener('click', (ev: Event): void => {
@@ -9,11 +10,11 @@ window.onload = () => {
     if (target) {
       const direction: string = target.dataset.direction as string;
 
+      closeMenu();
       updateContent(document.querySelector('#page-holder') as HTMLElement, direction);
     }
   });
 
-  updateContent(document.querySelector('#menu') as HTMLElement, 'menu');
   updateContent(document.querySelector('#header') as HTMLElement, 'header');
   const state = getState();
   updateContent(document.querySelector('#page-holder') as HTMLElement, state.currentPage);
