@@ -12,24 +12,26 @@ export interface HTMLElementOptions {
 }
 
 export interface DivOptions extends HTMLElementOptions {
-  dataSet?: DataSet
+  dataSet?: DataSet;
 }
 
 export interface SpanOptions extends HTMLElementOptions {
-  text?: string
+  text?: string;
 }
 
 export interface ButtonOptions extends HTMLElementOptions {
   text?: string,
   action?: string,
-  disabled?: boolean
+  disabled?: boolean;
 }
 
 export interface InputOptions extends HTMLElementOptions {
-  type?: string
+  type?: string,
+  placeholder?: string;
+  value?: string;
 }
 
 export type Link = {
   caption: string,
-  direction: string
+  direction: string;
 };
