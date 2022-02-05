@@ -13,7 +13,7 @@ export default class WordsCard extends BaseComponent {
   public oninit(): Promise<void> {
     const wordRequest = apiService.getWord(this.elem.dataset.wordId as string);
     return wordRequest.then((word: WordCard) => {
-      console.log(word);
+
     });
   }
 
