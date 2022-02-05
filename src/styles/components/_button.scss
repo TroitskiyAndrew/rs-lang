@@ -16,6 +16,14 @@ button {
   content: "\f11b";
 }
 
+.icon-button.move-left::before {
+  content: "\f060";
+}
+
+.icon-button.move-right::before {
+  content: "\f061";
+}
+
 .icon-button._crossed {
   position: relative;
   @include flex;

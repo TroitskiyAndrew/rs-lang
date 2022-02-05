@@ -13,11 +13,6 @@ export default class Menu extends BaseComponent {
     this.extraClass = 'menu';
   }
 
-  public oninit(): Promise<void> {
-    this.setActions();
-    return Promise.resolve();
-  }
-
   public createHTML(): void {
     const listLisnks = document.createElement('ul');
     const menuButton = createButton({ className: 'menu__button icon-button', action: 'showMenu' });

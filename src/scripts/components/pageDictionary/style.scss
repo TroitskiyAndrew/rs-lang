@@ -1,6 +1,33 @@
 .dictionary {
+  display: flex;
+  &__levels {
+    width: 200px;
+    flex-shrink: 0;
+  }
+
+  &__list {
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
   &__holder {
     display: flex;
     gap: 10px;
+    position: relative;
+    left: 0;
+    flex-grow: 1;
+  }
+
+  &__word {
+    width: 500px;
+    flex-shrink: 0;
+  }
+
+  &__paginator {
+    display: flex;
+    height: 50px;
+    width: 100%;
+    background-color: $mid-grey;
   }
 }

@@ -1,5 +1,5 @@
 import BaseComponent from '../base';
-import { createDiv, createSpan } from '../../utils';
+import { createButton, createDiv, createSpan } from '../../utils';
 import { pageChenging } from '../../rooting';
 import { getState } from '../../state';
 import { apiService } from '../../api/apiMethods';
@@ -32,7 +32,9 @@ export default class PageDictionary extends BaseComponent {
     const page = createDiv({ className: 'page dictionary' });
     const levels = createDiv({ className: 'dictionary__levels' });
     const wordsList = createDiv({ className: 'dictionary__list' });
-    const paginator = createDiv({ className: 'dictionary__paginator' });
+    const paginator = createDiv({ className: 'dictionary__paginator paginator' });
+    paginator.append(createButton({ className: 'paginator__move icon-button move-left', action: 'moveLeft' }));
+    paginator.append(createButton({ className: 'paginator__move icon-button move-right', action: 'moveRight' }));
     this.wordsHolder = createDiv({ className: 'dictionary__holder' });
 
 
@@ -42,5 +44,34 @@ export default class PageDictionary extends BaseComponent {
     wordsList.append(paginator);
 
     this.fragment.append(page);
+  }
+
+  public listenEvents(): void {
+    this.elem.addEventListener('click', this.actionHandler.bind(this));
+  }
+
+  public setActions(): void {
+    this.actions.moveLeft = this.moveLeft;
+    this.actions.moveRight = this.moveRight;
+  }
+
+  public moveLeft(): void {
+    if (!this.wordsHolder) {
+      return;
+    }
+    let currPosition = Number.parseInt(this.wordsHolder.style.left || '0');
+    const shift = 30;
+    currPosition -= shift;
+    this.wordsHolder.style.left = currPosition + 'px';
+  }
+
+  public moveRight(): void {
+    if (!this.wordsHolder) {
+      return;
+    }
+    let currPosition = Number.parseInt(this.wordsHolder.style.left || '0');
+    const shift = 30;
+    currPosition += shift;
+    this.wordsHolder.style.left = currPosition + 'px';
   }
 }
