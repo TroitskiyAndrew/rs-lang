@@ -1,6 +1,6 @@
 .dictionary {
-  position: relative;
-  span {
-    @include position;
+  &__holder {
+    display: flex;
+    gap: 10px;
   }
 }
