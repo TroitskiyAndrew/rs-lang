@@ -9,9 +9,17 @@ import { WordCard } from '../../api/api.types';
 export default class PageDictionary extends BaseComponent {
   wordsHolder: HTMLElement | undefined;
 
+  backGround = createDiv({ className: 'dictionary__backGround' });
+
+  currentWord: number;
+
+  wordElems: HTMLElement[];
+
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'pageDictionary';
+    this.currentWord = 0;
+    this.wordElems = [];
   }
 
   public oninit(): Promise<void> {
@@ -22,9 +30,14 @@ export default class PageDictionary extends BaseComponent {
     return wordsList.then((list: WordCard[]): void => {
       const words = new DocumentFragment;
       for (const word of list) {
-        words.append(createDiv({ className: 'dictionary__word', dataSet: { widget: 'wordsCard', wordId: word.id } }));
+        const newWord = createDiv({ className: 'dictionary__word', dataSet: { widget: 'wordsCard', wordId: word.id } });
+        this.wordElems.push(newWord);
+        words.append(newWord);
       }
+      const hundred = 100;
+      this.backGround.style.width = `${this.wordElems.length * hundred}%`;
       this.wordsHolder?.append(words);
+      this.move(0);
     });
   }
 
@@ -37,7 +50,7 @@ export default class PageDictionary extends BaseComponent {
     paginator.append(createButton({ className: 'paginator__move icon-button move-right', action: 'moveRight' }));
     this.wordsHolder = createDiv({ className: 'dictionary__holder' });
 
-
+    this.wordsHolder.append(this.backGround);
     page.append(levels);
     page.append(wordsList);
     wordsList.append(this.wordsHolder);
@@ -55,23 +68,29 @@ export default class PageDictionary extends BaseComponent {
     this.actions.moveRight = this.moveRight;
   }
 
-  public moveLeft(): void {
-    if (!this.wordsHolder) {
+  public move(position: number): void {
+    const wordsCount = this.wordElems.length;
+    (this.elem.querySelector('[data-action="moveRight"]') as HTMLButtonElement).disabled = position === wordsCount;
+    (this.elem.querySelector('[data-action="moveLeft"]') as HTMLButtonElement).disabled = this.currentWord === 0;
+    if (position >= wordsCount || position < 0) {
       return;
     }
-    let currPosition = Number.parseInt(this.wordsHolder.style.left || '0');
-    const shift = 30;
-    currPosition -= shift;
-    this.wordsHolder.style.left = currPosition + 'px';
+    this.currentWord = position;
+    const hundred = 100;
+    const fifty = 50;
+
+    for (let i = 0; i < wordsCount; i += 1) {
+
+      this.wordElems[i].style.left = `${((i - this.currentWord) * hundred + fifty)}%`;
+    }
+    this.backGround.style.left = `${-1 * hundred * this.currentWord}%`;
+  }
+
+  public moveLeft(): void {
+    this.move(this.currentWord - 1);
   }
 
   public moveRight(): void {
-    if (!this.wordsHolder) {
-      return;
-    }
-    let currPosition = Number.parseInt(this.wordsHolder.style.left || '0');
-    const shift = 30;
-    currPosition += shift;
-    this.wordsHolder.style.left = currPosition + 'px';
+    this.move(this.currentWord + 1);
   }
 }
