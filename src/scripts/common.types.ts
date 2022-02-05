@@ -29,6 +29,7 @@ export interface InputOptions extends HTMLElementOptions {
   type?: string,
   placeholder?: string;
   value?: string;
+  required?: boolean;
 }
 
 export type Link = {
