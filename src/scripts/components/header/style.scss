@@ -1,4 +1,7 @@
 .header {
-  @include flex($jc: space-between);
+  @include flex($jc: flex-start);
   width: 100%;
+  &__user {
+    margin-left: auto;
+  }
 }
