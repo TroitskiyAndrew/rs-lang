@@ -55,12 +55,13 @@ class ApiResourceService {
       body: JSON.stringify(user),
     });
     const authorization: Authorization = await rawResponse.json();
-    const { refreshToken, token, userId } = authorization;
+    const { refreshToken, token, userId, name } = authorization;
 
     updateState({
       token: token,
       refreshToken: refreshToken,
       userId: userId,
+      userName: name,
     });
 
     return authorization;
@@ -100,7 +101,6 @@ class ApiResourceService {
         'Accept': 'application/json',
       },
     });
-
 
     updateState({
       token: '',

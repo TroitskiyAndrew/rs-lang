@@ -4,11 +4,13 @@ export interface User {
   password: string;
 }
 export interface UserId {
+  name: string,
   id: string,
   email: string,
 }
 export interface Authorization {
   message: string,
+  name: string,
   refreshToken: string,
   token: string,
   userId: string,
