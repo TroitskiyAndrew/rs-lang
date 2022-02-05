@@ -61,7 +61,7 @@ export default class User extends BaseComponent {
       placeholder: 'Name*',
     });
     const nameWarning = createSpan({
-      text: 'Name is required field',
+      text: 'Name must contains at least 3 chars',
       className: 'modal-user__warning form-name__warning',
     });
 
@@ -87,13 +87,17 @@ export default class User extends BaseComponent {
       placeholder: 'Password*',
     });
     const passwordWarning = createSpan({
-      text: 'Password is too short - should be 8 chars minimum',
+      text: 'Password must contains at least 8 chars',
       className: 'modal-user__warning form-password__warning',
     });
     const togglePasswordBtn = document.createElement('i');
     togglePasswordBtn.classList.add('far', 'fa-eye');
     togglePasswordBtn.id = 'togglePassword';
 
+    const userExistWarning = createSpan({
+      text: 'Such user is already exists, sign in',
+      className: 'modal-user__warning form-exist__warning',
+    });
     this.registrationBtn = createButton({
       className: 'modal-user__submit registration',
       text: 'REGISTRATION',
@@ -129,6 +133,7 @@ export default class User extends BaseComponent {
     formPassword.append(passwordWarning);
     formPassword.append(togglePasswordBtn);
 
+    this.modalWindow.append(userExistWarning);
     this.modalWindow.append(this.registrationBtn);
     this.modalWindow.append(this.loginBtn);
     this.modalWindow.append(this.changeModalBtnL);
@@ -148,6 +153,10 @@ export default class User extends BaseComponent {
 
     (this.registrationBtn as HTMLInputElement).addEventListener('click', this.registrateAndLoginUser.bind(this));
     (this.loginBtn as HTMLInputElement).addEventListener('click', this.loginUser.bind(this));
+
+    this.inputName?.addEventListener('input', this.isValidateName.bind(this));
+    this.inputMail?.addEventListener('input', this.isValidateMail.bind(this));
+    this.inputPassword?.addEventListener('input', this.isValidatePassword.bind(this));
   }
 
   async registrateAndLoginUser(): Promise<void> {
@@ -158,10 +167,69 @@ export default class User extends BaseComponent {
       try {
         await apiService.createUser({ name, email, password });
       } catch (error) {
+        // todo
+        const existWarning = this.elem.querySelector('.form-exist__warning') as HTMLElement;
+        existWarning.textContent = 'Such user is already exists, sign in';
+        existWarning.classList.add('active');
         console.log('such User exists!!!!');
         return;
       }
       this.loginUser();
+    }
+  }
+
+  isValidateName(): boolean {
+    const namLength = 3;
+    const inputName = this.inputName as HTMLInputElement;
+    const nameWarning = this.elem.querySelector('.form-name__warning') as HTMLElement;
+    const name = inputName.value.trim();
+    if (name.length < namLength) {
+      inputName.classList.add('active');
+      nameWarning.classList.add('active');
+      // console.log('Name is required field ЛОГИН');
+      return false;
+    } else {
+      inputName.classList.remove('active');
+      nameWarning.classList.remove('active');
+      return true;
+    }
+  }
+
+  isValidateMail(): boolean {
+    this.disableExistWarning();
+
+    const inputMail = this.inputMail as HTMLInputElement;
+    const email = inputMail.value;
+    const reg = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
+    const mailWarning = this.elem.querySelector('.form-mail__warning') as HTMLElement;
+    if (reg.test(email) === false) {
+      inputMail.classList.add('active');
+      mailWarning.classList.add('active');
+      // console.log('Email should have correct format');
+      return false;
+    } else {
+      inputMail.classList.remove('active');
+      mailWarning.classList.remove('active');
+      return true;
+    }
+  }
+
+  isValidatePassword(): boolean {
+    this.disableExistWarning();
+
+    const inputPassword = this.inputPassword as HTMLInputElement;
+    const password = inputPassword.value.trim();
+    const minPasswordLength = 8;
+    const passwordWarning = this.elem.querySelector('.form-password__warning') as HTMLElement;
+    if (password.length < minPasswordLength) {
+      // console.log('Password is too short - should be 8 chars minimum.');
+      inputPassword.classList.add('active');
+      passwordWarning.classList.add('active');
+      return false;
+    } else {
+      inputPassword.classList.remove('active');
+      passwordWarning.classList.remove('active');
+      return true;
     }
   }
 
@@ -170,34 +238,15 @@ export default class User extends BaseComponent {
     password: string;
     name?: string;
   } | undefined {
+    const inputName = this.inputName as HTMLInputElement;
     const email = (this.inputMail as HTMLInputElement).value;
     const password = (this.inputPassword as HTMLInputElement).value.trim();
-    const reg = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
-    const minPasswordLength = 8;
     let isValid = true;
-
-    const name = (this.inputName as HTMLInputElement).value.trim();
+    const name = inputName.value.trim();
     if (isRegistration) {
-      if (!name.length) {
-        // todo
-        console.log('Name is required field ЛОГИН');
-        isValid = false;
-      }
+      isValid = this.isValidateName();
     }
-
-    if (reg.test(email) === false) {
-      // todo
-
-      console.log('Email should have correct format');
-      isValid = false;
-    }
-    if (password.length < minPasswordLength) {
-      // todo
-
-      console.log('Password is too short - should be 8 chars minimum.');
-      isValid = false;
-    }
-    if (isValid) {
+    if (isValid && this.isValidateMail() && this.isValidatePassword()) {
       return { email, password, name };
     }
   }
@@ -206,23 +255,27 @@ export default class User extends BaseComponent {
     if (this.verifyUser()) {
       const email = this.verifyUser()?.email as string;
       const password = this.verifyUser()?.password as string;
-
       try {
         await apiService.loginUser({ email, password });
         updateState({
           userEmail: email,
           userPassword: password,
         });
-
         this.closeModalWindow();
         this.disableLogo();
       } catch (error) {
-        // todo
-
-        console.log('Incorrect e-mail or password!');
+        const existWarning = this.elem.querySelector('.form-exist__warning') as HTMLElement;
+        existWarning.textContent = 'Incorrect e-mail or password!';
+        existWarning.classList.add('active');
+        // console.log('Incorrect e-mail or password!');
         return;
       }
     }
+  }
+
+  disableExistWarning(): void {
+    const existWarning = this.elem.querySelector('.form-exist__warning') as HTMLElement;
+    existWarning.classList.remove('active');
   }
 
   disableLogo(): void {
@@ -257,6 +310,7 @@ export default class User extends BaseComponent {
   }
 
   toggleRegisterModal(): void {
+    this.disableExistWarning();
     const registrationElems = this.elem.querySelectorAll('.registration');
     const loginElems = this.elem.querySelectorAll('.login');
     registrationElems.forEach(el => el.classList.toggle('show'));
