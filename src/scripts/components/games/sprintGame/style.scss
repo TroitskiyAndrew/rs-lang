@@ -1,0 +1,34 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sprint {
+  background-color: #6ce8e8;
+}
+
+.sprint__groups-wrapper {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #d7d7bd;
+  padding: 1rem;
+  border: 1px solid #eefbe8;
+}
+
+.sprint__groups-wrapper_text {
+  display: flex;
+  flex-direction: inherit;
+  align-items: inherit;
+}
+
+.sprint__groups-wrapper_paragraph {
+  text-align: center;
+}
+
+[class|=group] {
+  height: 2.6rem;
+  width: 2.6rem;
+}
