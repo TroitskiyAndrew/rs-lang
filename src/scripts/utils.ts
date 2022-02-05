@@ -57,6 +57,9 @@ export function createInput(options: InputOptions): HTMLInputElement {
   if (options.value) {
     input.value = options.value;
   }
+  if (options.required) {
+    input.required = options.required;
+  }
   return input;
 }
 
