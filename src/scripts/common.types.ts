@@ -9,6 +9,7 @@ export type TableHeader = {
 
 export interface HTMLElementOptions {
   className?: string,
+
 }
 
 export interface DivOptions extends HTMLElementOptions {
@@ -23,12 +24,14 @@ export interface ButtonOptions extends HTMLElementOptions {
   text?: string,
   action?: string,
   disabled?: boolean;
+  dataSet?: DataSet;
 }
 
 export interface InputOptions extends HTMLElementOptions {
   type?: string,
   placeholder?: string;
   value?: string;
+  required?: boolean;
 }
 
 export type Link = {
