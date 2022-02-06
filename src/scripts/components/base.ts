@@ -16,12 +16,14 @@ export default class BaseComponent {
   public fragment: DocumentFragment;
 
   public actions: {
-    [name: string]: () => void,
+    [name: string]: (ev?: Event) => void,
   };
 
   private isDisposed: boolean;
 
   private id: string;
+
+  public options = '';
 
   constructor(elem: HTMLElement) {
     this.name = '';
@@ -117,7 +119,7 @@ export default class BaseComponent {
 
     const action = target.dataset.action;
     if (action && this.actions[action]) {
-      this.actions[action].call(this);
+      this.actions[action].call(this, ev);
     }
 
 
