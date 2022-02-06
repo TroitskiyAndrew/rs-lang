@@ -11,7 +11,7 @@ window.onload = () => {
       const direction: string = target.dataset.direction as string;
 
       closeMenu();
-      updateContent(document.querySelector('#page-holder') as HTMLElement, direction);
+      updateContent(document.querySelector('#page-holder') as HTMLElement, direction, target.dataset.options);
     }
   });
 
