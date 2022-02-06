@@ -1,6 +1,6 @@
 // ToDo-1 Временно зачищаем localStorage при каждом запуске приложения, чтобы не хватать проблем с изменением состава state
 // Убрать, когда окончательно финализируем состава state
-localStorage.clear();
+// localStorage.clear();
 
 type State = {
   currentPage: string,
