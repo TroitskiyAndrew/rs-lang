@@ -1,8 +1,8 @@
 import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics } from './api.types';
 import { updateState, getState } from '../state';
 
-export const baseUrl = 'http://127.0.0.1:3000';
-// export const baseUrl = 'https://rs-learning-words.herokuapp.com';
+// export const baseUrl = 'http://127.0.0.1:3000';
+export const baseUrl = 'https://rs-learning-words.herokuapp.com';
 const signIn = `${baseUrl}/signin`;
 const users = `${baseUrl}/users`;
 const words = `${baseUrl}/words`;
