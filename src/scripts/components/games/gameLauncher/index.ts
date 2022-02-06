@@ -15,39 +15,100 @@ export default class GameLauncher extends BaseComponent {
 
   public createHTML(): void {
     const page = createDiv({ className: 'launcher-games' });
-    const backBtn = createDiv({ className: 'games__link', dataSet: { direction: 'pageGames' } });
-
-    const flagPole = createInput({
-      className: 'flagPole slider',
-      type: 'range',
-
+    const backBtn = createDiv({
+      className: 'launcher-games__link games__link ',
+      dataSet: {
+        direction: 'pageGames',
+      },
     });
-    flagPole.min = '0';
-    flagPole.max = '7';
+    const description = createDiv({
+      className: 'launcher-games__description game-description',
+    });
+    const titleDescription = createDiv({
+      className: 'game-description__title',
+    });
+    const textDescription = createSpan({
+      className: 'game-description__text',
+    });
+
+
+    const flagZone = createDiv({
+      className: 'flagPole-zone',
+    });
+    const flagZoneNumbers = createDiv({
+      className: 'flagPole-zone__numbers',
+    });
+    const flagPoleWrapper = createDiv({
+      className: 'flagPole-wrapper',
+    });
+    const flagPole = createInput({
+      className: 'flagPole',
+      type: 'range',
+    });
+    flagPole.min = '-1';
+    flagPole.max = '5';
     flagPole.step = '1';
-    const showText = createSpan({ text: 'value from range' });
+    flagPole.value = '-1';
+
+    const totalWordsGroup = 6;
+    for (let i = 0; i < totalWordsGroup; i++) {
+      const groupNumber = createDiv({
+        className: `flagPole__number flagPole__number${i}`,
+      });
+      groupNumber.textContent = `${i + 1}`;
+      flagZoneNumbers.append(groupNumber);
+    }
 
     flagPole.oninput = () => {
-      showText.textContent = flagPole.value;
+      const numbers = this.elem.querySelectorAll('.flagPole__number');
+      numbers.forEach(el => {
+        const isSelected = el.classList.contains(`flagPole__number${flagPole.value}`);
+        if (isSelected) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      });
+
+      const startGameBtn = this.elem.querySelector('.start-game') as HTMLDivElement;
+      if (flagPole.value !== '-1') {
+        startGameBtn.classList.add('enable');
+      } else {
+        startGameBtn.classList.remove('enable');
+      }
+      startGameBtn.dataset.options = flagPole.value;
     };
 
     if (this.options === 'audio-game') {
+      titleDescription.textContent = '«Аудиовызов»';
+      textDescription.innerText = `«Аудиовызов» - это тренировка, которая улучшает восприятие речи на слух.
+      Используйте мышь, чтобы выбрать.
+      Используйте цифровые клавиши от 1 до 4 для выбора ответа
+      Используйте пробел для подсказки или для перехода к следующему слову.
+      Для выбора уровня сложности подымите флаг)`;
+
       const gameAudio = createDiv({
-        className: 'games__link',
+        className: 'launcher-games__link games__link start-game',
         dataSet: {
           direction: 'audioGame',
         },
       });
-      gameAudio.append(createSpan({ text: 'Игра Аудио' }));
+      gameAudio.append(createSpan({ text: 'Начать игру Аудиовызов' }));
       page.append(gameAudio);
     } else if (this.options === 'sprint-game') {
+      titleDescription.textContent = '«Спринт»';
+      textDescription.innerText = `«Спринт» - Тренирует навык быстрого перевода с английского языка на русский. Вам нужно выбрать соответствует ли перевод предложенному слову.
+      Используйте мышь, чтобы выбрать.
+      Используйте цифровые клавиши 1 или 2 для выбора ответа.
+      Для выбора уровня сложности подымите флаг)`;
+
       const gameSprint = createDiv({
-        className: 'games__link',
+        className: 'launcher-games__link games__link start-game',
         dataSet: {
           direction: 'sprintGame',
         },
       });
-      gameSprint.append(createSpan({ text: 'Игра Спринт' }));
+      gameSprint.append(createSpan({ text: 'Начать игру Спринт' }));
       page.append(gameSprint);
     }
 
@@ -56,8 +117,13 @@ export default class GameLauncher extends BaseComponent {
 
 
     page.append(backBtn);
-    page.append(flagPole);
-    page.append(showText);
+    description.append(titleDescription);
+    description.append(textDescription);
+    page.append(description);
+    flagPoleWrapper.append(flagPole);
+    flagZone.append(flagPoleWrapper);
+    flagZone.append(flagZoneNumbers);
+    page.append(flagZone);
     this.fragment.append(page);
   }
 }

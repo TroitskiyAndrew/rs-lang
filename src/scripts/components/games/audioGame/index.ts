@@ -1,6 +1,6 @@
 import BaseComponent from '../../base';
 import { pageChenging } from '../../../rooting';
-import { createSpan, createDiv, createInput, createButton } from '../../../utils';
+import { createSpan, createDiv, createInput, createButton, getRandom } from '../../../utils';
 import { apiService } from '../../../api/apiMethods';
 // import { updateState, getState } from '../../../state';
 
@@ -37,11 +37,17 @@ export default class AudioGame extends BaseComponent {
 
 
   public listenEvents(): void {
-    (this.test as HTMLElement).addEventListener('click', this.showQuestion.bind(this));
+    (this.test as HTMLElement).addEventListener('click', this.showQuestion.bind(this, undefined));
   }
 
-  async showQuestion() {
-    const words = await apiService.getChunkOfWords(0, 0);
+  async showQuestion(group?: number) {
+    const minPage = 0;
+    const maxPage = 29;
+    const page = getRandom(minPage, maxPage);
+    const groupLevel = group ? group : +this.options;
+    console.log('option group', +this.options); //пустая строка == 0
+
+    const words = await apiService.getChunkOfWords(page, groupLevel);
     console.log(words);
 
   }
