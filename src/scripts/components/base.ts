@@ -43,6 +43,7 @@ export default class BaseComponent {
     this.elem.innerHTML = '';
     this.elem.dataset.inited = 'true';
     this.addLoading();
+    this.setActions();
     this.createHTML();
     this.pasteHTML();
     const initialization = this.oninit();

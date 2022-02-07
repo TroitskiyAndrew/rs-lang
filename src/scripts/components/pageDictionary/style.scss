@@ -1,6 +1,46 @@
 .dictionary {
-  position: relative;
-  span {
+  display: flex;
+  &__levels {
+    width: 200px;
+    flex-shrink: 0;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  &__holder {
+    width: 100%;
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  &__backGround {
+    position: absolute;
+    z-index: 1;
+    height: 100%;
+    background-image: url("/src/assets/img/background.jpg");
+    background-repeat-y: no-repeat;
+    background-size: contain;
+  }
+
+  &__word {
     @include position;
+    width: 500px;
+    z-index: 2;
+  }
+
+  &__word,
+  &__backGround {
+    transition: left 1s;
+  }
+
+  &__paginator {
+    display: flex;
+    height: 50px;
+    width: 100%;
+    background-color: $mid-grey;
   }
 }
