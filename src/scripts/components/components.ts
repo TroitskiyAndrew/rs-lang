@@ -10,11 +10,12 @@ import AudioGame from './games/audioGame';
 import GameLauncher from './games/gameLauncher';
 import WordsCard from './pageDictionary/wordCard';
 import User from './user';
+import FlagPole from './flagPole';
 
 
 
 export const components: {
-  [n: string]: { new(elem: HTMLElement): PageHome | PageGames | PageDictionary | PageStatistics | Menu | Header | SprintGame | AudioGame | WordsCard | User | GameLauncher; };
+  [n: string]: { new(elem: HTMLElement): PageHome | PageGames | PageDictionary | PageStatistics | Menu | Header | SprintGame | AudioGame | WordsCard | User | GameLauncher | FlagPole; };
 } = {
   pageHome: PageHome,
   pageGames: PageGames,
@@ -27,10 +28,11 @@ export const components: {
   wordsCard: WordsCard,
   user: User,
   gameLauncher: GameLauncher,
+  flagPole: FlagPole,
 };
 
 export const instances: {
-  [name: string]: PageHome | PageGames | PageDictionary | PageStatistics | Menu | Header | SprintGame | AudioGame | WordsCard | User | GameLauncher;
+  [name: string]: PageHome | PageGames | PageDictionary | PageStatistics | Menu | Header | SprintGame | AudioGame | WordsCard | User | GameLauncher | FlagPole;
 } = {
 
 };
