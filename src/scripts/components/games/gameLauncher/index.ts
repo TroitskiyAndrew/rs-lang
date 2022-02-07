@@ -83,23 +83,18 @@ export default class GameLauncher extends BaseComponent {
     this.fragment.append(page);
   }
 
-  /*   public listenEvents(): void {
-      (this.elem.querySelector('.launcher-games') as HTMLDivElement).addEventListener('change-flag', this.groupChangeFromFlag.bind(this));
-    } */
+  public listenEvents(): void {
+    (this.elem.querySelector('.launcher-games') as HTMLDivElement).addEventListener('change-flag', this.groupChangeFromFlag.bind(this));
+  }
 
-  /*   private groupChangeFromFlag(event: Event) {
-      const target = event.target as HTMLElement;
-      const widgetId = target.dataset.widgetId as string;
-      const widget = instances[widgetId] as FlagPole;
+  private groupChangeFromFlag(event: Event) {
+    const target = event.target as HTMLElement;
+    const widgetId = target.dataset.widgetId as string;
+    const widget = instances[widgetId] as FlagPole;
 
-      const startGameBtn = this.elem.querySelector('.start-game') as HTMLDivElement;
-      if (widget.value !== '-1') {
-        startGameBtn.classList.add('enable');
-      } else {
-        startGameBtn.classList.remove('enable');
-      }
-      startGameBtn.dataset.options = JSON.stringify({
-        'group': widget.value,
-      });
-    } */
+    const startGameBtn = this.elem.querySelector('.start-game') as HTMLDivElement;
+    startGameBtn.dataset.options = JSON.stringify({
+      'group': widget.value,
+    });
+  }
 }
