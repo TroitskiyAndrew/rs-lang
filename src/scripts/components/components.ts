@@ -7,13 +7,15 @@ import Menu from './menu';
 import Header from './header';
 import SprintGame from './games/sprintGame';
 import AudioGame from './games/audioGame';
+import GameLauncher from './games/gameLauncher';
 import WordsCard from './pageDictionary/wordCard';
 import User from './user';
+import FlagPole from './flagPole';
 
 
 
 export const components: {
-  [n: string]: { new(elem: HTMLElement): PageHome | PageGames | PageDictionary | PageStatistics | Menu | Header | SprintGame | AudioGame | WordsCard | User }
+  [n: string]: { new(elem: HTMLElement): PageHome | PageGames | PageDictionary | PageStatistics | Menu | Header | SprintGame | AudioGame | WordsCard | User | GameLauncher | FlagPole; };
 } = {
   pageHome: PageHome,
   pageGames: PageGames,
@@ -25,10 +27,12 @@ export const components: {
   audioGame: AudioGame,
   wordsCard: WordsCard,
   user: User,
+  gameLauncher: GameLauncher,
+  flagPole: FlagPole,
 };
 
 export const instances: {
-  [name: string]: PageHome | PageGames | PageDictionary | PageStatistics | Menu | Header | SprintGame | AudioGame | WordsCard | User
+  [name: string]: PageHome | PageGames | PageDictionary | PageStatistics | Menu | Header | SprintGame | AudioGame | WordsCard | User | GameLauncher | FlagPole;
 } = {
 
 };
