@@ -21,7 +21,7 @@ class ApiResourceService {
     return wordsResult;
   }
 
-  async getChunkOfWordsGroup(group: number): Promise<WordCard[][]> {
+  async getChunkOfWordsGroup(group: number): Promise<WordCard[]> {
     const minPage = constants.minWordsPage;
     const maxPage = constants.maxWordsPage;
 
@@ -29,7 +29,7 @@ class ApiResourceService {
     for (let i = minPage; i <= maxPage; i++) {
       allPromises.push(this.getChunkOfWords(i, group));
     }
-    return Promise.all(allPromises);
+    return (await Promise.all(allPromises)).flat();
   }
 
   // Get word by Id

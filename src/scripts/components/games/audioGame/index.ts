@@ -98,15 +98,15 @@ export default class AudioGame extends BaseComponent {
 
         const answer1 = createDiv({});
         answer1.textContent = this.wordsFromAPI.translateWords[1];
-        const answer2 = createDiv({});
-        answer2.textContent = this.wordsFromAPI.translateWords[2];
-        const answer3 = createDiv({});
-        answer3.textContent = this.wordsFromAPI.translateWords[3];
-        const answer4 = createDiv({});
-        answer4.textContent = this.wordsFromAPI.translateWords[4];
-        this.elem.append(answer4);
-        this.elem.append(answer3);
-        this.elem.append(answer2);
+        // const answer2 = createDiv({});
+        // answer2.textContent = this.wordsFromAPI.translateWords[2];
+        // const answer3 = createDiv({});
+        // answer3.textContent = this.wordsFromAPI.translateWords[3];
+        // const answer4 = createDiv({});
+        // answer4.textContent = this.wordsFromAPI.translateWords[4];
+        // this.elem.append(answer4);
+        // this.elem.append(answer3);
+        // this.elem.append(answer2);
         this.elem.append(answer1);
       }
     };
@@ -137,7 +137,6 @@ export default class AudioGame extends BaseComponent {
   async setAllTranslateWordsToState(): Promise<void> {
     if (this.group) {
       const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(this.group))
-        .flat()
         .map(elem => elem.wordTranslate);
       this.wordsFromAPI.translateWords = wordsTranslationGroup;
     }
