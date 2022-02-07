@@ -1,11 +1,18 @@
 import BaseComponent from '../../base';
 import { createButton, createDiv, createSpan } from '../../../utils';
 import { pageChenging } from '../../../rooting';
+// import GameLauncher from '../gameLauncher';
+
+interface IGameOptions {
+  group: string;
+}
+let options: IGameOptions;
 
 export default class SprintGame extends BaseComponent {
 
   // groupsWrapper: HTMLElement | undefined;
   // groupsWrapperButton: HTMLButtonElement | undefined;
+  group: string = '';
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -34,10 +41,26 @@ export default class SprintGame extends BaseComponent {
     const buttonsWrapper = createDiv({ className: 'buttons-wrapper' });
 
     const star = document.createElement('img');
+    star.className = 'group-img'
     star.src = '/../../../../assets/img/sprintGame/png/pixel_star_50px.png';
     console.log(star)
+    if (this.options) {
+      options = JSON.parse (this.options);
+      localStorage.setItem ('options', this.options);
+    } 
+    
+    if (options) {
+      this.group = options.group;
+    } else {
+      localStorage.getItem ('options') ? options = JSON.parse (localStorage.getItem ('options') as string) : options = {group: '0'};
+      this.group = options.group;
+    }
+
+    console.log('group ' + this.group)
 
     paramsLevelWrapper.append(star);
+    paramsLevelWrapper.innerHTML += `&#215;`;
+    paramsLevelWrapper.append(this.group);
     paramsWrapper.append(paramsLevelWrapper);
     sprintWrapper.append(paramsWrapper);
 
@@ -67,6 +90,11 @@ export default class SprintGame extends BaseComponent {
     // this.fragment.append(page);
   }
 
+  private setOptions() {
+    
+  }
+
+
   // public listenEvents(): void {
   //   this.groupsWrapper!.addEventListener('click', this.actionHandler.bind(this));
   // }
@@ -80,3 +108,20 @@ export default class SprintGame extends BaseComponent {
   //   //this.groupsWrapper!.style.display = 'none';
   // }
 }
+
+  // private definePageAndGroup(): void {
+  //   const options = this.options ? JSON.parse(this.options) : {};
+  //   this.page = getRandom(constants.minWordsPage, constants.maxWordsPage);
+
+  //   if (options.page) {
+  //     this.page = options.page;
+  //   }
+  //   this.group = getRandom(constants.minWordsGroup, constants.maxWordsGroup);
+  //   if (options.group) {
+  //     this.group = +options.group;
+  //   }
+
+  //   console.log('options', options);
+  //   console.log('this.page', this.page);
+  //   console.log('this.group', this.group);
+  // }
