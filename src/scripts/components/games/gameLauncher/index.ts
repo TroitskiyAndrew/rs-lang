@@ -2,11 +2,12 @@ import BaseComponent from '../../base';
 import { createDiv, createSpan, createButton, createInput } from '../../../utils';
 import { pageChenging } from '../../../rooting';
 import constants from '../../../app.constants';
+import { instances } from '../../components';
+import FlagPole from '../../flagPole';
 
 export default class GameLauncher extends BaseComponent {
 
   flagPole: HTMLInputElement | undefined;
-
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -35,33 +36,6 @@ export default class GameLauncher extends BaseComponent {
     const textDescription = createSpan({
       className: 'game-description__text',
     });
-
-
-    const flagZone = createDiv({
-      className: 'flagPole-zone',
-    });
-    const flagZoneNumbers = createDiv({
-      className: 'flagPole-zone__numbers',
-    });
-    const flagPoleWrapper = createDiv({
-      className: 'flagPole-wrapper',
-    });
-    this.flagPole = createInput({
-      className: 'flagPole',
-      type: 'range',
-    });
-    this.flagPole.min = '-1';
-    this.flagPole.max = '5';
-    this.flagPole.step = '1';
-    this.flagPole.value = '-1';
-
-    for (let i = 0; i <= constants.maxWordsGroup; i++) {
-      const groupNumber = createDiv({
-        className: `flagPole__number flagPole__number${i}`,
-      });
-      groupNumber.textContent = `${i + 1}`;
-      flagZoneNumbers.append(groupNumber);
-    }
 
     if (this.options === 'audio-game') {
       titleDescription.textContent = '«Аудиовызов»';
@@ -101,36 +75,31 @@ export default class GameLauncher extends BaseComponent {
     description.append(titleDescription);
     description.append(textDescription);
     page.append(description);
-    flagPoleWrapper.append(this.flagPole);
-    flagZone.append(flagPoleWrapper);
-    flagZone.append(flagZoneNumbers);
-    page.append(flagZone);
+
+    page.append(createDiv({
+      className: '',
+      dataSet: { widget: 'flagPole' },
+    }));
     this.fragment.append(page);
   }
 
-  public listenEvents(): void {
-    (this.flagPole as HTMLInputElement).addEventListener('input', this.groupChangeFromFlag.bind(this));
-  }
+  /*   public listenEvents(): void {
+      (this.elem.querySelector('.launcher-games') as HTMLDivElement).addEventListener('change-flag', this.groupChangeFromFlag.bind(this));
+    } */
 
-  groupChangeFromFlag() {
-    const numbers = this.elem.querySelectorAll('.flagPole__number');
-    numbers.forEach(el => {
-      const isSelected = el.classList.contains(`flagPole__number${this.flagPole?.value}`);
-      if (isSelected) {
-        el.classList.add('active');
+  /*   private groupChangeFromFlag(event: Event) {
+      const target = event.target as HTMLElement;
+      const widgetId = target.dataset.widgetId as string;
+      const widget = instances[widgetId] as FlagPole;
+
+      const startGameBtn = this.elem.querySelector('.start-game') as HTMLDivElement;
+      if (widget.value !== '-1') {
+        startGameBtn.classList.add('enable');
       } else {
-        el.classList.remove('active');
+        startGameBtn.classList.remove('enable');
       }
-    });
-
-    const startGameBtn = this.elem.querySelector('.start-game') as HTMLDivElement;
-    if (this.flagPole?.value !== '-1') {
-      startGameBtn.classList.add('enable');
-    } else {
-      startGameBtn.classList.remove('enable');
-    }
-    startGameBtn.dataset.options = JSON.stringify({
-      'group': this.flagPole?.value,
-    });
-  }
+      startGameBtn.dataset.options = JSON.stringify({
+        'group': widget.value,
+      });
+    } */
 }
