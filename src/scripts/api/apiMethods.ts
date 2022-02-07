@@ -1,5 +1,6 @@
 import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics } from './api.types';
 import { updateState, getState } from '../state';
+import constants from '../app.constants';
 
 // export const baseUrl = 'http://127.0.0.1:3000';
 export const baseUrl = 'https://rs-learning-words.herokuapp.com';
@@ -18,6 +19,17 @@ class ApiResourceService {
     const wordsResult = await response.json();
     // console.log(wordsResult);
     return wordsResult;
+  }
+
+  async getChunkOfWordsGroup(group: number): Promise<WordCard[][]> {
+    const minPage = constants.minWordsPage;
+    const maxPage = constants.maxWordsPage;
+
+    const allPromises: Promise<WordCard[]>[] = [];
+    for (let i = minPage; i <= maxPage; i++) {
+      allPromises.push(this.getChunkOfWords(i, group));
+    }
+    return Promise.all(allPromises);
   }
 
   // Get word by Id

@@ -1,8 +1,13 @@
 import BaseComponent from '../../base';
 import { createDiv, createSpan, createButton, createInput } from '../../../utils';
 import { pageChenging } from '../../../rooting';
+import constants from '../../../app.constants';
 
 export default class GameLauncher extends BaseComponent {
+
+  flagPole: HTMLInputElement | undefined;
+
+
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'gameLauncher';
@@ -41,43 +46,22 @@ export default class GameLauncher extends BaseComponent {
     const flagPoleWrapper = createDiv({
       className: 'flagPole-wrapper',
     });
-    const flagPole = createInput({
+    this.flagPole = createInput({
       className: 'flagPole',
       type: 'range',
     });
-    flagPole.min = '-1';
-    flagPole.max = '5';
-    flagPole.step = '1';
-    flagPole.value = '-1';
+    this.flagPole.min = '-1';
+    this.flagPole.max = '5';
+    this.flagPole.step = '1';
+    this.flagPole.value = '-1';
 
-    const totalWordsGroup = 6;
-    for (let i = 0; i < totalWordsGroup; i++) {
+    for (let i = 0; i <= constants.maxWordsGroup; i++) {
       const groupNumber = createDiv({
         className: `flagPole__number flagPole__number${i}`,
       });
       groupNumber.textContent = `${i + 1}`;
       flagZoneNumbers.append(groupNumber);
     }
-
-    flagPole.oninput = () => {
-      const numbers = this.elem.querySelectorAll('.flagPole__number');
-      numbers.forEach(el => {
-        const isSelected = el.classList.contains(`flagPole__number${flagPole.value}`);
-        if (isSelected) {
-          el.classList.add('active');
-        } else {
-          el.classList.remove('active');
-        }
-      });
-
-      const startGameBtn = this.elem.querySelector('.start-game') as HTMLDivElement;
-      if (flagPole.value !== '-1') {
-        startGameBtn.classList.add('enable');
-      } else {
-        startGameBtn.classList.remove('enable');
-      }
-      startGameBtn.dataset.options = flagPole.value;
-    };
 
     if (this.options === 'audio-game') {
       titleDescription.textContent = '«Аудиовызов»';
@@ -112,18 +96,41 @@ export default class GameLauncher extends BaseComponent {
       page.append(gameSprint);
     }
 
-
     backBtn.append(createSpan({ text: 'back' }));
-
-
     page.append(backBtn);
     description.append(titleDescription);
     description.append(textDescription);
     page.append(description);
-    flagPoleWrapper.append(flagPole);
+    flagPoleWrapper.append(this.flagPole);
     flagZone.append(flagPoleWrapper);
     flagZone.append(flagZoneNumbers);
     page.append(flagZone);
     this.fragment.append(page);
+  }
+
+  public listenEvents(): void {
+    (this.flagPole as HTMLInputElement).addEventListener('input', this.groupChangeFromFlag.bind(this));
+  }
+
+  groupChangeFromFlag() {
+    const numbers = this.elem.querySelectorAll('.flagPole__number');
+    numbers.forEach(el => {
+      const isSelected = el.classList.contains(`flagPole__number${this.flagPole?.value}`);
+      if (isSelected) {
+        el.classList.add('active');
+      } else {
+        el.classList.remove('active');
+      }
+    });
+
+    const startGameBtn = this.elem.querySelector('.start-game') as HTMLDivElement;
+    if (this.flagPole?.value !== '-1') {
+      startGameBtn.classList.add('enable');
+    } else {
+      startGameBtn.classList.remove('enable');
+    }
+    startGameBtn.dataset.options = JSON.stringify({
+      'group': this.flagPole?.value,
+    });
   }
 }
