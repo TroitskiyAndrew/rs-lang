@@ -5,6 +5,7 @@ import { pageChenging } from '../../../rooting';
 
 interface IGameOptions {
   group: string;
+  page?: string;
 }
 let options: IGameOptions;
 
@@ -13,6 +14,7 @@ export default class SprintGame extends BaseComponent {
   // groupsWrapper: HTMLElement | undefined;
   // groupsWrapperButton: HTMLButtonElement | undefined;
   group: string = '';
+  page: string = '';
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -51,9 +53,11 @@ export default class SprintGame extends BaseComponent {
     
     if (options) {
       this.group = options.group;
+      if (options.page) this.page = options.page;
     } else {
       localStorage.getItem ('options') ? options = JSON.parse (localStorage.getItem ('options') as string) : options = {group: '0'};
       this.group = options.group;
+      if (options.page) this.page = options.page;
     }
 
     console.log('group ' + this.group)
