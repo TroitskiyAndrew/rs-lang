@@ -15,6 +15,7 @@ export default class SprintGame extends BaseComponent {
   // groupsWrapperButton: HTMLButtonElement | undefined;
   group: string = '';
   page: string = '';
+  
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -34,18 +35,36 @@ export default class SprintGame extends BaseComponent {
     const paramsWrapper = createDiv({ className: 'params-wrapper' });
     const paramsLevelWrapper = createDiv({ className: 'params-wrapper__level' });
     const paramsMultiplyerWrapper = createDiv({ className: 'params-wrapper__multiplyer' });
-    const paramsTimeWrapper = createDiv({ className: 'params-wrapper__time' });
+    const paramsTime = createDiv({ className: 'params-wrapper__time' });
+    const paramsScore = createDiv({ className: 'params-wrapper__score'})
 
-    const marioWrapper = createDiv({ className: 'mario-wrapper' });
-    const marioGifWrapper = createDiv({ className: 'mario-wrapper__gif' });
-    
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
     const buttonsWrapper = createDiv({ className: 'buttons-wrapper' });
+
+    const marioWrapper = createDiv({ className: 'mario-wrapper' });
+    //const marioGifWrapper = createDiv({ className: 'mario-wrapper__gif' });
 
     const star = document.createElement('img');
     star.className = 'group-img'
     star.src = '/../../../../assets/img/sprintGame/png/pixel_star_50px.png';
-    console.log(star)
+
+    // const multiplyerBorderImg = document.createElement('img');
+    // multiplyerBorderImg.className = 'params-wrapper__multiplyer-border';
+    // multiplyerBorderImg.src = '/../../../../assets/img/sprintGame/png/ItemStock-cut.png';
+    // TEST
+    const multiplyerItem = document.createElement('img');
+    multiplyerItem.className = 'params-wrapper__multiplyer-item';
+    multiplyerItem.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
+    // TEST
+
+    const mario = document.createElement('img');
+    mario.className = 'mario-img'
+    mario.src = '/../../../../assets/img/sprintGame/gif/Mario_SMW.gif';
+
+    const coin = document.createElement('img');
+    coin.className = 'coin-img'
+    coin.src = '/../../../../assets/img/sprintGame/gif/CoinSMW.gif';
+
     if (this.options) {
       options = JSON.parse (this.options);
       localStorage.setItem ('options', this.options);
@@ -65,8 +84,25 @@ export default class SprintGame extends BaseComponent {
     paramsLevelWrapper.append(star);
     paramsLevelWrapper.innerHTML += `&#215;`;
     paramsLevelWrapper.append(this.group);
+
+    paramsMultiplyerWrapper.append(multiplyerItem);
+    //multiplyerBorderImg.append(multiplyerItem);
+    
+
+    paramsTime.innerHTML = `time<br> 60`;
+    paramsScore.textContent = '0';
+
     paramsWrapper.append(paramsLevelWrapper);
+    
+    paramsWrapper.append(paramsMultiplyerWrapper);
+    paramsWrapper.append(paramsTime);
+    paramsWrapper.append(paramsScore);
+
+    marioWrapper.append(mario);
+    marioWrapper.append(coin);
+    
     sprintWrapper.append(paramsWrapper);
+    sprintWrapper.append(marioWrapper);
 
     page.append(sprintWrapper);
     this.fragment.append(page);
@@ -129,3 +165,12 @@ export default class SprintGame extends BaseComponent {
   //   console.log('this.page', this.page);
   //   console.log('this.group', this.group);
   // }
+
+
+        // const multiplyerItem = new Image;
+      // multiplyerItem.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
+      // multiplyerItem.className = 'params-wrapper__multiplyer-item'
+      // multiplyerItem.onload = () => {
+      //   paramsMultiplyerWrapper.append(multiplyerItem);
+      // }
+      // // TEST
