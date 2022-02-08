@@ -16,7 +16,7 @@ class ApiResourceService {
     const response = await fetch(
       `${words}?page=${page}&group=${group}`,
     );
-    const wordsResult = await response.json();
+    const wordsResult: WordCard[] = await response.json();
     // console.log(wordsResult);
     return wordsResult;
   }

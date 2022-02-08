@@ -1,6 +1,6 @@
 import BaseComponent from '../../base';
 import { pageChenging } from '../../../rooting';
-import { createSpan, createDiv, createInput, createButton, getRandom } from '../../../utils';
+import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 // import { updateState, getState } from '../../../state';
 import constants from '../../../app.constants';
@@ -19,17 +19,28 @@ export default class AudioGame extends BaseComponent {
 
   group: number | undefined;
 
+  nextBtn: HTMLButtonElement | undefined;
+
+  questionNumber = 0;
+
+  audio = new Audio();
+
 
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'audioGame';
   }
 
-  public oninit(): Promise<void> {
+  public async oninit(): Promise<void> {
     pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
 
     // получаю с АПИ данные
+    await this.setAllTranslateWordsToState();
+    await this.setAllQuestionWordsToState();
+    console.log('this.wordsFromAPI', this.wordsFromAPI);
     // стартую первый раз игру
+    this.showNextQuestion();
+
     return Promise.resolve();
   }
 
@@ -48,94 +59,144 @@ export default class AudioGame extends BaseComponent {
     console.log('options', options);
     console.log('this.page', this.page);
     console.log('this.group', this.group);
-
   }
 
 
   public createHTML(): void {
     this.definePageAndGroup();
 
-    // this.setAllTranslateWordsToState();
-    // console.log('this.wordsFromAPI.translateWords', this.wordsFromAPI.translateWords);
-    console.log('this.wordsFromAPI', this.wordsFromAPI);
+    const audioPage = createDiv({ className: 'audio-game' });
 
-
-
-    this.test = createButton({
-      text: 'test span Audio game',
+    const upperContent = createDiv({
+      className: 'audio-game__upperContent',
     });
-    const test2 = createButton({
-      text: 'first-answer',
-      className: 'first-answer',
+
+    const imageDiv = createDiv({
+      className: 'audio-game__image',
     });
-    test2.onclick = () => {
-      console.log('this.wordsFromAPI333', this.wordsFromAPI);
-      if (this.wordsFromAPI.questionWords) {
-        console.log('first if');
 
-        const audio = new Audio();
-        audio.src = baseUrl + '/' + this.wordsFromAPI.questionWords[0].audio;
-        audio.play();
-        const img = createDiv({});
-        img.style.background = `url(${baseUrl}/${this.wordsFromAPI.questionWords[0].image})`;
-        img.style.width = '200px';
-        img.style.height = '200px';
-        img.style.borderRadius = '50%';
+    const lowerContent = createDiv({
+      className: 'audio-game__lowerContent',
+    });
+    const audioWrapper = createDiv({
+      className: 'audio-game__audio-wrapper',
+    });
+    const audioWord = createSpan({
+      className: 'audio-game__word',
+      text: 'english word(replace)',
+    });
 
-        const question = createSpan({
-          text: `${this.wordsFromAPI.questionWords[0].word}`,
-        });
+    const answersField = createDiv({
+      className: 'audio-game__answers audio-answers',
+    });
 
-        // img.onload = () => {
-        //   console.log('this.elem', this.elem);
-        // };
-        this.elem.append(img);
-        this.elem.append(question);
-      }
+    this.nextBtn = createButton({
+      className: 'audio-game__next',
+      text: 'следующий',
+    });
 
-      if (this.wordsFromAPI.translateWords) {
-        console.log('second if');
+    upperContent.append(imageDiv);
+    audioPage.append(upperContent);
 
-        const answer1 = createDiv({});
-        answer1.textContent = this.wordsFromAPI.translateWords[1];
-        // const answer2 = createDiv({});
-        // answer2.textContent = this.wordsFromAPI.translateWords[2];
-        // const answer3 = createDiv({});
-        // answer3.textContent = this.wordsFromAPI.translateWords[3];
-        // const answer4 = createDiv({});
-        // answer4.textContent = this.wordsFromAPI.translateWords[4];
-        // this.elem.append(answer4);
-        // this.elem.append(answer3);
-        // this.elem.append(answer2);
-        this.elem.append(answer1);
-      }
-    };
+    lowerContent.append(audioWrapper);
+    lowerContent.append(audioWord);
 
+    audioPage.append(lowerContent);
+    audioPage.append(answersField);
+    audioPage.append(this.nextBtn);
 
-    this.fragment.append(this.test);
-    this.fragment.append(test2);
+    this.fragment.append(audioPage);
   }
 
   public listenEvents(): void {
-    (this.test as HTMLElement).addEventListener('click', this.showQuestion.bind(this, undefined));
+    (this.nextBtn as HTMLElement).addEventListener('click', this.showNextQuestion.bind(this));
   }
 
-  async showQuestion() {
-    // todo сохранить в переменную, и тягать оттуда слова, а не каждый раз делать запрос.Аналогично с запросом из getChunkOfWords
-    await this.setAllTranslateWordsToState();
-    await this.setAllQuestionWordsToState();
-    console.log('this.wordsFromAPI222', this.wordsFromAPI);
-    /*       const words: WordCard[] = await apiService.getChunkOfWords(this.page, this.group);
-          console.log(words);
+  async showNextQuestion() {
+    // Проверка на количество вопросов, если 20-е, то модальное окно со статистикой
+    const totalQuestions = 19;
+    if (this.questionNumber > totalQuestions) {
+      console.log('show statistics');
+      this.questionNumber = 0;
+      return;
+    }
 
-          const wordsTranslationGroup: string[] = (await apiService.getChunkOfWordsGroup(this.group)).flat().map(elem => elem.wordTranslate);
-          // 600 слов перевод
-          console.log('all group words', wordsTranslationGroup); */
+    if (!this.wordsFromAPI.questionWords) return;
+    const currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
+    console.log('currentQuestionCard', currentQuestionCard);
+
+    // меняем на новую картинку при завершении ответа
+    const imageDiv = this.elem.querySelector('.audio-game__image') as HTMLElement;
+    const img = new Image();
+    img.src = `${baseUrl}/${currentQuestionCard.image}`;
+    img.onload = () => {
+      imageDiv.style.backgroundImage = `url(${img.src})`;
+      imageDiv.classList.add('show');
+    };
+
+    // меняем на новый аудио звук
+    // при завершении ответа иконку звука уменьшаем
+    const audioWrapper = this.elem.querySelector('.audio-game__audio-wrapper') as HTMLElement;
+    audioWrapper.innerHTML = '';
+    const audioBtn = createButton({
+      className: 'audio-game__audio icon-button',
+    });
+    audioWrapper.append(audioBtn);
+
+    audioBtn.addEventListener('click', () => {
+      console.log('audio btn!');
+      this.audio.currentTime = 0;
+      this.audio.src = `${baseUrl}/${currentQuestionCard.audio}`;
+      this.audio.play();
+    });
+
+    // меняем на новый англ текст при завершении ответа
+    const audioWord = this.elem.querySelector('.audio-game__word') as HTMLElement;
+    audioWord.textContent = currentQuestionCard.word;
+
+
+    // меняем на новые варианты ответов
+    const answersField = this.elem.querySelector('.audio-answers') as HTMLElement;
+    answersField.innerHTML = '';
+    const correctAnswer = 'answer1';
+    // перемешивать основную группу уже не нужно, только ответы между собой и 3 неверных ответа
+    // const a = this.wordsFromAPI.questionWords;
+    // if (a) {
+    //   shuffleArray<WordCard>(a);
+    //   console.log('a', a);
+    // }
+    // console.log(this.questionNumber);
+
+    // let answers = [];
+    //   answers.push(currentAuthor);
+    //   answers.push(uniqueOtherAuthors[0]);
+    //   answers.push(uniqueOtherAuthors[1]);
+    //   answers.push(uniqueOtherAuthors[2]);
+
+    for (let i = 0; i < constants.answersInAudioGame; i++) {
+      const answerDiv = createDiv({
+        className: 'audio-answers__answer',
+      });
+      answerDiv.textContent = `answer${i + 1}`;
+
+      answerDiv.addEventListener('click', () => {
+        if (answerDiv.textContent === correctAnswer) {
+          console.log('correct');
+        } else {
+          console.log('wrong');
+        }
+        this.questionNumber += 1;
+        this.showNextQuestion();
+        console.log(this.questionNumber);
+      });
+
+      answersField.append(answerDiv);
+    }
 
   }
 
   async setAllTranslateWordsToState(): Promise<void> {
-    if (this.group) {
+    if (this.group !== undefined) {
       const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(this.group))
         .map(elem => elem.wordTranslate);
       this.wordsFromAPI.translateWords = wordsTranslationGroup;
@@ -143,17 +204,11 @@ export default class AudioGame extends BaseComponent {
   }
 
   async setAllQuestionWordsToState(): Promise<void> {
-    if (this.group && this.page) {
+    if (this.group !== undefined && this.page !== undefined) {
       const words: WordCard[] = await apiService.getChunkOfWords(this.page, this.group);
+      shuffleArray<WordCard>(words);
       this.wordsFromAPI.questionWords = words;
     }
   }
-
-  /*   async setQuestionWordsToState(group: number): Promise<string[]> {
-      const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(group))
-        .flat()
-        .map(elem => elem.wordTranslate);
-      return wordsTranslationGroup;
-    } */
 
 }

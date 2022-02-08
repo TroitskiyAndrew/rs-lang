@@ -1,0 +1,72 @@
+.audio-game {
+  display: flex;
+  flex-direction: column;
+  // justify-content: center;
+  align-items: center;
+  background-color: #c2c2c2;
+  width: 100%;
+  height: 100%;
+
+  .audio-game__answers {
+    margin: 20px;
+  }
+}
+
+.audio-game__upperContent {
+  width: 100%;
+
+  .audio-game__image {
+    display: block;
+    transform: scale(0);
+    margin: 3rem auto 0;
+    width: 390px;
+    height: 260px;
+    // padding-bottom: 30%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    transition: all 0.3s ease 0s;
+
+    &.show {
+      transform: scale(1);
+    }
+  }
+}
+
+.audio-game__lowerContent {
+  display: flex;
+  width: 50%;
+  align-items: center;
+  column-gap: 20px;
+
+  .audio-game__audio-wrapper {
+    flex: 0 1 50%;
+
+    .audio-game__audio {
+      display: block;
+      margin-left: auto;
+
+      &.icon-button::before {
+        content: '\f144';
+        font-size: 100px;
+      }
+    }
+  }
+
+  .audio-game__word {
+    display: block;
+    flex: 0 1 50%;
+    color: $brand-color;
+  }
+}
+
+.audio-answers {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 20px;
+
+  .audio-answers__answer {
+    cursor: pointer;
+  }
+}

@@ -4,6 +4,7 @@ type Constnts = {
   maxWordsGroup: number;
   minWordsPage: number;
   maxWordsPage: number;
+  answersInAudioGame: number;
 };
 
 const constants: Constnts = {
@@ -12,6 +13,7 @@ const constants: Constnts = {
   maxWordsGroup: 5,
   minWordsPage: 0,
   maxWordsPage: 29,
+  answersInAudioGame: 4,
 };
 
 export default constants;
