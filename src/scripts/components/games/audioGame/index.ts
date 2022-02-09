@@ -27,6 +27,17 @@ export default class AudioGame extends BaseComponent {
 
   audio = new Audio();
 
+  isChangeablePage = false;
+
+  correctAnswer = '';
+
+  nextTextBtn = 'следующий вопрос';
+
+  showResultTextBtn = 'показать ответ';
+
+  showStatisticsTextBtn = 'показать статистику';
+
+
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -83,7 +94,7 @@ export default class AudioGame extends BaseComponent {
     });
     const questionCurrentAmount = createSpan({
       className: 'questionsAmount__current',
-      text: '1',
+      text: '',
     });
     const questionTotalAmount = createSpan({
       className: 'questionsAmount__total',
@@ -110,7 +121,7 @@ export default class AudioGame extends BaseComponent {
     });
     const audioWord = createSpan({
       className: 'questionField__word',
-      text: 'english word(replace)',
+      text: '',
     });
 
     const answersField = createDiv({
@@ -119,7 +130,7 @@ export default class AudioGame extends BaseComponent {
 
     this.nextBtn = createButton({
       className: 'audio-game__next',
-      text: 'следующий',
+      text: '',
     });
 
     questionsAmount.append(questionCurrentAmount);
@@ -147,22 +158,30 @@ export default class AudioGame extends BaseComponent {
   }
 
   nextQuestion() {
-    this.questionNumber++;
-    this.showNextQuestion();
+    if (this.isChangeablePage) {
+      this.questionNumber++;
+      this.showNextQuestion();
+      this.isChangeablePage = false;
+    } else {
+      // show answer
+      (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
+      this.shoWrongAnswer();
+      console.log('show answer');
+      this.isChangeablePage = true;
+    }
   }
 
   async showNextQuestion() {
-    if (!this.totalQuestions) return;
+    if (!this.totalQuestions || !this.nextBtn) return;
     // Проверка на количество вопросов, если 20-е, то модальное окно со статистикой
-    if (this.questionNumber === this.totalQuestions) {
-      this.nextBtn!.textContent = 'показать результаты';
-    }
 
     if (this.questionNumber > this.totalQuestions) {
-      console.log('show statistics');
+      console.log('STATISTICS!');
+      this.nextBtn.style.pointerEvents = 'none';
       return;
-      this.questionNumber = 0;
     }
+
+    this.nextBtn.textContent = this.showResultTextBtn;
 
     const currentQuestionSpan = this.elem.querySelector('.questionsAmount__current') as HTMLElement;
     currentQuestionSpan.textContent = `${this.questionNumber + 1}`;
@@ -205,9 +224,9 @@ export default class AudioGame extends BaseComponent {
     const answersField = this.elem.querySelector('.audio-answers') as HTMLElement;
     answersField.innerHTML = '';
 
-    const correctAnswer = currentQuestionCard.wordTranslate;
+    this.correctAnswer = currentQuestionCard.wordTranslate;
     if (!this.wordsFromAPI.translateWords) return;
-    const answers = this.getArrOfAnswers(correctAnswer, this.wordsFromAPI.translateWords);
+    const answers = this.getArrOfAnswers(this.correctAnswer, this.wordsFromAPI.translateWords);
 
     for (let i = 0; i < constants.answersInAudioGame; i++) {
       const answerDiv = createDiv({
@@ -216,10 +235,10 @@ export default class AudioGame extends BaseComponent {
       answerDiv.textContent = `${answers[i]}`;
 
       answerDiv.addEventListener('click', () => {
-        if (answerDiv.textContent === correctAnswer) {
-          this.correctAnswer(correctAnswer);
+        if (answerDiv.textContent === this.correctAnswer) {
+          this.showCorrectAnswer();
         } else {
-          this.wrongAnswer(correctAnswer);
+          this.shoWrongAnswer();
         }
       });
 
@@ -228,10 +247,10 @@ export default class AudioGame extends BaseComponent {
 
   }
 
-  correctAnswer(correctAnswer: string) {
+  showCorrectAnswer() {
     const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
     allDivAnswers.forEach(divAnswer => {
-      if (divAnswer.textContent === correctAnswer) {
+      if (divAnswer.textContent === this.correctAnswer) {
         divAnswer.classList.add('correct');
       } else { divAnswer.classList.add('disable'); }
     },
@@ -241,10 +260,10 @@ export default class AudioGame extends BaseComponent {
     this.answerResult();
   }
 
-  wrongAnswer(correctAnswer: string) {
+  shoWrongAnswer() {
     const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
     allDivAnswers.forEach(divAnswer => {
-      if (divAnswer.textContent === correctAnswer) {
+      if (divAnswer.textContent === this.correctAnswer) {
         divAnswer.classList.add('wrong');
       } else { divAnswer.classList.add('disable'); }
     },
@@ -256,8 +275,12 @@ export default class AudioGame extends BaseComponent {
 
   answerResult() {
     console.log(this.questionNumber);
-    // const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
+    this.isChangeablePage = true;
+    (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
 
+    if (this.questionNumber === this.totalQuestions) {
+      (this.nextBtn as HTMLElement).textContent = this.showStatisticsTextBtn;
+    }
   }
 
   async setAllTranslateWordsToState(): Promise<void> {
