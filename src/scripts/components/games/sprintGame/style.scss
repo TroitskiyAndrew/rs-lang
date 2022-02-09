@@ -10,7 +10,7 @@
   background-image: url("/src/assets/img/sprintGame/jpg/3-cut.jpg");
   width: 60%;
   height: 80%;
-  background-size: cover;
+  background-size: 1080px;
   background-repeat: no-repeat;
   background-position: bottom;
 
@@ -18,6 +18,7 @@
 
 .params-wrapper {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   align-items: center;
   justify-content: center;
@@ -71,7 +72,7 @@
   
   // gap: 20px;
   position: absolute;
-  bottom: 92px;
+  bottom: 165px;
   left: 50%;
 }
 

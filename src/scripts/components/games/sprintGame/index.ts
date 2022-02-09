@@ -16,7 +16,6 @@ export default class SprintGame extends BaseComponent {
   group: string = '';
   page: string = '';
   
-
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'sprintGame';
@@ -31,18 +30,27 @@ export default class SprintGame extends BaseComponent {
   public createHTML(): void {
     const page = createDiv({ className: 'page sprint' });
     const sprintWrapper = createDiv({ className: 'sprint-wrapper' });
-
     const paramsWrapper = createDiv({ className: 'params-wrapper' });
+    const marioWrapper = createDiv({ className: 'mario-wrapper' });
+    const gamepadWrapper = createDiv({ className: 'gamepad-wrapper'});
+    const wordsWrapper = createDiv({ className: 'words-wrapper' });
+
+    this.renderGamepad(gamepadWrapper);
+    this.renderParams(paramsWrapper);
+    this.renderMario(marioWrapper);
+    
+    sprintWrapper.append(paramsWrapper);
+    sprintWrapper.append(marioWrapper);
+
+    page.append(sprintWrapper);
+    this.fragment.append(page);
+  }
+
+  private renderParams(paramsWrapper: HTMLDivElement) {
     const paramsLevelWrapper = createDiv({ className: 'params-wrapper__level' });
     const paramsMultiplyerWrapper = createDiv({ className: 'params-wrapper__multiplyer' });
     const paramsTime = createDiv({ className: 'params-wrapper__time' });
-    const paramsScore = createDiv({ className: 'params-wrapper__score'})
-
-    const wordsWrapper = createDiv({ className: 'words-wrapper' });
-    const buttonsWrapper = createDiv({ className: 'buttons-wrapper' });
-
-    const marioWrapper = createDiv({ className: 'mario-wrapper' });
-    //const marioGifWrapper = createDiv({ className: 'mario-wrapper__gif' });
+    const paramsScore = createDiv({ className: 'params-wrapper__score'});
 
     const star = document.createElement('img');
     star.className = 'group-img'
@@ -51,19 +59,12 @@ export default class SprintGame extends BaseComponent {
     // const multiplyerBorderImg = document.createElement('img');
     // multiplyerBorderImg.className = 'params-wrapper__multiplyer-border';
     // multiplyerBorderImg.src = '/../../../../assets/img/sprintGame/png/ItemStock-cut.png';
+    
     // TEST
     const multiplyerItem = document.createElement('img');
     multiplyerItem.className = 'params-wrapper__multiplyer-item';
     multiplyerItem.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
     // TEST
-
-    const mario = document.createElement('img');
-    mario.className = 'mario-img'
-    mario.src = '/../../../../assets/img/sprintGame/gif/Mario_SMW.gif';
-
-    const coin = document.createElement('img');
-    coin.className = 'coin-img'
-    coin.src = '/../../../../assets/img/sprintGame/gif/CoinSMW.gif';
 
     if (this.options) {
       options = JSON.parse (this.options);
@@ -86,54 +87,51 @@ export default class SprintGame extends BaseComponent {
     paramsLevelWrapper.append(this.group);
 
     paramsMultiplyerWrapper.append(multiplyerItem);
-    //multiplyerBorderImg.append(multiplyerItem);
-    
 
     paramsTime.innerHTML = `time<br> 60`;
     paramsScore.textContent = '0';
 
     paramsWrapper.append(paramsLevelWrapper);
-    
     paramsWrapper.append(paramsMultiplyerWrapper);
     paramsWrapper.append(paramsTime);
     paramsWrapper.append(paramsScore);
+  }
+
+  private renderMario(marioWrapper: HTMLDivElement) {
+    const mario = document.createElement('img');
+    mario.className = 'mario-img'
+    mario.src = '/../../../../assets/img/sprintGame/gif/Mario_SMW.gif';
+
+    const coin = document.createElement('img');
+    coin.className = 'coin-img'
+    coin.src = '/../../../../assets/img/sprintGame/gif/CoinSMW.gif';
 
     marioWrapper.append(mario);
     marioWrapper.append(coin);
-    
-    sprintWrapper.append(paramsWrapper);
-    sprintWrapper.append(marioWrapper);
-
-    page.append(sprintWrapper);
-    this.fragment.append(page);
-    
-
-
-    // const groupsWrapperText = createDiv({ className: 'sprint__groups-wrapper_text' });
-    // const groupsWrapperButtons = createDiv({ className: 'sprint__groups-wrapper_buttons' });
-    
-    // groupsWrapperText.innerHTML =  `
-    // <h3>Спринт</h3>
-    // <p class = "sprint__groups-wrapper_paragraph">Тренирует навык быстрого перевода с английского языка на русский. 
-    // Вам нужно выбрать соответствует ли перевод предложенному слову.</p>
-    // `;
-
-    // for (let i=0; i < 6; i++) {
-    //   this.groupsWrapperButton = createButton({ text: `${i + 1}`, className: `group-${i}`, action: 'showSprintGame'});
-    //   groupsWrapperButtons.append(this.groupsWrapperButton);
-    // }
-    
-    // this.groupsWrapper.append(groupsWrapperText);
-    // this.groupsWrapper.append(groupsWrapperButtons);
-
-    // page.append(this.groupsWrapper);
-    // this.fragment.append(page);
   }
 
-  private setOptions() {
-    
+  private renderGamepad(gamepadWrapper: HTMLDivElement) {
+    const buttonsWrapper = createDiv({ className: 'buttons-wrapper' });
+    const controlsWrapper = createDiv({ className: 'controls-wrapper' });
+
+    const buttonBWrapper = createDiv({ className: 'buttons-wrapper__button-wrapper' });
+    const buttonBBack = createDiv({ className: 'buttons-wrapper__back' });
+    const buttonBCapture = createDiv({ className: 'buttons-wrapper__capture' });
+    const buttonB = createButton({className: 'buttons-wrapper__button'})
+
+    const buttonAWrapper = createDiv({ className: 'buttons-wrapper__button-wrapper' });
+    const buttonABack = createDiv({ className: 'buttons-wrapper__back' });
+    const buttonACapture = createDiv({ className: 'buttons-wrapper__capture' });
+    const buttonA = createButton({className: 'buttons-wrapper__button'})
+
+    const controlsBack = createDiv({ className: 'controls-wrapper__back' });
+    const controlsCapture = createDiv({ className: 'controls-wrapper__capture' });
+    const controlSelect = createDiv({ className: 'controls-wrapper__select' });
+    const controlStart = createDiv({ className: 'controls-wrapper__start' }); 
   }
 
+
+}
 
   // public listenEvents(): void {
   //   this.groupsWrapper!.addEventListener('click', this.actionHandler.bind(this));
@@ -147,7 +145,6 @@ export default class SprintGame extends BaseComponent {
   //   console.log(this.groupsWrapperButton?.className.slice(-1))
   //   //this.groupsWrapper!.style.display = 'none';
   // }
-}
 
   // private definePageAndGroup(): void {
   //   const options = this.options ? JSON.parse(this.options) : {};
@@ -167,10 +164,10 @@ export default class SprintGame extends BaseComponent {
   // }
 
 
-        // const multiplyerItem = new Image;
-      // multiplyerItem.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
-      // multiplyerItem.className = 'params-wrapper__multiplyer-item'
-      // multiplyerItem.onload = () => {
-      //   paramsMultiplyerWrapper.append(multiplyerItem);
-      // }
-      // // TEST
+    // const multiplyerItem = new Image;
+  // multiplyerItem.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
+  // multiplyerItem.className = 'params-wrapper__multiplyer-item'
+  // multiplyerItem.onload = () => {
+  //   paramsMultiplyerWrapper.append(multiplyerItem);
+  // }
+  // // TEST
