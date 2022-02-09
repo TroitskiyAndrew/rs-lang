@@ -48,6 +48,7 @@ export default class AudioGame extends BaseComponent {
     pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
 
     // получаю с АПИ данные
+    // todo новые слова перезаписать ТУТ!, которые придут не связанные с группой
     await this.setAllQuestionWordsToState();
     await this.setAllTranslateWordsToState();
     console.log('this.wordsFromAPI', this.wordsFromAPI);
@@ -150,7 +151,7 @@ export default class AudioGame extends BaseComponent {
       this.isChangeablePage = false;
     } else {
       (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
-      this.showWrongAnswer();
+      this.answerResult(false);
       this.isChangeablePage = true;
     }
   }
@@ -216,9 +217,9 @@ export default class AudioGame extends BaseComponent {
 
       answerDiv.addEventListener('click', () => {
         if (answerFromDiv[1] === this.correctAnswer) {
-          this.showCorrectAnswer();
+          this.answerResult(true);
         } else {
-          this.showWrongAnswer();
+          this.answerResult(false);
         }
       });
 
@@ -227,37 +228,23 @@ export default class AudioGame extends BaseComponent {
 
   }
 
-  showCorrectAnswer() {
+  answerResult(answer: boolean) {
     const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
     allDivAnswers.forEach(divAnswer => {
       if (divAnswer.textContent) {
         const answerFromDiv = divAnswer.textContent.split('. ');
         if (answerFromDiv[1] === this.correctAnswer) {
-          divAnswer.classList.add('correct');
+          if (answer) {
+            divAnswer.classList.add('correct');
+          } else {
+            divAnswer.classList.add('wrong');
+          }
+
         } else { divAnswer.classList.add('disable'); }
       }
     },
     );
 
-    this.answerResult();
-  }
-
-  showWrongAnswer() {
-    const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
-    allDivAnswers.forEach(divAnswer => {
-      if (divAnswer.textContent) {
-        const answerFromDiv = divAnswer.textContent.split('. ');
-        if (answerFromDiv[1] === this.correctAnswer) {
-          divAnswer.classList.add('wrong');
-        } else { divAnswer.classList.add('disable'); }
-      }
-    },
-    );
-
-    this.answerResult();
-  }
-
-  answerResult() {
     console.log(this.questionNumber);
     this.isChangeablePage = true;
     (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
@@ -281,6 +268,7 @@ export default class AudioGame extends BaseComponent {
       const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(this.group))
         .map(elem => elem.wordTranslate);
 
+      // todo новые слова перепроверить ТУТ!, которые придут не связанные с группой
       const filterWordsOfCurrentGroup = this.wordsFromAPI.questionWords?.map(card => {
         return card.wordTranslate;
       });
