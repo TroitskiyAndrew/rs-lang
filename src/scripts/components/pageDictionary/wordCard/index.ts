@@ -1,22 +1,22 @@
 import BaseComponent from '../../base';
-import { createDiv } from '../../../utils';
-import { apiService } from '../../../api/apiMethods';
+import { createButton, createDiv } from '../../../utils';
+import { apiService, baseUrl } from '../../../api/apiMethods';
 import { WordCard } from '../../../api/api.types';
 
 export default class WordsCard extends BaseComponent {
-  word: HTMLElement | undefined;
+  word: HTMLElement = createDiv({ className: 'wordCard__word' });
 
-  wordRu: HTMLElement | undefined;
+  wordRu: HTMLElement = createDiv({ className: 'wordCard__wordRu' });
 
-  meaning: HTMLElement | undefined;
+  meaning: HTMLElement = createDiv({ className: 'wordCard__meaning' });
 
-  meaningRu: HTMLElement | undefined;
+  meaningRu: HTMLElement = createDiv({ className: 'wordCard__meaningRu' });
 
-  example: HTMLElement | undefined;
+  example: HTMLElement = createDiv({ className: 'wordCard__example' });
 
-  exampleRu: HTMLElement | undefined;
+  exampleRu: HTMLElement = createDiv({ className: 'wordCard__exampleRu' });
 
-  transcription: HTMLElement | undefined;
+  transcription: HTMLElement = createDiv({ className: 'wordCard__transcription' });
 
   file: string;
 
@@ -28,8 +28,6 @@ export default class WordsCard extends BaseComponent {
     this.file = '';
   }
 
-
-
   public oninit(): Promise<void> {
     const wordRequest = apiService.getWord(this.elem.dataset.wordId as string);
     return wordRequest.then((word: WordCard) => {
@@ -39,24 +37,21 @@ export default class WordsCard extends BaseComponent {
         this.file = match[0] as string;
       }
 
-      (this.word as HTMLElement).innerHTML = word.word;
-      (this.wordRu as HTMLElement).innerHTML = word.wordTranslate;
-      (this.meaning as HTMLElement).innerHTML = word.textMeaning;
-      (this.meaningRu as HTMLElement).innerHTML = word.textMeaningTranslate;
-      (this.example as HTMLElement).innerHTML = word.textExample;
-      (this.exampleRu as HTMLElement).innerHTML = word.textExampleTranslate;
-      (this.transcription as HTMLElement).innerHTML = word.transcription;
+      this.word.innerHTML = word.word;
+      this.wordRu.innerHTML = word.wordTranslate;
+      this.meaning.innerHTML = word.textMeaning;
+      this.meaningRu.innerHTML = word.textMeaningTranslate;
+      this.example.innerHTML = word.textExample;
+      this.exampleRu.innerHTML = word.textExampleTranslate;
+      this.transcription.innerHTML = word.transcription;
+
+      this.word.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayWord' }));
+      this.example.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayExample' }));
+      this.meaning.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayMeaning' }));
     });
   }
 
   public createHTML(): void {
-    this.word = createDiv({ className: 'wordCard__word' });
-    this.wordRu = createDiv({ className: 'wordCard__wordRu' });
-    this.meaning = createDiv({ className: 'wordCard__meaning' });
-    this.meaningRu = createDiv({ className: 'wordCard__meaningRu' });
-    this.example = createDiv({ className: 'wordCard__example' });
-    this.exampleRu = createDiv({ className: 'wordCard__exampleRu' });
-    this.transcription = createDiv({ className: 'wordCard__transcription' });
 
     this.fragment.append(this.word);
     this.fragment.append(this.transcription);
@@ -67,4 +62,33 @@ export default class WordsCard extends BaseComponent {
     this.fragment.append(this.exampleRu);
 
   }
+
+  public listenEvents(): void {
+    this.elem.addEventListener('click', this.actionHandler.bind(this));
+  }
+
+  public setActions(): void {
+    this.actions.sayWord = this.sayWord;
+    this.actions.sayExample = this.sayExample;
+    this.actions.sayMeaning = this.sayMeaning;
+  }
+
+  sayWord(): void {
+    const url = `${baseUrl}/files/${this.file}.mp3`;
+
+    this.playAudio(url);
+  }
+
+  sayExample(): void {
+    const url = `${baseUrl}/files/${this.file}_example.mp3`;
+
+    this.playAudio(url);
+  }
+
+  sayMeaning(): void {
+    const url = `${baseUrl}/files/${this.file}_meaning.mp3`;
+
+    this.playAudio(url);
+  }
+
 }

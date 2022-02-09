@@ -38,6 +38,11 @@ export function createButton(options: ButtonOptions): HTMLButtonElement {
   if (options.action) {
     button.dataset.action = options.action;
   }
+  if (options.dataSet) {
+    for (const key of Object.keys(options.dataSet)) {
+      button.dataset[key] = options.dataSet[key];
+    }
+  }
   if (options.disabled) {
     button.disabled = true;
   }
