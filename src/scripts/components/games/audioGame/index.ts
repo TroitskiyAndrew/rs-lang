@@ -23,6 +23,8 @@ export default class AudioGame extends BaseComponent {
 
   questionNumber = 0;
 
+  totalQuestions: number | undefined;
+
   audio = new Audio();
 
 
@@ -35,9 +37,18 @@ export default class AudioGame extends BaseComponent {
     pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
 
     // получаю с АПИ данные
-    await this.setAllTranslateWordsToState();
     await this.setAllQuestionWordsToState();
+    await this.setAllTranslateWordsToState();
     console.log('this.wordsFromAPI', this.wordsFromAPI);
+
+    if (!this.wordsFromAPI.questionWords) return;
+    this.totalQuestions = this.wordsFromAPI.questionWords.length - 1;
+    const totalQuestionSpan = this.elem.querySelector('.questionsAmount__total') as HTMLElement;
+    if (this.totalQuestions) {
+      totalQuestionSpan.textContent = `/${this.totalQuestions + 1}`;
+    } else {
+      totalQuestionSpan.textContent = '/20';
+    }
     // стартую первый раз игру
     this.showNextQuestion();
 
@@ -67,22 +78,38 @@ export default class AudioGame extends BaseComponent {
 
     const audioPage = createDiv({ className: 'audio-game' });
 
+    const questionsAmount = createDiv({
+      className: 'audio-game__questionsAmount questionsAmount',
+    });
+    const questionCurrentAmount = createSpan({
+      className: 'questionsAmount__current',
+      text: '1',
+    });
+    const questionTotalAmount = createSpan({
+      className: 'questionsAmount__total',
+    });
+
+    const questionField = createDiv({
+      className: 'audio-game__questionField questionField',
+
+    });
+
     const upperContent = createDiv({
-      className: 'audio-game__upperContent',
+      className: 'questionField__upperContent',
     });
 
     const imageDiv = createDiv({
-      className: 'audio-game__image',
+      className: 'questionField__image',
     });
 
     const lowerContent = createDiv({
-      className: 'audio-game__lowerContent',
+      className: 'questionField__lowerContent',
     });
     const audioWrapper = createDiv({
-      className: 'audio-game__audio-wrapper',
+      className: 'questionField__audio-wrapper',
     });
     const audioWord = createSpan({
-      className: 'audio-game__word',
+      className: 'questionField__word',
       text: 'english word(replace)',
     });
 
@@ -95,13 +122,20 @@ export default class AudioGame extends BaseComponent {
       text: 'следующий',
     });
 
+    questionsAmount.append(questionCurrentAmount);
+    questionsAmount.append(questionTotalAmount);
+    audioPage.append(questionsAmount);
+
     upperContent.append(imageDiv);
-    audioPage.append(upperContent);
+    questionField.append(upperContent);
+    audioPage.append(questionField);
+
 
     lowerContent.append(audioWrapper);
     lowerContent.append(audioWord);
+    questionField.append(lowerContent);
 
-    audioPage.append(lowerContent);
+    audioPage.append(questionField);
     audioPage.append(answersField);
     audioPage.append(this.nextBtn);
 
@@ -109,24 +143,36 @@ export default class AudioGame extends BaseComponent {
   }
 
   public listenEvents(): void {
-    (this.nextBtn as HTMLElement).addEventListener('click', this.showNextQuestion.bind(this));
+    (this.nextBtn as HTMLElement).addEventListener('click', this.nextQuestion.bind(this));
+  }
+
+  nextQuestion() {
+    this.questionNumber++;
+    this.showNextQuestion();
   }
 
   async showNextQuestion() {
+    if (!this.totalQuestions) return;
     // Проверка на количество вопросов, если 20-е, то модальное окно со статистикой
-    const totalQuestions = 19;
-    if (this.questionNumber > totalQuestions) {
-      console.log('show statistics');
-      this.questionNumber = 0;
-      return;
+    if (this.questionNumber === this.totalQuestions) {
+      this.nextBtn!.textContent = 'показать результаты';
     }
+
+    if (this.questionNumber > this.totalQuestions) {
+      console.log('show statistics');
+      return;
+      this.questionNumber = 0;
+    }
+
+    const currentQuestionSpan = this.elem.querySelector('.questionsAmount__current') as HTMLElement;
+    currentQuestionSpan.textContent = `${this.questionNumber + 1}`;
 
     if (!this.wordsFromAPI.questionWords) return;
     const currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
     console.log('currentQuestionCard', currentQuestionCard);
 
     // меняем на новую картинку при завершении ответа
-    const imageDiv = this.elem.querySelector('.audio-game__image') as HTMLElement;
+    const imageDiv = this.elem.querySelector('.questionField__image') as HTMLElement;
     const img = new Image();
     img.src = `${baseUrl}/${currentQuestionCard.image}`;
     img.onload = () => {
@@ -136,10 +182,10 @@ export default class AudioGame extends BaseComponent {
 
     // меняем на новый аудио звук
     // при завершении ответа иконку звука уменьшаем
-    const audioWrapper = this.elem.querySelector('.audio-game__audio-wrapper') as HTMLElement;
+    const audioWrapper = this.elem.querySelector('.questionField__audio-wrapper') as HTMLElement;
     audioWrapper.innerHTML = '';
     const audioBtn = createButton({
-      className: 'audio-game__audio icon-button',
+      className: 'questionField__audio icon-button',
     });
     audioWrapper.append(audioBtn);
 
@@ -151,43 +197,30 @@ export default class AudioGame extends BaseComponent {
     });
 
     // меняем на новый англ текст при завершении ответа
-    const audioWord = this.elem.querySelector('.audio-game__word') as HTMLElement;
+    const audioWord = this.elem.querySelector('.questionField__word') as HTMLElement;
     audioWord.textContent = currentQuestionCard.word;
 
 
     // меняем на новые варианты ответов
     const answersField = this.elem.querySelector('.audio-answers') as HTMLElement;
     answersField.innerHTML = '';
-    const correctAnswer = 'answer1';
-    // перемешивать основную группу уже не нужно, только ответы между собой и 3 неверных ответа
-    // const a = this.wordsFromAPI.questionWords;
-    // if (a) {
-    //   shuffleArray<WordCard>(a);
-    //   console.log('a', a);
-    // }
-    // console.log(this.questionNumber);
 
-    // let answers = [];
-    //   answers.push(currentAuthor);
-    //   answers.push(uniqueOtherAuthors[0]);
-    //   answers.push(uniqueOtherAuthors[1]);
-    //   answers.push(uniqueOtherAuthors[2]);
+    const correctAnswer = currentQuestionCard.wordTranslate;
+    if (!this.wordsFromAPI.translateWords) return;
+    const answers = this.getArrOfAnswers(correctAnswer, this.wordsFromAPI.translateWords);
 
     for (let i = 0; i < constants.answersInAudioGame; i++) {
       const answerDiv = createDiv({
         className: 'audio-answers__answer',
       });
-      answerDiv.textContent = `answer${i + 1}`;
+      answerDiv.textContent = `${answers[i]}`;
 
       answerDiv.addEventListener('click', () => {
         if (answerDiv.textContent === correctAnswer) {
-          console.log('correct');
+          this.correctAnswer(correctAnswer);
         } else {
-          console.log('wrong');
+          this.wrongAnswer(correctAnswer);
         }
-        this.questionNumber += 1;
-        this.showNextQuestion();
-        console.log(this.questionNumber);
       });
 
       answersField.append(answerDiv);
@@ -195,11 +228,54 @@ export default class AudioGame extends BaseComponent {
 
   }
 
+  correctAnswer(correctAnswer: string) {
+    const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
+    allDivAnswers.forEach(divAnswer => {
+      if (divAnswer.textContent === correctAnswer) {
+        divAnswer.classList.add('correct');
+      } else { divAnswer.classList.add('disable'); }
+    },
+    );
+
+    console.log('correct');
+    this.answerResult();
+  }
+
+  wrongAnswer(correctAnswer: string) {
+    const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
+    allDivAnswers.forEach(divAnswer => {
+      if (divAnswer.textContent === correctAnswer) {
+        divAnswer.classList.add('wrong');
+      } else { divAnswer.classList.add('disable'); }
+    },
+    );
+
+    console.log('wrong');
+    this.answerResult();
+  }
+
+  answerResult() {
+    console.log(this.questionNumber);
+    // const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
+
+  }
+
   async setAllTranslateWordsToState(): Promise<void> {
     if (this.group !== undefined) {
       const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(this.group))
         .map(elem => elem.wordTranslate);
-      this.wordsFromAPI.translateWords = wordsTranslationGroup;
+
+      const filterWordsOfCurrentGroup = this.wordsFromAPI.questionWords?.map(card => {
+        return card.wordTranslate;
+      });
+      // перевод слов 600 штук - 20 из нашей группы = 580
+      const filteredChunk = wordsTranslationGroup.filter(word => {
+        if (filterWordsOfCurrentGroup) {
+          return !filterWordsOfCurrentGroup.includes(word);
+        }
+      });
+
+      this.wordsFromAPI.translateWords = filteredChunk;
     }
   }
 
@@ -209,6 +285,18 @@ export default class AudioGame extends BaseComponent {
       shuffleArray<WordCard>(words);
       this.wordsFromAPI.questionWords = words;
     }
+  }
+
+  private getArrOfAnswers(correctAnswer: string, fakeArrayAnswers: string[]): string[] {
+    shuffleArray(fakeArrayAnswers);
+    const answers = [];
+    answers.push(correctAnswer);
+    for (let i = 0; i < constants.answersInAudioGame - 1; i++) {
+      answers.push(fakeArrayAnswers[i]);
+    }
+    // shuffling 4 answers
+    shuffleArray(answers);
+    return answers;
   }
 
 }
