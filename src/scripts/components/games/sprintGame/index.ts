@@ -2,13 +2,12 @@ import BaseComponent from '../../base';
 import { createButton, createDiv, createSpan, getRandom } from '../../../utils';
 import { pageChenging } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
+import { IGameOptions, IWordAndTranslation } from './sprintGameTypes';
 // import GameLauncher from '../gameLauncher';
 
-interface IGameOptions {
-  group: string;
-  page?: string;
-}
+const GROUP_WORDS_NUMBER = 600;
 let options: IGameOptions;
+let groupWordsArr: IWordAndTranslation[];
 
 export default class SprintGame extends BaseComponent {
 
@@ -33,19 +32,18 @@ export default class SprintGame extends BaseComponent {
     const sprintWrapper = createDiv({ className: 'sprint-wrapper' });
     const paramsWrapper = createDiv({ className: 'params-wrapper' });
     const marioWrapper = createDiv({ className: 'mario-wrapper' });
-    const gamepadWrapper = createDiv({ className: 'gamepad-wrapper'});
+    const gamepadWrapper = createDiv({ className: 'gamepad-wrapper' });
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
 
     this.getGroupAndPage();
-
-    // apiService.getChunkOfWordsGroup(Number(this.group)) {
-    //   console.log(`this.group ${this.group}`)
-    // }
 
     this.renderParams(paramsWrapper);
     this.renderMario(marioWrapper);
     this.renderGamepad(gamepadWrapper);
     this.renderWords(wordsWrapper);
+    
+    //this.addLoading();
+    this.getWordsArray();
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
@@ -173,12 +171,42 @@ export default class SprintGame extends BaseComponent {
     const engWord = createDiv({ className: 'eng-word' });
     const translatedWord = createDiv({ className: 'translated-word' });
 
-    engWord.textContent = 'word';
-    translatedWord.textContent = 'слово';
+    engWord.textContent = '';
+    translatedWord.textContent = '';
     wordsWrapper.append(engWord);
     wordsWrapper.append(translatedWord);
   }
+
+  private async getWordsArray() {
+    if (options.page === undefined) {
+      groupWordsArr = [];
+      
+      await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
+        words.forEach((el) => {
+          const elMod: IWordAndTranslation =  {word: `${el.word}`, wordTranslate: `${el.wordTranslate}`};
+           groupWordsArr.push(elMod);
+        })
+      });
+      console.log(groupWordsArr)
+      
+    }
+    this.getRandomWords(groupWordsArr);
+  }
+
+  private getRandomWords(groupWordsArr: IWordAndTranslation[]) {
+    const word = this.elem.querySelector('.eng-word') as HTMLDivElement;
+    const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
+    word!.textContent = groupWordsArr[getRandom(0, GROUP_WORDS_NUMBER)].word;
+    wordTranslate!.textContent = groupWordsArr[getRandom(0, GROUP_WORDS_NUMBER)].wordTranslate;
+  }
+
+
+
 }
+
+//TODO:
+// 1) LOADER
+
 
 
 
