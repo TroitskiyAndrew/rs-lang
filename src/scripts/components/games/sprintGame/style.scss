@@ -7,6 +7,9 @@
 
 .sprint-wrapper {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background-image: url("/src/assets/img/sprintGame/jpg/3-cut.jpg");
   width: 60%;
   height: 80%;
@@ -65,16 +68,90 @@
 }
 
 .mario-img, .coin-img {
-  height: 2.6rem;
+  height: 3.6rem;
 }
 
 .mario-wrapper {
-  
   // gap: 20px;
   position: absolute;
   bottom: 165px;
   left: 50%;
 }
+
+.gamepad-wrapper {
+  display: flex;
+  // flex-direction: row;
+  justify-content: center;
+  text-transform: uppercase;
+  color: #DD3836;
+  font-weight: 800;
+  margin-bottom: 15px;
+  gap: 25px;
+}
+
+.buttons-wrapper {
+  display: flex;
+  gap: 15px;
+}
+
+.controls-wrapper__back{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 45px;
+  border-radius: 5px;
+  background-color: #DADADA;
+}
+
+.controls-wrapper__select, .controls-wrapper__start {
+  background-color: #4E4E4E;
+  width: 50px;
+  height: 15px;
+  border-radius: 4px;
+}
+
+.buttons-wrapper__button-wrapper {
+  flex-direction: column;
+  margin-top: 26px;
+}
+.buttons-wrapper__back {
+  background-color: #DADADA;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+}
+
+.buttons-wrapper__button {
+  background-color: #DD3836;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.buttons-wrapper__capture {
+  text-align: end;
+}
+
+.words-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+.eng-word {
+  font-size: 4.6rem;
+  font-weight: bold;
+}
+
+.translated-word {
+  font-size: 2.6rem;
+}
+
 
 // .sprint {
 //   background-color: #6ce8e8;

@@ -35,12 +35,16 @@ export default class SprintGame extends BaseComponent {
     const gamepadWrapper = createDiv({ className: 'gamepad-wrapper'});
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
 
-    this.renderGamepad(gamepadWrapper);
+    
     this.renderParams(paramsWrapper);
     this.renderMario(marioWrapper);
+    this.renderGamepad(gamepadWrapper);
+    this.renderWords(wordsWrapper);
     
     sprintWrapper.append(paramsWrapper);
+    sprintWrapper.append(wordsWrapper);
     sprintWrapper.append(marioWrapper);
+    sprintWrapper.append(gamepadWrapper);
 
     page.append(sprintWrapper);
     this.fragment.append(page);
@@ -126,12 +130,46 @@ export default class SprintGame extends BaseComponent {
 
     const controlsBack = createDiv({ className: 'controls-wrapper__back' });
     const controlsCapture = createDiv({ className: 'controls-wrapper__capture' });
-    const controlSelect = createDiv({ className: 'controls-wrapper__select' });
-    const controlStart = createDiv({ className: 'controls-wrapper__start' }); 
+    const controlSelect = createButton({ className: 'controls-wrapper__select' });
+    const controlStart = createButton({ className: 'controls-wrapper__start' }); 
+
+    controlsWrapper.append(controlsCapture);
+    controlsCapture.innerHTML = 'select&nbsp;&nbsp;&nbsp;&nbsp;start';
+    controlsWrapper.append(controlsBack);
+    controlsBack.append(controlSelect);
+    controlsBack.append(controlStart);
+
+    controlsWrapper.append(buttonsWrapper);
+    
+    buttonsWrapper.append(buttonBWrapper);
+    buttonBWrapper.append(buttonBBack);
+    buttonBWrapper.append(buttonBCapture);
+    buttonBCapture.textContent = 'B';
+    buttonBBack.append(buttonB);
+
+    buttonsWrapper.append(buttonAWrapper);
+    buttonAWrapper.append(buttonABack);
+    buttonAWrapper.append(buttonACapture);
+    buttonACapture.textContent = 'A';
+    buttonABack.append(buttonA);
+
+    gamepadWrapper.append(controlsWrapper);
+    gamepadWrapper.append(buttonsWrapper);
+  }
+
+  private renderWords(wordsWrapper: HTMLDivElement) {
+    const engWord = createDiv({ className: 'eng-word' });
+    const translatedWord = createDiv({ className: 'translated-word' });
+
+    engWord.textContent = 'word';
+    translatedWord.textContent = 'слово';
+    wordsWrapper.append(engWord);
+    wordsWrapper.append(translatedWord);
   }
 
 
 }
+
 
   // public listenEvents(): void {
   //   this.groupsWrapper!.addEventListener('click', this.actionHandler.bind(this));
