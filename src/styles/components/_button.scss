@@ -16,12 +16,24 @@ button {
   content: "\f11b";
 }
 
-.icon-button.move-left::before {
+.icon-button.step-back::before {
   content: "\f060";
 }
 
-.icon-button.move-right::before {
+.icon-button.step-forward::before {
   content: "\f061";
+}
+
+.icon-button.prevPage::before {
+  content: "\f060";
+}
+
+.icon-button.nextPage::before {
+  content: "\f061";
+}
+
+.icon-button.volume::before {
+  content: "\f028";
 }
 
 .icon-button._crossed {
