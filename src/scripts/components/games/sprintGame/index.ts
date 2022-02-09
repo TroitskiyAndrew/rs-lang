@@ -1,6 +1,7 @@
 import BaseComponent from '../../base';
-import { createButton, createDiv, createSpan } from '../../../utils';
+import { createButton, createDiv, createSpan, getRandom } from '../../../utils';
 import { pageChenging } from '../../../rooting';
+import { apiService } from '../../../api/apiMethods';
 // import GameLauncher from '../gameLauncher';
 
 interface IGameOptions {
@@ -34,6 +35,12 @@ export default class SprintGame extends BaseComponent {
     const marioWrapper = createDiv({ className: 'mario-wrapper' });
     const gamepadWrapper = createDiv({ className: 'gamepad-wrapper'});
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
+
+    this.getGroupAndPage();
+
+    // apiService.getChunkOfWordsGroup(Number(this.group)) {
+    //   console.log(`this.group ${this.group}`)
+    // }
 
     this.renderParams(paramsWrapper);
     this.renderMario(marioWrapper);
@@ -72,20 +79,6 @@ export default class SprintGame extends BaseComponent {
     multiplyerItem.className = 'params-wrapper__multiplyer-item';
     multiplyerItem.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
     
-    if (this.options) {
-      options = JSON.parse (this.options);
-      localStorage.setItem ('options', this.options);
-    } 
-    
-    if (options) {
-      this.group = options.group;
-      if (options.page) this.page = options.page;
-    } else {
-      localStorage.getItem ('options') ? options = JSON.parse (localStorage.getItem ('options') as string) : options = {group: '0'};
-      this.group = options.group;
-      if (options.page) this.page = options.page;
-    }
-
     console.log('group ' + this.group)
 
     paramsLevelWrapper.append(star);
@@ -106,6 +99,22 @@ export default class SprintGame extends BaseComponent {
     paramsWrapper.append(paramsMultiplyerWrapper);
     paramsWrapper.append(paramsTime);
     paramsWrapper.append(paramsCoinsWrapper);
+  }
+
+  private getGroupAndPage() {
+    if (this.options) {
+      options = JSON.parse (this.options);
+      localStorage.setItem ('options', this.options);
+    } 
+    
+    if (options) {
+      this.group = options.group;
+      if (options.page) this.page = options.page;
+    } else {
+      localStorage.getItem ('options') ? options = JSON.parse (localStorage.getItem ('options') as string) : options = {group: '0'};
+      this.group = options.group;
+      if (options.page) this.page = options.page;
+    }
   }
 
   private renderMario(marioWrapper: HTMLDivElement) {
@@ -169,8 +178,6 @@ export default class SprintGame extends BaseComponent {
     wordsWrapper.append(engWord);
     wordsWrapper.append(translatedWord);
   }
-
-
 }
 
 
