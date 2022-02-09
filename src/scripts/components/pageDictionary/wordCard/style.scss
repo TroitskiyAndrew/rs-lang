@@ -1,5 +1,23 @@
 .wordCard {
   padding: 10px;
-  background-color: $brand-color;
-  height: max-content;
+}
+
+.wordCard {
+  @include flex($ai: flex-end);
+
+  &__controls {
+    @include flex;
+  }
+}
+
+.button-block {
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+  &__overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(182, 67, 46);
+  }
 }
