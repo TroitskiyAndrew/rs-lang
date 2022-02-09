@@ -14,55 +14,53 @@
 }
 
 .questionField {
-  height: 400px;
-}
-
-.questionField__upperContent {
-  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 20px;
 
   .questionField__image {
     display: block;
-    transform: scale(0);
-    width: 390px;
-    height: 260px;
-    // padding-bottom: 30%;
+    visibility: hidden;
+    opacity: 0;
+    width: 180px;
+    height: 120px;
+    border-radius: 20px;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     transition: all 0.3s ease 0s;
+  }
 
-    &.show {
-      transform: scale(1);
+  .questionField__audio {
+    display: block;
+
+    &.icon-button::before {
+      content: '\f144';
+      color: white;
+      font-size: 120px;
     }
+  }
+  .questionField__word {
+    display: block;
+    font-size: 28px;
+    width: 180px;
+    color: $brand-color;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease 0s;
   }
 }
 
-.questionField__lowerContent {
-  display: flex;
-  width: 50%;
-  align-items: center;
-  column-gap: 20px;
-  margin: 0 auto;
-
-  .questionField__audio-wrapper {
-    flex: 0 1 50%;
-
-    .questionField__audio {
-      display: block;
-      margin-left: auto;
-
-      &.icon-button::before {
-        content: '\f144';
-        color: white;
-        font-size: 100px;
-      }
-    }
+.questionField.show {
+  .questionField__image {
+    visibility: visible;
+    opacity: 1;
   }
 
   .questionField__word {
-    display: block;
-    flex: 0 1 50%;
-    color: $brand-color;
+    visibility: visible;
+    opacity: 1;
   }
 }
 
@@ -70,16 +68,21 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  column-gap: 20px;
+  // column-gap: 20px;
 
   .audio-answers__answer {
     cursor: pointer;
+    margin: 10px;
+    padding: 10px;
+    font-size: 18px;
 
     &.correct {
       color: green;
+      pointer-events: none;
     }
     &.wrong {
       color: red;
+      pointer-events: none;
     }
     &.disable {
       color: rgba(255, 255, 255, 0.4);

@@ -78,7 +78,6 @@ export default class AudioGame extends BaseComponent {
       this.group = +options.group;
     }
 
-    console.log('options', options);
     console.log('this.page', this.page);
     console.log('this.group', this.group);
   }
@@ -105,17 +104,10 @@ export default class AudioGame extends BaseComponent {
 
     });
 
-    const upperContent = createDiv({
-      className: 'questionField__upperContent',
-    });
-
     const imageDiv = createDiv({
       className: 'questionField__image',
     });
 
-    const lowerContent = createDiv({
-      className: 'questionField__lowerContent',
-    });
     const audioWrapper = createDiv({
       className: 'questionField__audio-wrapper',
     });
@@ -130,21 +122,15 @@ export default class AudioGame extends BaseComponent {
 
     this.nextBtn = createButton({
       className: 'audio-game__next',
-      text: '',
     });
 
     questionsAmount.append(questionCurrentAmount);
     questionsAmount.append(questionTotalAmount);
     audioPage.append(questionsAmount);
 
-    upperContent.append(imageDiv);
-    questionField.append(upperContent);
-    audioPage.append(questionField);
-
-
-    lowerContent.append(audioWrapper);
-    lowerContent.append(audioWord);
-    questionField.append(lowerContent);
+    questionField.append(imageDiv);
+    questionField.append(audioWrapper);
+    questionField.append(audioWord);
 
     audioPage.append(questionField);
     audioPage.append(answersField);
@@ -163,10 +149,8 @@ export default class AudioGame extends BaseComponent {
       this.showNextQuestion();
       this.isChangeablePage = false;
     } else {
-      // show answer
       (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
-      this.shoWrongAnswer();
-      console.log('show answer');
+      this.showWrongAnswer();
       this.isChangeablePage = true;
     }
   }
@@ -174,7 +158,6 @@ export default class AudioGame extends BaseComponent {
   async showNextQuestion() {
     if (!this.totalQuestions || !this.nextBtn) return;
     // Проверка на количество вопросов, если 20-е, то модальное окно со статистикой
-
     if (this.questionNumber > this.totalQuestions) {
       console.log('STATISTICS!');
       this.nextBtn.style.pointerEvents = 'none';
@@ -190,37 +173,33 @@ export default class AudioGame extends BaseComponent {
     const currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
     console.log('currentQuestionCard', currentQuestionCard);
 
-    // меняем на новую картинку при завершении ответа
+    // картинка
     const imageDiv = this.elem.querySelector('.questionField__image') as HTMLElement;
     const img = new Image();
     img.src = `${baseUrl}/${currentQuestionCard.image}`;
     img.onload = () => {
       imageDiv.style.backgroundImage = `url(${img.src})`;
-      imageDiv.classList.add('show');
     };
 
-    // меняем на новый аудио звук
-    // при завершении ответа иконку звука уменьшаем
+    const questionDiv = this.elem.querySelector('.questionField') as HTMLElement;
+    questionDiv.classList.remove('show');
+
+    // аудио звук
     const audioWrapper = this.elem.querySelector('.questionField__audio-wrapper') as HTMLElement;
     audioWrapper.innerHTML = '';
     const audioBtn = createButton({
       className: 'questionField__audio icon-button',
     });
     audioWrapper.append(audioBtn);
+    this.audio.src = `${baseUrl}/${currentQuestionCard.audio}`;
+    this.audio.play();
 
     audioBtn.addEventListener('click', () => {
-      console.log('audio btn!');
       this.audio.currentTime = 0;
-      this.audio.src = `${baseUrl}/${currentQuestionCard.audio}`;
       this.audio.play();
     });
 
-    // меняем на новый англ текст при завершении ответа
-    const audioWord = this.elem.querySelector('.questionField__word') as HTMLElement;
-    audioWord.textContent = currentQuestionCard.word;
-
-
-    // меняем на новые варианты ответов
+    // варианты ответов
     const answersField = this.elem.querySelector('.audio-answers') as HTMLElement;
     answersField.innerHTML = '';
 
@@ -232,13 +211,14 @@ export default class AudioGame extends BaseComponent {
       const answerDiv = createDiv({
         className: 'audio-answers__answer',
       });
-      answerDiv.textContent = `${answers[i]}`;
+      answerDiv.textContent = `${i + 1}. ${answers[i]}`;
+      const answerFromDiv = answerDiv.textContent.split('. ');
 
       answerDiv.addEventListener('click', () => {
-        if (answerDiv.textContent === this.correctAnswer) {
+        if (answerFromDiv[1] === this.correctAnswer) {
           this.showCorrectAnswer();
         } else {
-          this.shoWrongAnswer();
+          this.showWrongAnswer();
         }
       });
 
@@ -250,26 +230,30 @@ export default class AudioGame extends BaseComponent {
   showCorrectAnswer() {
     const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
     allDivAnswers.forEach(divAnswer => {
-      if (divAnswer.textContent === this.correctAnswer) {
-        divAnswer.classList.add('correct');
-      } else { divAnswer.classList.add('disable'); }
+      if (divAnswer.textContent) {
+        const answerFromDiv = divAnswer.textContent.split('. ');
+        if (answerFromDiv[1] === this.correctAnswer) {
+          divAnswer.classList.add('correct');
+        } else { divAnswer.classList.add('disable'); }
+      }
     },
     );
 
-    console.log('correct');
     this.answerResult();
   }
 
-  shoWrongAnswer() {
+  showWrongAnswer() {
     const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
     allDivAnswers.forEach(divAnswer => {
-      if (divAnswer.textContent === this.correctAnswer) {
-        divAnswer.classList.add('wrong');
-      } else { divAnswer.classList.add('disable'); }
+      if (divAnswer.textContent) {
+        const answerFromDiv = divAnswer.textContent.split('. ');
+        if (answerFromDiv[1] === this.correctAnswer) {
+          divAnswer.classList.add('wrong');
+        } else { divAnswer.classList.add('disable'); }
+      }
     },
     );
 
-    console.log('wrong');
     this.answerResult();
   }
 
@@ -277,6 +261,15 @@ export default class AudioGame extends BaseComponent {
     console.log(this.questionNumber);
     this.isChangeablePage = true;
     (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
+
+    // меняем на новый англ текст при завершении ответа
+    if (!this.wordsFromAPI.questionWords) return;
+    const currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
+    const audioWord = this.elem.querySelector('.questionField__word') as HTMLElement;
+    audioWord.textContent = currentQuestionCard.word;
+
+    const questionDiv = this.elem.querySelector('.questionField') as HTMLElement;
+    questionDiv.classList.add('show');
 
     if (this.questionNumber === this.totalQuestions) {
       (this.nextBtn as HTMLElement).textContent = this.showStatisticsTextBtn;
