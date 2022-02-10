@@ -1,4 +1,5 @@
 .audio-game {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -7,6 +8,12 @@
   background-color: black;
   width: 100%;
   height: 100%;
+
+  &__questionsAmount {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+  }
 
   .audio-game__answers {
     margin: 20px;

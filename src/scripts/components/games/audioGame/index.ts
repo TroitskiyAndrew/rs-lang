@@ -27,8 +27,6 @@ export default class AudioGame extends BaseComponent {
 
   audio = new Audio();
 
-  isChangeablePage = false;
-
   correctAnswer = '';
 
   nextTextBtn = 'следующий вопрос';
@@ -37,6 +35,11 @@ export default class AudioGame extends BaseComponent {
 
   showStatisticsTextBtn = 'показать статистику';
 
+  isChangeablePage = false;
+
+  enableKeyAnswer = false;
+
+  focusedGame = false;
 
 
   constructor(elem: HTMLElement) {
@@ -142,9 +145,60 @@ export default class AudioGame extends BaseComponent {
 
   public listenEvents(): void {
     (this.nextBtn as HTMLElement).addEventListener('click', this.nextQuestion.bind(this));
+    // todo Ивенты клавиш
+    document.addEventListener('keyup', this.keyFunctionality.bind(this));
+    document.onpointerdown = e => {
+      if ((e.target as HTMLElement).closest('.audio-game')) {
+        this.focusedGame = true;
+        // console.log('focused = true');
+      } else {
+        this.focusedGame = false;
+        // console.log('focused = false');
+      }
+    };
+  }
+
+
+  private keyFunctionality(e: KeyboardEvent): void {
+    if (this.focusedGame) {
+      if (!this.totalQuestions) return;
+      if (this.questionNumber > this.totalQuestions) {
+        return;
+      }
+      if (e.code === 'Space') {
+        e.preventDefault();
+        this.nextQuestion();
+      }
+      for (let i = 1; i <= constants.answersInAudioGame; i++) {
+        if (e.code === `Digit${i}`) {
+          e.preventDefault();
+          this.checkAnswerByKey(i);
+        }
+      }
+    }
+  }
+
+  checkAnswerByKey(pos: number) {
+    if (!this.enableKeyAnswer) return;
+    const answerDiv = document.querySelector(`[data-audio="answer-${pos}"]`) as HTMLElement;
+    if (!answerDiv.textContent) return;
+    const answerFromDiv = answerDiv.textContent.split('. ');
+    if (answerFromDiv[1] === this.correctAnswer) {
+      console.log('correct answer KEY');
+      this.answerResult(true);
+      this.enableKeyAnswer = false;
+    } else {
+      console.log('wrong answer KEY');
+      this.answerResult(false);
+      this.enableKeyAnswer = false;
+    }
   }
 
   nextQuestion() {
+    if (!this.totalQuestions) return;
+    if (this.questionNumber > this.totalQuestions) {
+      return;
+    }
     if (this.isChangeablePage) {
       this.questionNumber++;
       this.showNextQuestion();
@@ -157,6 +211,9 @@ export default class AudioGame extends BaseComponent {
   }
 
   async showNextQuestion() {
+    this.focusedGame = true;
+    this.enableKeyAnswer = true;
+
     if (!this.totalQuestions || !this.nextBtn) return;
     // Проверка на количество вопросов, если 20-е, то модальное окно со статистикой
     if (this.questionNumber > this.totalQuestions) {
@@ -211,6 +268,7 @@ export default class AudioGame extends BaseComponent {
     for (let i = 0; i < constants.answersInAudioGame; i++) {
       const answerDiv = createDiv({
         className: 'audio-answers__answer',
+        dataSet: { audio: `answer-${i + 1}` },
       });
       answerDiv.textContent = `${i + 1}. ${answers[i]}`;
       const answerFromDiv = answerDiv.textContent.split('. ');
@@ -225,7 +283,6 @@ export default class AudioGame extends BaseComponent {
 
       answersField.append(answerDiv);
     }
-
   }
 
   answerResult(answer: boolean) {
@@ -242,25 +299,26 @@ export default class AudioGame extends BaseComponent {
 
         } else { divAnswer.classList.add('disable'); }
       }
-    },
-    );
+    });
 
-    console.log(this.questionNumber);
     this.isChangeablePage = true;
-    (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
+    if (this.questionNumber === this.totalQuestions) {
+      (this.nextBtn as HTMLElement).textContent = this.showStatisticsTextBtn;
+    } else {
+      (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
+    }
 
     // меняем на новый англ текст при завершении ответа
     if (!this.wordsFromAPI.questionWords) return;
     const currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
     const audioWord = this.elem.querySelector('.questionField__word') as HTMLElement;
+    if (!currentQuestionCard.word) return;
     audioWord.textContent = currentQuestionCard.word;
 
     const questionDiv = this.elem.querySelector('.questionField') as HTMLElement;
     questionDiv.classList.add('show');
 
-    if (this.questionNumber === this.totalQuestions) {
-      (this.nextBtn as HTMLElement).textContent = this.showStatisticsTextBtn;
-    }
+
   }
 
   async setAllTranslateWordsToState(): Promise<void> {
