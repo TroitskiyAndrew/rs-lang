@@ -7,8 +7,6 @@ import FlagPole from '../../flagPole';
 
 export default class GameLauncher extends BaseComponent {
 
-  flagPole: HTMLInputElement | undefined;
-
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'gameLauncher';
@@ -52,6 +50,9 @@ export default class GameLauncher extends BaseComponent {
         },
       });
       gameAudio.append(createSpan({ text: 'Начать игру Аудиовызов' }));
+      gameAudio.dataset.options = JSON.stringify({
+        'group': '0',
+      });
       page.append(gameAudio);
     } else if (this.options === 'sprint-game') {
       titleDescription.textContent = '«Спринт»';
@@ -67,6 +68,9 @@ export default class GameLauncher extends BaseComponent {
         },
       });
       gameSprint.append(createSpan({ text: 'Начать игру Спринт' }));
+      gameSprint.dataset.options = JSON.stringify({
+        'group': '0',
+      });
       page.append(gameSprint);
     }
 
