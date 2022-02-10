@@ -8,8 +8,9 @@ import { IGameOptions, IWordAndTranslation, IRoundResult, IScoreCounter } from '
 const GROUP_WORDS_NUMBER = 600;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
 const MAX_SCORE_MULTIPLYER = 8;
-
+const TIME_FOR_GAME_MILISECONDS = 60000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
+
 let options: IGameOptions;
 let groupWordsArr: IWordAndTranslation[];
 let roundResults: IRoundResult[] = [];
@@ -31,6 +32,7 @@ export default class SprintGame extends BaseComponent {
   buttonB: HTMLButtonElement | undefined;
   buttonA: HTMLButtonElement | undefined;
   paramsScore: HTMLDivElement | undefined;
+  paramsTime: HTMLDivElement | undefined;
   
   constructor(elem: HTMLElement) {
     super(elem);
@@ -62,7 +64,7 @@ export default class SprintGame extends BaseComponent {
     this.renderWords(wordsWrapper);
     
     this.getWordsArray();
-
+    this.startTimer();
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
@@ -71,6 +73,11 @@ export default class SprintGame extends BaseComponent {
 
     page.append(sprintWrapper);
     this.fragment.append(page);
+    
+    // window.onload = () => {
+    //   console.log('111')
+    //   this.startTimer()
+    // };
   }
 
   private getCoin(size: string) {
@@ -88,6 +95,7 @@ export default class SprintGame extends BaseComponent {
     const paramsCoins = createDiv({ className: 'params-wrapper__coins' });
     const paramsScore = createDiv({ className: 'params-wrapper__score' });
     this.paramsScore = paramsScore;
+    this.paramsTime = paramsTime;
 
     const star = document.createElement('img');
     star.className = 'group-img'
@@ -199,6 +207,24 @@ export default class SprintGame extends BaseComponent {
     wordsWrapper.append(translatedWord);
   }
 
+  private startTimer() {
+
+    const getSecondsLeft = () => {
+      const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
+      if (Math.round(delta / 1000) === 0) {
+        console.log(0)
+        this.paramsTime!.innerHTML = `time<br> 0`;
+        clearInterval (timerId)
+      } else {
+        console.log(Math.round(delta / 1000))
+        this.paramsTime!.innerHTML = `time<br> ${Math.round(delta / 1000)}`;
+      }
+    }
+
+    const start = Date.now();
+    const timerId = setInterval(getSecondsLeft, 1000)
+  }
+
   private async getWordsArray() {
     if (options.page === undefined) {
       groupWordsArr = [];
@@ -240,7 +266,6 @@ export default class SprintGame extends BaseComponent {
       }
       return randomWordAnotherNumber;
     }
-
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
@@ -268,7 +293,7 @@ export default class SprintGame extends BaseComponent {
       scoreCounter.score += scoreCounter.multiplyer * MIN_SCORE_FOR_CORRECT_ANSWER;
       scoreCounter.multiplyerIntermediateCounter += 1;
       
-      if (scoreCounter.multiplyerIntermediateCounter > 2 
+      if (scoreCounter.multiplyerIntermediateCounter === MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER 
         && scoreCounter.multiplyer !== MAX_SCORE_MULTIPLYER) {
         scoreCounter.multiplyer = scoreCounter.multiplyer * 2;
         scoreCounter.multiplyerIntermediateCounter = 0;
