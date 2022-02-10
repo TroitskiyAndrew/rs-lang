@@ -12,6 +12,7 @@ type State = {
   userId: string,
   token: string,
   refreshToken: string,
+  launchGame: string,
   aggregatedWords: AggregatedWords;
 };
 interface AggregatedWords {
@@ -31,6 +32,7 @@ export const defaultState: State = {
   userId: '',
   token: '',
   refreshToken: '',
+  launchGame: '',
   aggregatedWords: {
     page: 0,
     group: 1,

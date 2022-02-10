@@ -1,10 +1,11 @@
 import BaseComponent from '../../base';
-import { pageChenging } from '../../../rooting';
+// import { pageChenging } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 // import { updateState, getState } from '../../../state';
 import constants from '../../../app.constants';
 import { WordCard } from '../../../api/api.types';
+
 
 interface IState {
   questionWords: WordCard[];
@@ -27,8 +28,6 @@ export default class AudioGame extends BaseComponent {
 
   audio = new Audio();
 
-  correctAnswer = '';
-
   nextTextBtn = 'следующий вопрос';
 
   showResultTextBtn = 'показать ответ';
@@ -41,6 +40,12 @@ export default class AudioGame extends BaseComponent {
 
   focusedGame = false;
 
+  currentQuestionCard: Partial<WordCard> = {};
+
+  correctAnswersArray: Partial<WordCard>[] = [];
+
+  wrongAnswersArray: Partial<WordCard>[] = [];
+
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -48,7 +53,7 @@ export default class AudioGame extends BaseComponent {
   }
 
   public async oninit(): Promise<void> {
-    pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
+    // pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
 
     // получаю с АПИ данные
     // todo новые слова перезаписать ТУТ!, которые придут не связанные с группой
@@ -89,7 +94,6 @@ export default class AudioGame extends BaseComponent {
 
   public createHTML(): void {
     this.definePageAndGroup();
-
     const audioPage = createDiv({ className: 'audio-game' });
 
     const questionsAmount = createDiv({
@@ -105,7 +109,6 @@ export default class AudioGame extends BaseComponent {
 
     const questionField = createDiv({
       className: 'audio-game__questionField questionField',
-
     });
 
     const imageDiv = createDiv({
@@ -117,7 +120,6 @@ export default class AudioGame extends BaseComponent {
     });
     const audioWord = createSpan({
       className: 'questionField__word',
-      text: '',
     });
 
     const answersField = createDiv({
@@ -145,15 +147,13 @@ export default class AudioGame extends BaseComponent {
 
   public listenEvents(): void {
     (this.nextBtn as HTMLElement).addEventListener('click', this.nextQuestion.bind(this));
-    // todo Ивенты клавиш
+    // Ивенты клавиш
     document.addEventListener('keyup', this.keyFunctionality.bind(this));
     document.onpointerdown = e => {
       if ((e.target as HTMLElement).closest('.audio-game')) {
         this.focusedGame = true;
-        // console.log('focused = true');
       } else {
         this.focusedGame = false;
-        // console.log('focused = false');
       }
     };
   }
@@ -162,9 +162,7 @@ export default class AudioGame extends BaseComponent {
   private keyFunctionality(e: KeyboardEvent): void {
     if (this.focusedGame) {
       if (!this.totalQuestions) return;
-      if (this.questionNumber > this.totalQuestions) {
-        return;
-      }
+      if (this.questionNumber > this.totalQuestions) return;
       if (e.code === 'Space') {
         e.preventDefault();
         this.nextQuestion();
@@ -178,27 +176,25 @@ export default class AudioGame extends BaseComponent {
     }
   }
 
-  checkAnswerByKey(pos: number) {
+  private checkAnswerByKey(pos: number): void {
     if (!this.enableKeyAnswer) return;
     const answerDiv = document.querySelector(`[data-audio="answer-${pos}"]`) as HTMLElement;
     if (!answerDiv.textContent) return;
     const answerFromDiv = answerDiv.textContent.split('. ');
-    if (answerFromDiv[1] === this.correctAnswer) {
-      console.log('correct answer KEY');
+    const correctAnswer = this.currentQuestionCard.wordTranslate;
+    if (!correctAnswer) return;
+    if (answerFromDiv[1] === correctAnswer) {
       this.answerResult(true);
       this.enableKeyAnswer = false;
     } else {
-      console.log('wrong answer KEY');
       this.answerResult(false);
       this.enableKeyAnswer = false;
     }
   }
 
-  nextQuestion() {
+  private nextQuestion(): void {
     if (!this.totalQuestions) return;
-    if (this.questionNumber > this.totalQuestions) {
-      return;
-    }
+    if (this.questionNumber > this.totalQuestions) return;
     if (this.isChangeablePage) {
       this.questionNumber++;
       this.showNextQuestion();
@@ -210,7 +206,7 @@ export default class AudioGame extends BaseComponent {
     }
   }
 
-  async showNextQuestion() {
+  private async showNextQuestion(): Promise<void> {
     this.focusedGame = true;
     this.enableKeyAnswer = true;
 
@@ -219,26 +215,27 @@ export default class AudioGame extends BaseComponent {
     if (this.questionNumber > this.totalQuestions) {
       console.log('STATISTICS!');
       this.nextBtn.style.pointerEvents = 'none';
+      console.log('wrongAnswersArray', this.wrongAnswersArray);
+      console.log('correctAnswersArray', this.correctAnswersArray);
+      this.showModalStatistics();
       return;
     }
-
     this.nextBtn.textContent = this.showResultTextBtn;
 
     const currentQuestionSpan = this.elem.querySelector('.questionsAmount__current') as HTMLElement;
     currentQuestionSpan.textContent = `${this.questionNumber + 1}`;
 
     if (!this.wordsFromAPI.questionWords) return;
-    const currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
-    console.log('currentQuestionCard', currentQuestionCard);
+    this.currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
+    console.log('currentQuestionCard', this.currentQuestionCard);
 
     // картинка
     const imageDiv = this.elem.querySelector('.questionField__image') as HTMLElement;
     const img = new Image();
-    img.src = `${baseUrl}/${currentQuestionCard.image}`;
+    img.src = `${baseUrl}/${this.currentQuestionCard.image}`;
     img.onload = () => {
       imageDiv.style.backgroundImage = `url(${img.src})`;
     };
-
     const questionDiv = this.elem.querySelector('.questionField') as HTMLElement;
     questionDiv.classList.remove('show');
 
@@ -249,9 +246,8 @@ export default class AudioGame extends BaseComponent {
       className: 'questionField__audio icon-button',
     });
     audioWrapper.append(audioBtn);
-    this.audio.src = `${baseUrl}/${currentQuestionCard.audio}`;
+    this.audio.src = `${baseUrl}/${this.currentQuestionCard.audio}`;
     this.audio.play();
-
     audioBtn.addEventListener('click', () => {
       this.audio.currentTime = 0;
       this.audio.play();
@@ -260,10 +256,9 @@ export default class AudioGame extends BaseComponent {
     // варианты ответов
     const answersField = this.elem.querySelector('.audio-answers') as HTMLElement;
     answersField.innerHTML = '';
-
-    this.correctAnswer = currentQuestionCard.wordTranslate;
-    if (!this.wordsFromAPI.translateWords) return;
-    const answers = this.getArrOfAnswers(this.correctAnswer, this.wordsFromAPI.translateWords);
+    const correctAnswer = this.currentQuestionCard.wordTranslate;
+    if (!correctAnswer || !this.wordsFromAPI.translateWords) return;
+    const answers = this.getArrOfAnswers(correctAnswer, this.wordsFromAPI.translateWords);
 
     for (let i = 0; i < constants.answersInAudioGame; i++) {
       const answerDiv = createDiv({
@@ -274,7 +269,7 @@ export default class AudioGame extends BaseComponent {
       const answerFromDiv = answerDiv.textContent.split('. ');
 
       answerDiv.addEventListener('click', () => {
-        if (answerFromDiv[1] === this.correctAnswer) {
+        if (answerFromDiv[1] === correctAnswer) {
           this.answerResult(true);
         } else {
           this.answerResult(false);
@@ -285,12 +280,19 @@ export default class AudioGame extends BaseComponent {
     }
   }
 
-  answerResult(answer: boolean) {
+  private answerResult(answer: boolean): void {
     const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
+    if (answer) {
+      this.correctAnswersArray.push(this.currentQuestionCard);
+    } else {
+      this.wrongAnswersArray.push(this.currentQuestionCard);
+    }
     allDivAnswers.forEach(divAnswer => {
       if (divAnswer.textContent) {
         const answerFromDiv = divAnswer.textContent.split('. ');
-        if (answerFromDiv[1] === this.correctAnswer) {
+        const correctAnswer = this.currentQuestionCard.wordTranslate;
+        if (!correctAnswer) return;
+        if (answerFromDiv[1] === correctAnswer) {
           if (answer) {
             divAnswer.classList.add('correct');
           } else {
@@ -307,18 +309,13 @@ export default class AudioGame extends BaseComponent {
     } else {
       (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
     }
-
     // меняем на новый англ текст при завершении ответа
-    if (!this.wordsFromAPI.questionWords) return;
-    const currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
     const audioWord = this.elem.querySelector('.questionField__word') as HTMLElement;
-    if (!currentQuestionCard.word) return;
-    audioWord.textContent = currentQuestionCard.word;
+    if (!this.currentQuestionCard.word) return;
+    audioWord.textContent = this.currentQuestionCard.word;
 
     const questionDiv = this.elem.querySelector('.questionField') as HTMLElement;
     questionDiv.classList.add('show');
-
-
   }
 
   async setAllTranslateWordsToState(): Promise<void> {
@@ -361,4 +358,54 @@ export default class AudioGame extends BaseComponent {
     return answers;
   }
 
+
+  showModalStatistics() {
+    // rightAnswers - к-во правильных ответов
+    const modalDiv = createDiv({
+      className: 'audio__statistics',
+    });
+
+    const correctField = createDiv({
+      className: 'modal-score__correct',
+    });
+
+    this.correctAnswersArray.forEach(correctElem => {
+      const text = createSpan({
+        text: correctElem.word,
+      });
+      const translateText = createSpan({
+        text: correctElem.wordTranslate,
+      });
+      correctField?.append(text);
+      correctField?.append(translateText);
+    });
+
+    modalDiv.append(correctField);
+
+    const wrongField = createDiv({
+      className: 'modal-score__wrong',
+    });
+    this.wrongAnswersArray.forEach(wrongElem => {
+      const text = createSpan({
+        text: wrongElem.word,
+      });
+      const translateText = createSpan({
+        text: wrongElem.wordTranslate,
+      });
+      wrongField?.append(text);
+      wrongField?.append(translateText);
+    });
+
+    modalDiv.append(wrongField);
+
+    // появление модального окна
+    modalDiv.classList.add('show');
+
+    this.elem.append(modalDiv);
+    // let modalBlitzHomeBtn = document.querySelector('.modal-blitz-home');
+
+    // modalBlitzHomeBtn.addEventListener('click', () => {
+    //     modalScoreWrapper.classList.add('hide');
+    // });
+  }
 }

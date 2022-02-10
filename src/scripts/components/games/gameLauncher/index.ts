@@ -1,9 +1,10 @@
 import BaseComponent from '../../base';
-import { createDiv, createSpan, createButton, createInput } from '../../../utils';
+import { createDiv, createSpan } from '../../../utils';
 import { pageChenging } from '../../../rooting';
-import constants from '../../../app.constants';
+// import constants from '../../../app.constants';
 import { instances } from '../../components';
 import FlagPole from '../../flagPole';
+import { getState, updateState } from '../../../state';
 
 export default class GameLauncher extends BaseComponent {
 
@@ -14,6 +15,9 @@ export default class GameLauncher extends BaseComponent {
 
   public oninit(): Promise<void> {
     pageChenging(createSpan({ text: 'game Launch' }), this.name);
+
+    updateState({ launchGame: this.options });
+
     return Promise.resolve();
   }
 
@@ -34,6 +38,10 @@ export default class GameLauncher extends BaseComponent {
     const textDescription = createSpan({
       className: 'game-description__text',
     });
+
+    if (!this.options) {
+      this.options = getState().launchGame;
+    }
 
     if (this.options === 'audio-game') {
       titleDescription.textContent = '«Аудиовызов»';
