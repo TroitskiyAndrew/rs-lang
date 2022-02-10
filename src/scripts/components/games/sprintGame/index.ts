@@ -2,12 +2,14 @@ import BaseComponent from '../../base';
 import { createButton, createDiv, createSpan, getRandom } from '../../../utils';
 import { pageChenging } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
-import { IGameOptions, IWordAndTranslation } from './sprintGameTypes';
+import { IGameOptions, IWordAndTranslation, IRoundResult } from './sprintGameTypes';
 // import GameLauncher from '../gameLauncher';
 
 const GROUP_WORDS_NUMBER = 600;
 let options: IGameOptions;
 let groupWordsArr: IWordAndTranslation[];
+let roundResults: IRoundResult[] = [];
+//let translateCorrectness: boolean;
 
 export default class SprintGame extends BaseComponent {
 
@@ -15,6 +17,8 @@ export default class SprintGame extends BaseComponent {
   // groupsWrapperButton: HTMLButtonElement | undefined;
   group: string = '';
   page: string = '';
+  buttonB: HTMLButtonElement | undefined;
+  buttonA: HTMLButtonElement | undefined;
   
   constructor(elem: HTMLElement) {
     super(elem);
@@ -23,6 +27,7 @@ export default class SprintGame extends BaseComponent {
 
   public oninit(): Promise<void> {
     this.setActions();
+    //this.addLoading();
     pageChenging(createSpan({ text: 'Спринт Игра' }), this.name);
     return Promise.resolve();
   }
@@ -35,6 +40,8 @@ export default class SprintGame extends BaseComponent {
     const gamepadWrapper = createDiv({ className: 'gamepad-wrapper' });
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
 
+    //this.getApi();
+
     this.getGroupAndPage();
 
     this.renderParams(paramsWrapper);
@@ -42,8 +49,8 @@ export default class SprintGame extends BaseComponent {
     this.renderGamepad(gamepadWrapper);
     this.renderWords(wordsWrapper);
     
-    //this.addLoading();
     this.getWordsArray();
+
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
@@ -131,12 +138,14 @@ export default class SprintGame extends BaseComponent {
     const buttonBWrapper = createDiv({ className: 'buttons-wrapper__button-wrapper' });
     const buttonBBack = createDiv({ className: 'buttons-wrapper__back' });
     const buttonBCapture = createDiv({ className: 'buttons-wrapper__capture' });
-    const buttonB = createButton({className: 'buttons-wrapper__button'})
+    const buttonB = createButton({className: 'buttons-wrapper__button-b', action: 'getNextRandomWords'})
+    this.buttonB = buttonB;
 
     const buttonAWrapper = createDiv({ className: 'buttons-wrapper__button-wrapper' });
     const buttonABack = createDiv({ className: 'buttons-wrapper__back' });
     const buttonACapture = createDiv({ className: 'buttons-wrapper__capture' });
-    const buttonA = createButton({className: 'buttons-wrapper__button'})
+    const buttonA = createButton({className: 'buttons-wrapper__button-a', action: 'getNextRandomWords'})
+    this.buttonA = buttonA;
 
     const controlsBack = createDiv({ className: 'controls-wrapper__back' });
     const controlsCapture = createDiv({ className: 'controls-wrapper__capture' });
@@ -165,6 +174,8 @@ export default class SprintGame extends BaseComponent {
 
     gamepadWrapper.append(controlsWrapper);
     gamepadWrapper.append(buttonsWrapper);
+
+    // this.getNextRandomWords(buttonB, buttonA);
   }
 
   private renderWords(wordsWrapper: HTMLDivElement) {
@@ -183,7 +194,11 @@ export default class SprintGame extends BaseComponent {
       
       await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
         words.forEach((el) => {
-          const elMod: IWordAndTranslation =  {word: `${el.word}`, wordTranslate: `${el.wordTranslate}`};
+          const elMod: IWordAndTranslation =  {
+            word: `${el.word}`, 
+            wordTranslate: `${el.wordTranslate}`, 
+            audio: `${el.audio}`,
+          };
            groupWordsArr.push(elMod);
         })
       });
@@ -196,9 +211,67 @@ export default class SprintGame extends BaseComponent {
   private getRandomWords(groupWordsArr: IWordAndTranslation[]) {
     const word = this.elem.querySelector('.eng-word') as HTMLDivElement;
     const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
-    word!.textContent = groupWordsArr[getRandom(0, GROUP_WORDS_NUMBER)].word;
-    wordTranslate!.textContent = groupWordsArr[getRandom(0, GROUP_WORDS_NUMBER)].wordTranslate;
+    const randomWordNumber = getRandom(0, GROUP_WORDS_NUMBER);
+
+    word!.textContent = groupWordsArr[randomWordNumber].word;
+    if (Math.random() < 0.5) {
+      wordTranslate!.textContent = groupWordsArr[randomWordNumber].wordTranslate;
+      this.addElementToRoundResults(randomWordNumber, true);
+    } else {
+      wordTranslate!.textContent = groupWordsArr[getWrongTranslate()].wordTranslate;
+      this.addElementToRoundResults(randomWordNumber, false);
+    }
+
+    function getWrongTranslate() {
+      const randomWordAnotherNumber = getRandom(0, GROUP_WORDS_NUMBER);
+      if (randomWordNumber === randomWordAnotherNumber) {
+        getWrongTranslate();
+      }
+      return randomWordAnotherNumber;
+    }
+
   }
+
+  private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
+    console.log(groupWordsArr[randomWordNumber].word)
+    roundResults[roundResults.length] = {
+      word: `${groupWordsArr[randomWordNumber].word}`,
+      wordTranslate: `${groupWordsArr[randomWordNumber].wordTranslate}`,
+      audio: `${groupWordsArr[randomWordNumber].audio}`,
+      translateCorrectness: translateCorrectness,
+    };
+    console.log(roundResults)
+  }
+
+  public listenEvents(): void {
+    this.buttonB?.addEventListener('click', () => {
+      this.checkAnswer(false);
+    });
+  }
+
+  // public setActions(): void {
+  //   this.actions.getNextRandomWords = this.getNextRandomWords;
+  // }
+
+  private checkAnswer(answer: boolean) {
+    if (answer === roundResults[roundResults.length - 1].translateCorrectness) {
+      console.log('right')
+      console.log(roundResults)
+    } else {
+      console.log('Wrong')
+      console.log(roundResults)
+    }
+
+  }
+
+  private getApi() {
+    apiService.getUserStatistics(`1`).then(value => console.log(value))
+  }
+
+
+  // private getNextRandomWords() {
+  //   console.log('buttonB')
+  // }
 
 
 
