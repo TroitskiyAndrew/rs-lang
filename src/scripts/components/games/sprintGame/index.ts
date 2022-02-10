@@ -64,7 +64,7 @@ export default class SprintGame extends BaseComponent {
     this.renderWords(wordsWrapper);
     
     this.getWordsArray();
-    this.startTimer();
+    
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
@@ -207,8 +207,8 @@ export default class SprintGame extends BaseComponent {
     wordsWrapper.append(translatedWord);
   }
 
-  private startTimer() {
-
+  private startTimer(startOnce: boolean) {
+    
     const getSecondsLeft = () => {
       const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
       if (Math.round(delta / 1000) === 0) {
@@ -266,6 +266,7 @@ export default class SprintGame extends BaseComponent {
       }
       return randomWordAnotherNumber;
     }
+    this.startTimer(true);
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
