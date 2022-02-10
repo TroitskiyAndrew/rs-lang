@@ -2,13 +2,24 @@ import BaseComponent from '../../base';
 import { createButton, createDiv, createSpan, getRandom } from '../../../utils';
 import { pageChenging } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
-import { IGameOptions, IWordAndTranslation, IRoundResult } from './sprintGameTypes';
+import { IGameOptions, IWordAndTranslation, IRoundResult, IScoreCounter } from './sprintGameTypes';
 // import GameLauncher from '../gameLauncher';
 
 const GROUP_WORDS_NUMBER = 600;
+const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
+const MAX_SCORE_MULTIPLYER = 8;
+
+const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 let options: IGameOptions;
 let groupWordsArr: IWordAndTranslation[];
 let roundResults: IRoundResult[] = [];
+let scoreCounter: IScoreCounter = {
+  score: 0,
+  multiplyer: 1,
+  multiplyerIntermediateCounter: 0,
+};
+// let roundScore: number = 0;
+// let multiplyer: number = 1;
 //let translateCorrectness: boolean;
 
 export default class SprintGame extends BaseComponent {
@@ -19,6 +30,7 @@ export default class SprintGame extends BaseComponent {
   page: string = '';
   buttonB: HTMLButtonElement | undefined;
   buttonA: HTMLButtonElement | undefined;
+  paramsScore: HTMLDivElement | undefined;
   
   constructor(elem: HTMLElement) {
     super(elem);
@@ -75,6 +87,7 @@ export default class SprintGame extends BaseComponent {
     const paramsCoinsWrapper = createDiv({ className: 'params-wrapper__coins-wrapper' });
     const paramsCoins = createDiv({ className: 'params-wrapper__coins' });
     const paramsScore = createDiv({ className: 'params-wrapper__score' });
+    this.paramsScore = paramsScore;
 
     const star = document.createElement('img');
     star.className = 'group-img'
@@ -83,8 +96,6 @@ export default class SprintGame extends BaseComponent {
     const multiplyerItem = document.createElement('img');
     multiplyerItem.className = 'params-wrapper__multiplyer-item';
     multiplyerItem.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
-    
-    console.log('group ' + this.group)
 
     paramsLevelWrapper.append(star);
     paramsLevelWrapper.innerHTML += `&#215;`;
@@ -233,35 +244,47 @@ export default class SprintGame extends BaseComponent {
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
-    console.log(groupWordsArr[randomWordNumber].word)
     roundResults[roundResults.length] = {
       word: `${groupWordsArr[randomWordNumber].word}`,
       wordTranslate: `${groupWordsArr[randomWordNumber].wordTranslate}`,
       audio: `${groupWordsArr[randomWordNumber].audio}`,
       translateCorrectness: translateCorrectness,
     };
-    console.log(roundResults)
   }
 
   public listenEvents(): void {
-    this.buttonB?.addEventListener('click', () => {
-      this.checkAnswer(false);
-    });
+    this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
+    this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
   }
 
-  // public setActions(): void {
-  //   this.actions.getNextRandomWords = this.getNextRandomWords;
-  // }
+  public setActions(): void {
+
+  }
 
   private checkAnswer(answer: boolean) {
+    this.elem.querySelector('.params-wrapper__score')
     if (answer === roundResults[roundResults.length - 1].translateCorrectness) {
-      console.log('right')
-      console.log(roundResults)
+      roundResults[roundResults.length - 1].answerCorrectness = true;
+      scoreCounter.score += scoreCounter.multiplyer * MIN_SCORE_FOR_CORRECT_ANSWER;
+      scoreCounter.multiplyerIntermediateCounter += 1;
+      
+      if (scoreCounter.multiplyerIntermediateCounter > 2 
+        && scoreCounter.multiplyer !== MAX_SCORE_MULTIPLYER) {
+        scoreCounter.multiplyer = scoreCounter.multiplyer * 2;
+        scoreCounter.multiplyerIntermediateCounter = 0;
+      }
+      
     } else {
-      console.log('Wrong')
-      console.log(roundResults)
+      if (scoreCounter.multiplyer > 1) {
+        scoreCounter.multiplyer /= 2;
+        scoreCounter.multiplyerIntermediateCounter = 0;
+      }
+      roundResults[roundResults.length - 1].answerCorrectness = false;
     }
-
+    this.paramsScore!.textContent = `${scoreCounter.score}`;
+    console.log(roundResults)
+    console.log(scoreCounter)
+    this.getRandomWords(groupWordsArr);
   }
 
   private getApi() {

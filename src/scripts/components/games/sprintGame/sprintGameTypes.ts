@@ -11,8 +11,14 @@ export interface IWordAndTranslation {
 
 export interface IRoundResult {
   word: string;
-  wordTranslate?: string;
-  audio?: string;
-  translateCorrectness?: boolean;
+  wordTranslate: string;
+  audio: string;
+  translateCorrectness: boolean;
   answerCorrectness?: boolean;
+}
+
+export interface IScoreCounter {
+  score: number;
+  multiplyer: number;
+  multiplyerIntermediateCounter: number; 
 }
