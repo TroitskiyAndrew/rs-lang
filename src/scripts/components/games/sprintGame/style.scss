@@ -11,7 +11,7 @@
   flex-direction: column;
   justify-content: space-between;
   background-image: url("/src/assets/img/sprintGame/jpg/3-cut.jpg");
-  width: 60%;
+  width: 80%;
   height: 80%;
   background-size: 1080px;
   background-repeat: no-repeat;
@@ -62,13 +62,27 @@
   text-align: center;
 }
 
+.params-wrapper__coins-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
 .mario-img {
   transform: scale(-1, 1);
   margin-right: 20px;
 }
 
-.mario-img, .coin-img {
+.mario-img {
   height: 3.6rem;
+}
+
+.coin-img_medium {
+  height: 2.6rem;
+}
+
+.coin-img_small {
+  height: 1.6rem;
 }
 
 .mario-wrapper {
@@ -124,7 +138,7 @@
   border-radius: 5px;
 }
 
-.buttons-wrapper__button {
+.buttons-wrapper__button-a, .buttons-wrapper__button-b {
   background-color: #DD3836;
   border-radius: 50%;
   width: 40px;
