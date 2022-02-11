@@ -3,7 +3,7 @@ import { createButton, createDiv, createSpan, getRandom } from '../../../utils';
 import { pageChenging } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
 import { IGameOptions, IWordAndTranslation, IRoundResult, IScoreCounter } from './sprintGameTypes';
-// import GameLauncher from '../gameLauncher';
+import Menu from '../../menu/index';
 
 const GROUP_WORDS_NUMBER = 600;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
@@ -19,6 +19,8 @@ let scoreCounter: IScoreCounter = {
   multiplyer: 1,
   multiplyerIntermediateCounter: 0,
 };
+let startTimerOnce: boolean = true;
+let timerId: NodeJS.Timer;
 // let roundScore: number = 0;
 // let multiplyer: number = 1;
 //let translateCorrectness: boolean;
@@ -47,6 +49,8 @@ export default class SprintGame extends BaseComponent {
   }
 
   public createHTML(): void {
+    
+    // icon-button
     const page = createDiv({ className: 'page sprint' });
     const sprintWrapper = createDiv({ className: 'sprint-wrapper' });
     const paramsWrapper = createDiv({ className: 'params-wrapper' });
@@ -207,22 +211,28 @@ export default class SprintGame extends BaseComponent {
     wordsWrapper.append(translatedWord);
   }
 
-  private startTimer(startOnce: boolean) {
-    
-    const getSecondsLeft = () => {
-      const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
-      if (Math.round(delta / 1000) === 0) {
-        console.log(0)
-        this.paramsTime!.innerHTML = `time<br> 0`;
-        clearInterval (timerId)
-      } else {
-        console.log(Math.round(delta / 1000))
-        this.paramsTime!.innerHTML = `time<br> ${Math.round(delta / 1000)}`;
+  private startTimer() {
+    //console.log(startOnce === true)
+    if (startTimerOnce === true) {
+      const getSecondsLeft = () => {
+        const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
+        if (Math.round(delta / 1000) === 0) {
+          console.log(0)
+          this.paramsTime!.innerHTML = `time<br> 0`;
+          this.stopTimer()
+        } else {
+          console.log(Math.round(delta / 1000))
+          this.paramsTime!.innerHTML = `time<br> ${Math.round(delta / 1000)}`;
+        }
       }
+      const start = Date.now();
+      timerId = setInterval(getSecondsLeft, 1000)
     }
+    startTimerOnce = false;
+  }
 
-    const start = Date.now();
-    const timerId = setInterval(getSecondsLeft, 1000)
+  private stopTimer() {
+    clearInterval (timerId)
   }
 
   private async getWordsArray() {
@@ -266,7 +276,7 @@ export default class SprintGame extends BaseComponent {
       }
       return randomWordAnotherNumber;
     }
-    this.startTimer(true);
+    this.startTimer();
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
@@ -281,6 +291,9 @@ export default class SprintGame extends BaseComponent {
   public listenEvents(): void {
     this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
     this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
+    this.getMenuButton().then(val => {
+      val.addEventListener('click', this.stopTimer.bind(this) )
+    });
   }
 
   public setActions(): void {
@@ -311,6 +324,10 @@ export default class SprintGame extends BaseComponent {
     console.log(roundResults)
     console.log(scoreCounter)
     this.getRandomWords(groupWordsArr);
+  }
+
+  private async getMenuButton(): Promise<HTMLButtonElement> {
+    return  await document.getElementsByClassName('menu__button icon-button')[0] as HTMLButtonElement;
   }
 
   private getApi() {
