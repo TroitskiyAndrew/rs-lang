@@ -1,0 +1,106 @@
+.game-modal {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 500px;
+  min-height: 200px;
+  max-height: 500px;
+  overflow-y: scroll;
+  background: rgba(0, 0, 0, 1);
+  color: white;
+  padding: 20px;
+  outline: 2px solid white;
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &::-webkit-scrollbar-track-piece {
+    background-color: white;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    height: 50px;
+    background-color: #999999;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: #999999;
+  }
+
+  &::-webkit-resizer {
+    background-color: white;
+  }
+}
+
+.game-modal__words-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .game-modal__words-title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .game-modal__correct-words {
+    // background: aqua;
+  }
+  .game-modal__wrong-words {
+    // background: rgb(240, 136, 99);
+  }
+
+  .game-modal__word-row {
+    // font-size: 24px;
+  }
+}
+
+.modal-row {
+  display: flex;
+  column-gap: 10px;
+  font-size: 20px;
+  margin-bottom: 5px;
+
+  &__audio {
+    display: block;
+
+    &.icon-button::before {
+      content: '\f144';
+      color: white;
+      font-size: 20px;
+    }
+  }
+
+  &__word {
+    color: #2582e7;
+  }
+
+  &__split {
+  }
+
+  &__translation {
+    color: #37383c;
+  }
+}
+
+// .words-wrapper__correct {
+//   font-size: 24px;
+//   color: green;
+// }
+// .words-wrapper__wrong {
+//   font-size: 24px;
+//   color: red;
+// }

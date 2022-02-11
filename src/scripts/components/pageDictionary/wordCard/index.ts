@@ -52,15 +52,47 @@ export default class WordsCard extends BaseComponent {
   }
 
   public createHTML(): void {
+    const textHolder = createDiv({ className: 'wordCard__text-holder' });
+    const engHolder = createDiv({ className: 'wordCard__text-part _eng' });
+    const ruHolder = createDiv({ className: 'wordCard__text-part _ru' });
+    const contorls = createDiv({ className: 'wordCard__controls' });
+    const imgHolder = createDiv({ className: 'wordCard__img _blocked' });
+    imgHolder.append(createDiv({ className: 'wordCard__bricks' }));
 
-    this.fragment.append(this.word);
-    this.fragment.append(this.transcription);
-    this.fragment.append(this.meaning);
-    this.fragment.append(this.example);
-    this.fragment.append(this.wordRu);
-    this.fragment.append(this.meaningRu);
-    this.fragment.append(this.exampleRu);
+    contorls.append(this.createButtonHolder('visibility'));
+    contorls.append(this.createButtonHolder('difficult'));
+    contorls.append(this.createButtonHolder('studied'));
 
+    ruHolder.append(createDiv({ className: 'wordCard__bricks' }));
+    engHolder.append(this.word);
+    engHolder.append(this.transcription);
+    engHolder.append(this.meaning);
+    engHolder.append(this.example);
+    ruHolder.append(this.wordRu);
+    ruHolder.append(this.meaningRu);
+    ruHolder.append(this.exampleRu);
+    textHolder.append(engHolder);
+    textHolder.append(ruHolder);
+
+    this.fragment.append(contorls);
+    this.fragment.append(textHolder);
+    this.fragment.append(imgHolder);
+  }
+
+  private createButtonHolder(type: string): HTMLDivElement {
+    const holder = createDiv({ className: `wordCard__button-block button-block ${type}` });
+    const overlay = createDiv({ className: 'button-block__overlay' });
+    const marker = createDiv({ className: 'button-block__marker' });
+
+    holder.append(marker);
+    holder.append(overlay);
+    overlay.append(createDiv({ className: 'button-block__circle left-top' }));
+    overlay.append(createDiv({ className: 'button-block__circle left-bottom' }));
+    overlay.append(createDiv({ className: 'button-block__circle right-top' }));
+    overlay.append(createDiv({ className: 'button-block__circle right-bottom' }));
+    holder.append(createButton({ className: `button-block__button icon-button btn-${type}`, action: `${type}` }));
+
+    return holder;
   }
 
   public listenEvents(): void {

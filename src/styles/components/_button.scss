@@ -36,6 +36,16 @@ button {
   content: "\f028";
 }
 
+.icon-button.btn-visibility::before {
+  content: "\f06e";
+}
+.icon-button.btn-difficult::before {
+  content: "\f059";
+}
+.icon-button.btn-studied::before {
+  content: "\f005";
+}
+
 .icon-button._crossed {
   position: relative;
   @include flex;
