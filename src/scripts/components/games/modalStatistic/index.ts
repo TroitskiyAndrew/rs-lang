@@ -5,65 +5,159 @@ import BaseComponent from '../../base';
 import { instances } from '../../components';
 import AudioGame, { IStatisticAnswer } from '../audioGame';
 import SprintGame from '../sprintGame';
+import { baseUrl } from '../../../api/apiMethods';
 
 export default class ModalStatistic extends BaseComponent {
+  resultArray: IStatisticAnswer[] = [];
 
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'modalStatistic';
   }
 
-  /*
-    interface IStatisticAnswer {
-      id: string,
-      audio: string,
-      group: number,
-      image: string,
-      page: number,
-      word: string,
-      wordTranslate: string,
-      answerCorrectness: boolean;
-    } */
-
   public createHTML(): void {
-    const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame;
-    // const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame | SprintGame;
+    // const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame;
+    const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame | SprintGame;
+    this.resultArray = parenWidget.giveDataToModalStatistic();
 
-    const resultArray = parenWidget.giveDataToModalStatistic();
-
-    const rightAnswers = resultArray.filter(word => {
+    const rightAnswers = this.resultArray.filter(word => {
       return word.answerCorrectness;
     });
-    const wrongAnswers = resultArray.filter(word => {
+    const wrongAnswers = this.resultArray.filter(word => {
       return !word.answerCorrectness;
     });
 
+    if (parenWidget instanceof AudioGame) {
+      console.log('AUDIO GAME');
+    }
+
     // процент правильных ответов
     const totalPercents = 100;
-    const percentOfRightAnswers = Math.floor(rightAnswers.length * totalPercents / resultArray.length);
+    const percentOfRightAnswers = Math.floor(rightAnswers.length * totalPercents / this.resultArray.length);
 
     // выходные данные
-    console.log('resultArray', resultArray);
-    console.log('rightAnswers', rightAnswers);
-    console.log('wrongAnswers', wrongAnswers);
-    console.log('right Percent', percentOfRightAnswers + '%');
-
+    // console.log('resultArray', this.resultArray);
+    // console.log('rightAnswers', rightAnswers);
+    // console.log('wrongAnswers', wrongAnswers);
+    // console.log('right Percent', percentOfRightAnswers + '%');
     // самая длинная серия правильных ответов
-    // const array = [false, false, true, true, false, true, true, true, true, false, false, true, true];
-    this.checkLongestRightRange(resultArray);
+    // console.log('Sequence length=', this.longestRightRange());
 
     const modalWindow = createDiv({
-      className: 'game__modal-window',
+      className: 'game-modal',
     });
+    const gameInfo = createDiv({
+      className: 'game-modal__info',
+    });
+    const accuracy = createSpan({
+      text: `Точность ответов - ${percentOfRightAnswers}%`,
+    });
+    const inARow = createSpan({
+      text: `Правильно подряд - ${this.longestRightRange()}`,
+    });
+    const totalWords = createSpan({
+      text: `Всего слов - ${this.resultArray.length}`,
+    });
+
+    const wordsWrapper = createDiv({
+      className: 'game-modal__words-wrapper',
+    });
+    const correctWordsWrapper = createDiv({
+      className: 'game-modal__correct-words',
+    });
+    const correctWordsTitle = createSpan({
+      className: 'game-modal__words-title',
+      text: `Знаю - ${rightAnswers.length}`,
+    });
+
+    const wrongWordsWrapper = createDiv({
+      className: 'game-modal__wrong-words',
+    });
+    const wrongWordsTitle = createSpan({
+      className: 'game-modal__words-title',
+      text: `Ошибок - ${wrongAnswers.length}`,
+    });
+    for (let i = 0; i < rightAnswers.length; i++) {
+      const wordRow = this.drawWord(rightAnswers[i]);
+      correctWordsWrapper.append(wordRow);
+    }
+    for (let i = 0; i < wrongAnswers.length; i++) {
+      const wordRow = this.drawWord(wrongAnswers[i]);
+      wrongWordsWrapper.append(wordRow);
+    }
+
+    gameInfo.append(accuracy);
+    gameInfo.append(inARow);
+    gameInfo.append(totalWords);
+    modalWindow.append(gameInfo);
+
+    wordsWrapper.append(correctWordsTitle);
+    wordsWrapper.append(correctWordsWrapper);
+    wordsWrapper.append(wrongWordsTitle);
+    wordsWrapper.append(wrongWordsWrapper);
+
+    modalWindow.append(wordsWrapper);
 
     this.fragment.append(modalWindow);
   }
 
-  checkLongestRightRange(resultArray: IStatisticAnswer[]) {
-    const array = resultArray.map(word => word.answerCorrectness);
+  drawWord(card: IStatisticAnswer) {
+    /*
+    interface IStatisticAnswer {
+    id: string,
+    audio: string,
+    group: number,
+    image: string,
+    page: number,
+    word: string,
+    wordTranslate: string,
+    answerCorrectness: boolean;
+  } */
+    const wordRow = createDiv({
+      className: 'game-modal__word-row modal-row',
+    });
+
+    const audioBtn = createButton({
+      className: 'modal-row__audio icon-button',
+    });
+    const audio = new Audio();
+    audio.src = `${baseUrl}/${card.audio}`;
+    audioBtn.addEventListener('click', () => {
+      audio.currentTime = 0;
+      audio.play();
+    });
+
+    const wordText = createSpan({
+      className: 'modal-row__word',
+      text: card.word,
+    });
+
+    const wordSplit = createSpan({
+      className: 'modal-row__split',
+      text: '-',
+    });
+
+    const wordTranslation = createSpan({
+      className: 'modal-row__translation',
+      text: card.wordTranslate,
+    });
+
+    wordRow.append(audioBtn);
+    wordRow.append(wordText);
+    wordRow.append(wordSplit);
+    wordRow.append(wordTranslation);
+
+    return wordRow;
+  }
+
+  // В этот раз не получилось, но продолжай тренироваться!
+
+
+  longestRightRange() {
+    const array = this.resultArray.map(word => word.answerCorrectness);
     let length: number;
     if (!array.some(e => e === true)) {
-      length = 0;
+      return length = 0;
     }
 
     const res: boolean[] = array.reduce((a, c) => {
@@ -78,10 +172,7 @@ export default class ModalStatistic extends BaseComponent {
       .reduce(function (a, c) {
         return c.length > a.length ? c : a;
       });
-
     length = res.length;
-
-    console.log('Sequence length=', length);
     return length;
   }
 

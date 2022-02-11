@@ -1,5 +1,5 @@
 import BaseComponent from '../../base';
-import { updateContent } from '../../../rooting';
+import { pageChenging, updateContent } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 // import { updateState, getState } from '../../../state';
@@ -147,7 +147,7 @@ export default class AudioGame extends BaseComponent {
     audioPage.append(this.nextBtn);
 
     // todo temporary show modal
-    this.showModalStatistics();
+    // this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
@@ -382,7 +382,7 @@ export default class AudioGame extends BaseComponent {
   }
 
 
-  showModalStatistics(): void {
+  private showModalStatistics(): void {
     const modalStatistic = createDiv({
       className: '',
       dataSet: {
@@ -395,61 +395,119 @@ export default class AudioGame extends BaseComponent {
   }
 
   giveDataToModalStatistic(): IStatisticAnswer[] {
-    return [
-      {
-        answerCorrectness: false,
-        audio: 'files/10_0192.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0192.jpg',
-        page: 9,
-        word: 'immediate',
-        wordTranslate: 'немедленно',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0191.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0191.jpg',
-        page: 9,
-        word: 'unknown_2',
-        wordTranslate: 'неизвестно_2',
-      },
-      {
-        answerCorrectness: false,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-    ];
-    // return this.answersArray;
+    // return [
+    //   {
+    //     answerCorrectness: false,
+    //     audio: 'files/10_0192.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0192.jpg',
+    //     page: 9,
+    //     word: 'immediate',
+    //     wordTranslate: 'немедленно',
+    //   },
+    //   {
+    //     answerCorrectness: true,
+    //     audio: 'files/10_0191.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0191.jpg',
+    //     page: 9,
+    //     word: 'unknown_2',
+    //     wordTranslate: 'неизвестно_2',
+    //   },
+    //   {
+    //     answerCorrectness: true,
+    //     audio: 'files/10_0191.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0191.jpg',
+    //     page: 9,
+    //     word: 'unknown_2',
+    //     wordTranslate: 'неизвестно_2',
+    //   },
+    //   {
+    //     answerCorrectness: true,
+    //     audio: 'files/10_0191.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0191.jpg',
+    //     page: 9,
+    //     word: 'unknown_2',
+    //     wordTranslate: 'неизвестно_2',
+    //   },
+    //   {
+    //     answerCorrectness: false,
+    //     audio: 'files/10_0190.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0190.jpg',
+    //     page: 9,
+    //     word: 'unknown_3',
+    //     wordTranslate: 'неизвестно_3',
+    //   },
+    //   {
+    //     answerCorrectness: false,
+    //     audio: 'files/10_0190.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0190.jpg',
+    //     page: 9,
+    //     word: 'unknown_3',
+    //     wordTranslate: 'неизвестно_3',
+    //   },
+    //   {
+    //     answerCorrectness: false,
+    //     audio: 'files/10_0190.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0190.jpg',
+    //     page: 9,
+    //     word: 'unknown_3',
+    //     wordTranslate: 'неизвестно_3',
+    //   },
+    //   {
+    //     answerCorrectness: false,
+    //     audio: 'files/10_0190.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0190.jpg',
+    //     page: 9,
+    //     word: 'unknown_3',
+    //     wordTranslate: 'неизвестно_3',
+    //   },
+    //   {
+    //     answerCorrectness: false,
+    //     audio: 'files/10_0190.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0190.jpg',
+    //     page: 9,
+    //     word: 'unknown_3',
+    //     wordTranslate: 'неизвестно_3',
+    //   },
+    //   {
+    //     answerCorrectness: false,
+    //     audio: 'files/10_0190.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0190.jpg',
+    //     page: 9,
+    //     word: 'unknown_3',
+    //     wordTranslate: 'неизвестно_3',
+    //   },
+    //   {
+    //     answerCorrectness: false,
+    //     audio: 'files/10_0190.mp3',
+    //     group: 0,
+    //     id: '5e9f5ee35eb9e72bc21af55f',
+    //     image: 'files/10_0190.jpg',
+    //     page: 9,
+    //     word: 'unknown_3',
+    //     wordTranslate: 'неизвестно_3',
+    //   },
+    // ];
+    return this.answersArray;
   }
-
-  /*
-  correctAnswers: number - число верных ответов всего по слову
-  answersAll: number - число ответов всего по слову
-  newWord : number – новое слово
-  newWordDate: {date, boolean}[] – новое слово по датам
-  learnedWord: boolean - изученное слово (после 3-х верных ответов подряд)
-  learnedWordDate: {date, boolean}[]  – изуч. слово по датам
-  learnedWordsCounter: number – счетчик верных ответов (обнуляется после неверного и обновляет learnedWord)
-  // игры
-
-  correctAnswersSprint: {date, number}[]  - число верных ответов по игре по датам
-  correctAnswersAudio: {date, number}[]  - число верных ответов по игре по датам
-  answersSprint: {date, number}[]  - число ответов по игре по датам
-  answersAudio: {date, number}[]  - число ответов по игре по датам
-  correctAnswersRangeSprint: number – серия верных ответов по игре
-  correctAnswersRangeAudio: number– серия верных ответов по игре
-
-
-  количество новых слов за день
-  */
-
 
 }
