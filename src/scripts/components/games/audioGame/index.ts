@@ -392,55 +392,6 @@ export default class AudioGame extends BaseComponent {
     });
     this.elem.append(modalStatistic);
     updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
-
-    /* // rightAnswers - к-во правильных ответов
-
-    const modalDiv = createDiv({
-      className: 'audio__statistics',
-    });
-
-    const correctField = createDiv({
-      className: 'modal-score__correct',
-    });
-
-    this.correctAnswersArray.forEach(correctElem => {
-      const text = createSpan({
-        text: correctElem.word,
-      });
-      const translateText = createSpan({
-        text: correctElem.wordTranslate,
-      });
-      correctField?.append(text);
-      correctField?.append(translateText);
-    });
-
-    modalDiv.append(correctField);
-
-    const wrongField = createDiv({
-      className: 'modal-score__wrong',
-    });
-    this.wrongAnswersArray.forEach(wrongElem => {
-      const text = createSpan({
-        text: wrongElem.word,
-      });
-      const translateText = createSpan({
-        text: wrongElem.wordTranslate,
-      });
-      wrongField?.append(text);
-      wrongField?.append(translateText);
-    });
-
-    modalDiv.append(wrongField);
-
-    // появление модального окна
-    modalDiv.classList.add('show');
-
-    this.elem.append(modalDiv);
-    // let modalBlitzHomeBtn = document.querySelector('.modal-blitz-home');
-
-    // modalBlitzHomeBtn.addEventListener('click', () => {
-    //     modalScoreWrapper.classList.add('hide');
-    // }); */
   }
 
   giveDataToModalStatistic(): IStatisticAnswer[] {
@@ -456,16 +407,49 @@ export default class AudioGame extends BaseComponent {
         wordTranslate: 'немедленно',
       },
       {
-        answerCorrectness: false,
+        answerCorrectness: true,
         audio: 'files/10_0191.mp3',
         group: 0,
         id: '5e9f5ee35eb9e72bc21af55f',
         image: 'files/10_0191.jpg',
         page: 9,
-        word: 'unknown',
-        wordTranslate: 'неизвестно',
+        word: 'unknown_2',
+        wordTranslate: 'неизвестно_2',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
       },
     ];
     // return this.answersArray;
   }
+
+  /*
+  correctAnswers: number - число верных ответов всего по слову
+  answersAll: number - число ответов всего по слову
+  newWord : number – новое слово
+  newWordDate: {date, boolean}[] – новое слово по датам
+  learnedWord: boolean - изученное слово (после 3-х верных ответов подряд)
+  learnedWordDate: {date, boolean}[]  – изуч. слово по датам
+  learnedWordsCounter: number – счетчик верных ответов (обнуляется после неверного и обновляет learnedWord)
+  // игры
+
+  correctAnswersSprint: {date, number}[]  - число верных ответов по игре по датам
+  correctAnswersAudio: {date, number}[]  - число верных ответов по игре по датам
+  answersSprint: {date, number}[]  - число ответов по игре по датам
+  answersAudio: {date, number}[]  - число ответов по игре по датам
+  correctAnswersRangeSprint: number – серия верных ответов по игре
+  correctAnswersRangeAudio: number– серия верных ответов по игре
+
+
+  количество новых слов за день
+  */
+
+
 }
