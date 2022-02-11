@@ -1,0 +1,10 @@
+.game__modal-window {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  min-height: 200px;
+  background: pink;
+}

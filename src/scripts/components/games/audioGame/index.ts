@@ -1,5 +1,5 @@
 import BaseComponent from '../../base';
-// import { pageChenging } from '../../../rooting';
+import { updateContent } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 // import { updateState, getState } from '../../../state';
@@ -10,6 +10,16 @@ import { WordCard } from '../../../api/api.types';
 interface IState {
   questionWords: WordCard[];
   translateWords: string[];
+}
+export interface IStatisticAnswer {
+  id: string,
+  audio: string,
+  group: number,
+  image: string,
+  page: number,
+  word: string,
+  wordTranslate: string,
+  answerCorrectness: boolean;
 }
 export default class AudioGame extends BaseComponent {
   test: HTMLElement | undefined;
@@ -42,9 +52,11 @@ export default class AudioGame extends BaseComponent {
 
   currentQuestionCard: Partial<WordCard> = {};
 
-  correctAnswersArray: Partial<WordCard>[] = [];
+  // correctAnswersArray: Partial<WordCard>[] = [];
 
-  wrongAnswersArray: Partial<WordCard>[] = [];
+  // wrongAnswersArray: Partial<WordCard>[] = [];
+
+  answersArray: IStatisticAnswer[] = [];
 
 
   constructor(elem: HTMLElement) {
@@ -69,7 +81,7 @@ export default class AudioGame extends BaseComponent {
     } else {
       totalQuestionSpan.textContent = '/20';
     }
-    // стартую первый раз игру
+    // стартуем первый раз игру
     this.showNextQuestion();
 
     return Promise.resolve();
@@ -78,7 +90,6 @@ export default class AudioGame extends BaseComponent {
   private definePageAndGroup(): void {
     const options = this.options ? JSON.parse(this.options) : {};
     this.page = getRandom(constants.minWordsPage, constants.maxWordsPage);
-
     if (options.page) {
       this.page = options.page;
     }
@@ -86,7 +97,6 @@ export default class AudioGame extends BaseComponent {
     if (options.group) {
       this.group = +options.group;
     }
-
     console.log('this.page', this.page);
     console.log('this.group', this.group);
   }
@@ -101,31 +111,25 @@ export default class AudioGame extends BaseComponent {
     });
     const questionCurrentAmount = createSpan({
       className: 'questionsAmount__current',
-      text: '',
     });
     const questionTotalAmount = createSpan({
       className: 'questionsAmount__total',
     });
-
     const questionField = createDiv({
       className: 'audio-game__questionField questionField',
     });
-
     const imageDiv = createDiv({
       className: 'questionField__image',
     });
-
     const audioWrapper = createDiv({
       className: 'questionField__audio-wrapper',
     });
     const audioWord = createSpan({
       className: 'questionField__word',
     });
-
     const answersField = createDiv({
       className: 'audio-game__answers audio-answers',
     });
-
     this.nextBtn = createButton({
       className: 'audio-game__next',
     });
@@ -141,6 +145,9 @@ export default class AudioGame extends BaseComponent {
     audioPage.append(questionField);
     audioPage.append(answersField);
     audioPage.append(this.nextBtn);
+
+    // todo temporary show modal
+    this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
@@ -211,12 +218,10 @@ export default class AudioGame extends BaseComponent {
     this.enableKeyAnswer = true;
 
     if (!this.totalQuestions || !this.nextBtn) return;
-    // Проверка на количество вопросов, если 20-е, то модальное окно со статистикой
+    // модальное окно со статистикой
     if (this.questionNumber > this.totalQuestions) {
       console.log('STATISTICS!');
       this.nextBtn.style.pointerEvents = 'none';
-      console.log('wrongAnswersArray', this.wrongAnswersArray);
-      console.log('correctAnswersArray', this.correctAnswersArray);
       this.showModalStatistics();
       return;
     }
@@ -227,9 +232,17 @@ export default class AudioGame extends BaseComponent {
 
     if (!this.wordsFromAPI.questionWords) return;
     this.currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
-    console.log('currentQuestionCard', this.currentQuestionCard);
 
+    console.log('currentQuestionCard', this.currentQuestionCard);
     // картинка
+    this.implementPicture();
+    // аудио звук
+    this.implementAudio();
+    // варианты ответов
+    this.implementAnswers();
+  }
+
+  private implementPicture(): void {
     const imageDiv = this.elem.querySelector('.questionField__image') as HTMLElement;
     const img = new Image();
     img.src = `${baseUrl}/${this.currentQuestionCard.image}`;
@@ -238,8 +251,9 @@ export default class AudioGame extends BaseComponent {
     };
     const questionDiv = this.elem.querySelector('.questionField') as HTMLElement;
     questionDiv.classList.remove('show');
+  }
 
-    // аудио звук
+  private implementAudio(): void {
     const audioWrapper = this.elem.querySelector('.questionField__audio-wrapper') as HTMLElement;
     audioWrapper.innerHTML = '';
     const audioBtn = createButton({
@@ -252,14 +266,14 @@ export default class AudioGame extends BaseComponent {
       this.audio.currentTime = 0;
       this.audio.play();
     });
+  }
 
-    // варианты ответов
+  private implementAnswers(): void {
     const answersField = this.elem.querySelector('.audio-answers') as HTMLElement;
     answersField.innerHTML = '';
     const correctAnswer = this.currentQuestionCard.wordTranslate;
     if (!correctAnswer || !this.wordsFromAPI.translateWords) return;
     const answers = this.getArrOfAnswers(correctAnswer, this.wordsFromAPI.translateWords);
-
     for (let i = 0; i < constants.answersInAudioGame; i++) {
       const answerDiv = createDiv({
         className: 'audio-answers__answer',
@@ -275,17 +289,28 @@ export default class AudioGame extends BaseComponent {
           this.answerResult(false);
         }
       });
-
       answersField.append(answerDiv);
     }
   }
 
   private answerResult(answer: boolean): void {
     const allDivAnswers = this.elem.querySelectorAll('.audio-answers__answer');
+    const answerToStatistic = Object.assign(this.currentQuestionCard);
+    delete answerToStatistic.audioExample;
+    delete answerToStatistic.audioMeaning;
+    delete answerToStatistic.textExample;
+    delete answerToStatistic.textExampleTranslate;
+    delete answerToStatistic.textMeaning;
+    delete answerToStatistic.textMeaningTranslate;
+    delete answerToStatistic.transcription;
     if (answer) {
-      this.correctAnswersArray.push(this.currentQuestionCard);
+      answerToStatistic.answerCorrectness = true;
+      this.answersArray.push(answerToStatistic);
+      // this.correctAnswersArray.push(this.currentQuestionCard);
     } else {
-      this.wrongAnswersArray.push(this.currentQuestionCard);
+      answerToStatistic.answerCorrectness = false;
+      this.answersArray.push(answerToStatistic);
+      // this.wrongAnswersArray.push(this.currentQuestionCard);
     }
     allDivAnswers.forEach(divAnswer => {
       if (divAnswer.textContent) {
@@ -322,7 +347,6 @@ export default class AudioGame extends BaseComponent {
     if (this.group !== undefined) {
       const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(this.group))
         .map(elem => elem.wordTranslate);
-
       // todo новые слова перепроверить ТУТ!, которые придут не связанные с группой
       const filterWordsOfCurrentGroup = this.wordsFromAPI.questionWords?.map(card => {
         return card.wordTranslate;
@@ -353,14 +377,24 @@ export default class AudioGame extends BaseComponent {
     for (let i = 0; i < constants.answersInAudioGame - 1; i++) {
       answers.push(fakeArrayAnswers[i]);
     }
-    // shuffling 4 answers
     shuffleArray(answers);
     return answers;
   }
 
 
-  showModalStatistics() {
-    // rightAnswers - к-во правильных ответов
+  showModalStatistics(): void {
+    const modalStatistic = createDiv({
+      className: '',
+      dataSet: {
+        widget: 'modalStatistic',
+        parentId: this.id,
+      },
+    });
+    this.elem.append(modalStatistic);
+    updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
+
+    /* // rightAnswers - к-во правильных ответов
+
     const modalDiv = createDiv({
       className: 'audio__statistics',
     });
@@ -406,6 +440,32 @@ export default class AudioGame extends BaseComponent {
 
     // modalBlitzHomeBtn.addEventListener('click', () => {
     //     modalScoreWrapper.classList.add('hide');
-    // });
+    // }); */
+  }
+
+  giveDataToModalStatistic(): IStatisticAnswer[] {
+    return [
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0192.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0192.jpg',
+        page: 9,
+        word: 'immediate',
+        wordTranslate: 'немедленно',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0191.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0191.jpg',
+        page: 9,
+        word: 'unknown',
+        wordTranslate: 'неизвестно',
+      },
+    ];
+    // return this.answersArray;
   }
 }
