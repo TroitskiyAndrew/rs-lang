@@ -1,5 +1,5 @@
 import BaseComponent from '../../base';
-import { pageChenging, updateContent } from '../../../rooting';
+import { updateContent } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 // import { updateState, getState } from '../../../state';
@@ -143,7 +143,7 @@ export default class AudioGame extends BaseComponent {
     audioPage.append(this.nextBtn);
 
     // todo temporary show modal
-    this.showModalStatistics();
+    // this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
@@ -390,8 +390,8 @@ export default class AudioGame extends BaseComponent {
   }
 
   giveDataToModalStatistic(): IStatisticAnswer[] {
-    return this.fake();
-    // return this.answersArray;
+    // return this.fake();
+    return this.answersArray;
   }
 
   public playAgain() {

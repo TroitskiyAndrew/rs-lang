@@ -116,6 +116,9 @@ export default class ModalStatistic extends BaseComponent {
     wordsWrapper.append(wrongWordsWrapper);
 
     // todo btns
+    const navigationModal = createDiv({
+      className: 'game-modal__navigation',
+    });
     const againBtn = createButton({
       className: 'game-modal__button game-modal__play-again',
       text: 'повторить',
@@ -129,18 +132,18 @@ export default class ModalStatistic extends BaseComponent {
     const toGamesBtn = createButton({
       className: 'game-modal__button game-modal__to-games',
       text: 'к играм',
+      dataSet: {
+        direction: 'pageGames',
+      },
     });
-    if (parenWidget instanceof AudioGame) {
-      toGamesBtn.onclick = () => {
-        this.close(parenWidget.elem);
-        parenWidget.playAgain();
-      };
-    }
-    modalWindow.append(againBtn);
-    modalWindow.append(toGamesBtn);
+
+    navigationModal.append(againBtn);
+    navigationModal.append(toGamesBtn);
+
 
     gameContent.append(wordsWrapper);
     modalWindow.append(gameContent);
+    modalWindow.append(navigationModal);
 
     this.fragment.append(modalWindow);
   }

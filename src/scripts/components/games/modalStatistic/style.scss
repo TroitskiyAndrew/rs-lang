@@ -8,17 +8,24 @@
   outline: 2px solid white;
   color: white;
 
-  &__button {
-    position: absolute;
-    bottom: -50px;
+  &__navigation {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px 0;
   }
 
-  &__play-again {
+  /*   &__button {
+    position: absolute;
+    bottom: -50px;
+  } */
+
+  /*   &__play-again {
     left: 0;
-  }
-  &__to-games {
+  } */
+  /*   &__to-games {
     right: 0;
-  }
+  } */
 
   &__content {
     min-width: 500px;
@@ -56,7 +63,6 @@
 
   &__info {
     display: flex;
-    // flex-direction: column;
 
     &-left {
       flex: 0 1 50%;
@@ -100,15 +106,15 @@
   }
 
   .game-modal__correct-words {
-    // background: aqua;
+    margin: 10px 0;
   }
   .game-modal__wrong-words {
-    // background: rgb(240, 136, 99);
+    margin: 10px 0;
   }
 
-  .game-modal__word-row {
-    // font-size: 24px;
-  }
+  /*   .game-modal__word-row {
+  font-size: 24px;
+  } */
 }
 
 .modal-row {
@@ -131,19 +137,10 @@
     color: #2582e7;
   }
 
-  &__split {
-  }
+  /*   &__split {
+  } */
 
   &__translation {
     color: whitesmoke;
   }
 }
-
-// .words-wrapper__correct {
-//   font-size: 24px;
-//   color: green;
-// }
-// .words-wrapper__wrong {
-//   font-size: 24px;
-//   color: red;
-// }
