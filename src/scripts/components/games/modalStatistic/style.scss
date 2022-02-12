@@ -4,45 +4,88 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  min-width: 500px;
-  min-height: 200px;
-  max-height: 500px;
-  overflow-y: scroll;
   background: rgba(0, 0, 0, 1);
-  color: white;
-  padding: 20px;
   outline: 2px solid white;
+  color: white;
+
+  &__button {
+    position: absolute;
+    bottom: -50px;
+  }
+
+  &__play-again {
+    left: 0;
+  }
+  &__to-games {
+    right: 0;
+  }
+
+  &__content {
+    min-width: 500px;
+    max-height: 500px;
+    padding: 20px;
+    overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+      width: 10px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-button {
+      display: none;
+    }
+
+    &::-webkit-scrollbar-track-piece {
+      background-color: white;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      height: 50px;
+      background-color: #999999;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-corner {
+      background-color: #999999;
+    }
+
+    &::-webkit-resizer {
+      background-color: white;
+    }
+  }
 
   &__info {
     display: flex;
-    flex-direction: column;
-  }
+    // flex-direction: column;
 
-  &::-webkit-scrollbar {
-    width: 10px;
-    height: 8px;
-  }
+    &-left {
+      flex: 0 1 50%;
 
-  &::-webkit-scrollbar-button {
-    display: none;
-  }
+      .progress-ring {
+        position: relative;
+        width: 120px;
+        height: 120px;
 
-  &::-webkit-scrollbar-track-piece {
-    background-color: white;
-  }
+        .progress-ring__text {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
 
-  &::-webkit-scrollbar-thumb {
-    height: 50px;
-    background-color: #999999;
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-corner {
-    background-color: #999999;
-  }
-
-  &::-webkit-resizer {
-    background-color: white;
+        .progress-ring__circle {
+          transform-origin: center;
+          transform: rotate(-90deg);
+          transition: all 0.3s ease 0s;
+        }
+      }
+    }
+    &-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 0 1 50%;
+    }
   }
 }
 
@@ -92,7 +135,7 @@
   }
 
   &__translation {
-    color: #37383c;
+    color: whitesmoke;
   }
 }
 

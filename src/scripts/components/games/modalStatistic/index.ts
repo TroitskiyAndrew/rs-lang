@@ -1,5 +1,5 @@
 
-import { createDiv, createSpan, createButton, createInput } from '../../../utils';
+import { createDiv, createSpan, createButton } from '../../../utils';
 import constants from '../../../app.constants';
 import BaseComponent from '../../base';
 import { instances } from '../../components';
@@ -16,8 +16,8 @@ export default class ModalStatistic extends BaseComponent {
   }
 
   public createHTML(): void {
-    const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame;
-    // const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame | SprintGame;
+    // const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame;
+    const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame | SprintGame;
     this.resultArray = parenWidget.giveDataToModalStatistic();
 
     const rightAnswers = this.resultArray.filter(word => {
@@ -27,12 +27,8 @@ export default class ModalStatistic extends BaseComponent {
       return !word.answerCorrectness;
     });
 
-    if (parenWidget instanceof AudioGame) {
-      console.log('AUDIO GAME');
-    }
-
     // процент правильных ответов
-    const totalPercents = 100;
+    const totalPercents = constants.hundred;
     const percentOfRightAnswers = Math.floor(rightAnswers.length * totalPercents / this.resultArray.length);
 
     // выходные данные
@@ -46,8 +42,17 @@ export default class ModalStatistic extends BaseComponent {
     const modalWindow = createDiv({
       className: 'game-modal',
     });
+    const gameContent = createDiv({
+      className: 'game-modal__content',
+    });
     const gameInfo = createDiv({
       className: 'game-modal__info',
+    });
+    const gameInfoLeft = createDiv({
+      className: 'game-modal__info-left',
+    });
+    const gameInfoRight = createDiv({
+      className: 'game-modal__info-right',
     });
     const accuracy = createSpan({
       text: `Точность ответов - ${percentOfRightAnswers}%`,
@@ -58,6 +63,15 @@ export default class ModalStatistic extends BaseComponent {
     const totalWords = createSpan({
       text: `Всего слов - ${this.resultArray.length}`,
     });
+
+    if (parenWidget instanceof AudioGame) {
+      console.log('AUDIO GAME');
+    } else if (parenWidget instanceof SprintGame) {
+      const totalScore = createSpan({
+        text: `К-во баллов - ${parenWidget.giveScoreToModalStatistic()}`,
+      });
+      gameInfoRight.append(totalScore);
+    }
 
     const wordsWrapper = createDiv({
       className: 'game-modal__words-wrapper',
@@ -86,17 +100,47 @@ export default class ModalStatistic extends BaseComponent {
       wrongWordsWrapper.append(wordRow);
     }
 
-    gameInfo.append(accuracy);
-    gameInfo.append(inARow);
-    gameInfo.append(totalWords);
-    modalWindow.append(gameInfo);
+    gameInfoRight.append(accuracy);
+    gameInfoRight.append(inARow);
+    gameInfoRight.append(totalWords);
+    gameInfoLeft.append(this.createProgress(percentOfRightAnswers));
+    gameInfo.append(gameInfoLeft);
+    gameInfo.append(gameInfoRight);
+    gameContent.append(gameInfo);
+
+    modalWindow.append(gameContent);
 
     wordsWrapper.append(correctWordsTitle);
     wordsWrapper.append(correctWordsWrapper);
     wordsWrapper.append(wrongWordsTitle);
     wordsWrapper.append(wrongWordsWrapper);
 
-    modalWindow.append(wordsWrapper);
+    // todo btns
+    const againBtn = createButton({
+      className: 'game-modal__button game-modal__play-again',
+      text: 'повторить',
+    });
+    if (parenWidget instanceof AudioGame) {
+      againBtn.onclick = () => {
+        this.close(parenWidget.elem);
+        parenWidget.playAgain();
+      };
+    }
+    const toGamesBtn = createButton({
+      className: 'game-modal__button game-modal__to-games',
+      text: 'к играм',
+    });
+    if (parenWidget instanceof AudioGame) {
+      toGamesBtn.onclick = () => {
+        this.close(parenWidget.elem);
+        parenWidget.playAgain();
+      };
+    }
+    modalWindow.append(againBtn);
+    modalWindow.append(toGamesBtn);
+
+    gameContent.append(wordsWrapper);
+    modalWindow.append(gameContent);
 
     this.fragment.append(modalWindow);
   }
@@ -176,13 +220,42 @@ export default class ModalStatistic extends BaseComponent {
     return length;
   }
 
+  createProgress(percent: number): HTMLElement {
+    const width = 120;
+    const height = width;
+    const strokeWidth = 4;
+    const cx = width / 2;
+    const cy = cx;
+    const radius = width / 2 - strokeWidth * 2;
+    const strokeColor = '#64B5F6';
+
+    const progressBar = createDiv({
+      className: 'progress-ring',
+    });
+    const progressText = createSpan({
+      className: 'progress-ring__text',
+      text: `${percent}%`,
+    });
+    const circumference = 2 * Math.PI * radius;
+    const fullPercent = constants.hundred;
+    const offset = circumference - (percent / fullPercent) * circumference;
+
+    progressBar.innerHTML = `<svg width='${width}' height='${height}'>
+      <circle class="progress-ring__circle" stroke="${strokeColor}" stroke-width="${strokeWidth}" cx="${cx}" cy="${cy}" r="${radius}" fill="transparent" stroke-dasharray="${circumference} ${circumference}" stroke-dashoffset="${offset}" />
+      </svg>`;
+
+    progressBar.append(progressText);
+
+    return progressBar;
+  }
+
   public listenEvents(): void {
 
   }
 
 
-  close() {
+  close(parent: HTMLElement) {
     this.dispose();
-
+    parent.removeChild(this.elem);
   }
 }

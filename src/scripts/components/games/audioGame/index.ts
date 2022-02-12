@@ -52,10 +52,6 @@ export default class AudioGame extends BaseComponent {
 
   currentQuestionCard: Partial<WordCard> = {};
 
-  // correctAnswersArray: Partial<WordCard>[] = [];
-
-  // wrongAnswersArray: Partial<WordCard>[] = [];
-
   answersArray: IStatisticAnswer[] = [];
 
 
@@ -82,7 +78,6 @@ export default class AudioGame extends BaseComponent {
     } else {
       totalQuestionSpan.textContent = '/20';
     }
-    // стартуем первый раз игру
     this.showNextQuestion();
 
     return Promise.resolve();
@@ -205,10 +200,12 @@ export default class AudioGame extends BaseComponent {
     if (this.questionNumber > this.totalQuestions) return;
     if (this.isChangeablePage) {
       this.questionNumber++;
+      this.enableKeyAnswer = false;
       this.showNextQuestion();
       this.isChangeablePage = false;
     } else {
       (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
+      this.enableKeyAnswer = false;
       this.answerResult(false);
       this.isChangeablePage = true;
     }
@@ -221,7 +218,6 @@ export default class AudioGame extends BaseComponent {
     if (!this.totalQuestions || !this.nextBtn) return;
     // модальное окно со статистикой
     if (this.questionNumber > this.totalQuestions) {
-      console.log('STATISTICS!');
       this.nextBtn.style.pointerEvents = 'none';
       this.showModalStatistics();
       return;
@@ -307,11 +303,9 @@ export default class AudioGame extends BaseComponent {
     if (answer) {
       answerToStatistic.answerCorrectness = true;
       this.answersArray.push(answerToStatistic);
-      // this.correctAnswersArray.push(this.currentQuestionCard);
     } else {
       answerToStatistic.answerCorrectness = false;
       this.answersArray.push(answerToStatistic);
-      // this.wrongAnswersArray.push(this.currentQuestionCard);
     }
     allDivAnswers.forEach(divAnswer => {
       if (divAnswer.textContent) {
@@ -400,6 +394,14 @@ export default class AudioGame extends BaseComponent {
     // return this.answersArray;
   }
 
+  public playAgain() {
+    this.questionNumber = 0;
+    this.currentQuestionCard = {};
+    this.answersArray = [];
+    (this.nextBtn as HTMLElement).style.pointerEvents = 'auto';
+    this.showNextQuestion();
+  }
+
   private fake() {
     return [
       {
@@ -453,7 +455,27 @@ export default class AudioGame extends BaseComponent {
         wordTranslate: 'неизвестно_3',
       },
       {
-        answerCorrectness: false,
+        answerCorrectness: true,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: true,
         audio: 'files/10_0190.mp3',
         group: 0,
         id: '5e9f5ee35eb9e72bc21af55f',
@@ -473,7 +495,7 @@ export default class AudioGame extends BaseComponent {
         wordTranslate: 'неизвестно_3',
       },
       {
-        answerCorrectness: false,
+        answerCorrectness: true,
         audio: 'files/10_0190.mp3',
         group: 0,
         id: '5e9f5ee35eb9e72bc21af55f',
@@ -483,27 +505,7 @@ export default class AudioGame extends BaseComponent {
         wordTranslate: 'неизвестно_3',
       },
       {
-        answerCorrectness: false,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: false,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: false,
+        answerCorrectness: true,
         audio: 'files/10_0190.mp3',
         group: 0,
         id: '5e9f5ee35eb9e72bc21af55f',
