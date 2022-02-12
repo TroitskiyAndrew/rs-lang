@@ -66,6 +66,7 @@ export default class AudioGame extends BaseComponent {
 
   public async oninit(): Promise<void> {
     // pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
+    // pageChenging(createSpan({}), this.name);
 
     // получаю с АПИ данные
     // todo новые слова перезаписать ТУТ!, которые придут не связанные с группой
@@ -147,7 +148,7 @@ export default class AudioGame extends BaseComponent {
     audioPage.append(this.nextBtn);
 
     // todo temporary show modal
-    // this.showModalStatistics();
+    this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
@@ -395,119 +396,122 @@ export default class AudioGame extends BaseComponent {
   }
 
   giveDataToModalStatistic(): IStatisticAnswer[] {
-    // return [
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0192.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0192.jpg',
-    //     page: 9,
-    //     word: 'immediate',
-    //     wordTranslate: 'немедленно',
-    //   },
-    //   {
-    //     answerCorrectness: true,
-    //     audio: 'files/10_0191.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0191.jpg',
-    //     page: 9,
-    //     word: 'unknown_2',
-    //     wordTranslate: 'неизвестно_2',
-    //   },
-    //   {
-    //     answerCorrectness: true,
-    //     audio: 'files/10_0191.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0191.jpg',
-    //     page: 9,
-    //     word: 'unknown_2',
-    //     wordTranslate: 'неизвестно_2',
-    //   },
-    //   {
-    //     answerCorrectness: true,
-    //     audio: 'files/10_0191.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0191.jpg',
-    //     page: 9,
-    //     word: 'unknown_2',
-    //     wordTranslate: 'неизвестно_2',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    // ];
-    return this.answersArray;
+    return this.fake();
+    // return this.answersArray;
   }
 
+  private fake() {
+    return [
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0192.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0192.jpg',
+        page: 9,
+        word: 'immediate',
+        wordTranslate: 'немедленно',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0191.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0191.jpg',
+        page: 9,
+        word: 'unknown_2',
+        wordTranslate: 'неизвестно_2',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0191.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0191.jpg',
+        page: 9,
+        word: 'unknown_2',
+        wordTranslate: 'неизвестно_2',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0191.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0191.jpg',
+        page: 9,
+        word: 'unknown_2',
+        wordTranslate: 'неизвестно_2',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+    ];
+  }
 }

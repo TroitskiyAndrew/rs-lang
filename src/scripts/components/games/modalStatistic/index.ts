@@ -16,8 +16,8 @@ export default class ModalStatistic extends BaseComponent {
   }
 
   public createHTML(): void {
-    // const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame;
-    const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame | SprintGame;
+    const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame;
+    // const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame | SprintGame;
     this.resultArray = parenWidget.giveDataToModalStatistic();
 
     const rightAnswers = this.resultArray.filter(word => {
