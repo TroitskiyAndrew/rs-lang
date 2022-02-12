@@ -49,16 +49,12 @@ export default class SprintGame extends BaseComponent {
   }
 
   public createHTML(): void {
-    
-    // icon-button
     const page = createDiv({ className: 'page sprint' });
     const sprintWrapper = createDiv({ className: 'sprint-wrapper' });
     const paramsWrapper = createDiv({ className: 'params-wrapper' });
     const marioWrapper = createDiv({ className: 'mario-wrapper' });
     const gamepadWrapper = createDiv({ className: 'gamepad-wrapper' });
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
-
-    //this.getApi();
 
     this.getGroupAndPage();
 
@@ -68,7 +64,6 @@ export default class SprintGame extends BaseComponent {
     this.renderWords(wordsWrapper);
     
     this.getWordsArray();
-    
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
@@ -197,8 +192,6 @@ export default class SprintGame extends BaseComponent {
 
     gamepadWrapper.append(controlsWrapper);
     gamepadWrapper.append(buttonsWrapper);
-
-    // this.getNextRandomWords(buttonB, buttonA);
   }
 
   private renderWords(wordsWrapper: HTMLDivElement) {
@@ -212,7 +205,6 @@ export default class SprintGame extends BaseComponent {
   }
 
   private startTimer() {
-    //console.log(startOnce === true)
     if (startTimerOnce === true) {
       const getSecondsLeft = () => {
         const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
@@ -220,6 +212,7 @@ export default class SprintGame extends BaseComponent {
           console.log(0)
           this.paramsTime!.innerHTML = `time<br> 0`;
           this.stopTimer()
+          // this.giveScoreToModalStatistic()
           this.showModalStatistics()
         } else {
           console.log(Math.round(delta / 1000))
@@ -238,8 +231,6 @@ export default class SprintGame extends BaseComponent {
 
   private async getWordsArray() {
     if (options.page === undefined) {
-      // groupWordsArr = [];
-      
       await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
         words.forEach((el) => {
           const elMod: IWordParams =  {
@@ -256,7 +247,6 @@ export default class SprintGame extends BaseComponent {
         })
       });
       console.log(groupWordsArr)
-      
     }
     this.getRandomWords(groupWordsArr);
   }
@@ -353,19 +343,18 @@ export default class SprintGame extends BaseComponent {
     updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
   }
 
-  giveDataToModalStatistic(): IStatisticAnswer[] {
-    roundResults.map(el =>  {
-      if (el === roundResults[roundResults.length - 1]) {
-        delete roundResults[roundResults.length - 1]
-      }
+  public giveDataToModalStatistic(): IStatisticAnswer[] {
+    roundResults = roundResults.map(el =>  {
       delete el.translateCorrectness;
       return el
     })
+    delete roundResults[roundResults.length - 1]
     return roundResults;
   }
 
-
-
+  public giveScoreToModalStatistic(): number {
+    return scoreCounter.score;
+  }
 }
 
 //TODO:
