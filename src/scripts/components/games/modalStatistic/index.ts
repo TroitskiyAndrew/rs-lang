@@ -123,12 +123,11 @@ export default class ModalStatistic extends BaseComponent {
       className: 'game-modal__button game-modal__play-again',
       text: 'повторить',
     });
-    if (parenWidget instanceof AudioGame) {
-      againBtn.onclick = () => {
-        this.close(parenWidget.elem);
-        parenWidget.playAgain();
-      };
-    }
+    againBtn.onclick = () => {
+      this.close(parenWidget.elem);
+      parenWidget.playAgain();
+    };
+
     const toGamesBtn = createButton({
       className: 'game-modal__button game-modal__to-games',
       text: 'к играм',
