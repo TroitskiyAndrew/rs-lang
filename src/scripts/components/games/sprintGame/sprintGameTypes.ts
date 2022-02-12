@@ -2,7 +2,7 @@ import { IStatisticAnswer } from '../audioGame/index'
 
 export interface IGameOptions {
   group: string;
-  page?: string;
+  page?: string | undefined;
 }
 
 export interface IWordParams extends IStatisticAnswer {

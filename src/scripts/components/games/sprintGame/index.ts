@@ -25,6 +25,8 @@ let scoreCounter: IScoreCounter = {
 };
 let startTimerOnce: boolean = true;
 let timerId: NodeJS.Timer;
+let menuButton: HTMLButtonElement
+let menuModal: HTMLUListElement
 
 export default class SprintGame extends BaseComponent {
 
@@ -131,7 +133,7 @@ export default class SprintGame extends BaseComponent {
       // localStorage.setItem ('options', this.options);
       updateState({optionsSprint: this.options})
     } 
-    
+    console.log(options)
     if (options) {
       this.group = options.group;
       if (options.page) this.page = options.page;
@@ -229,11 +231,13 @@ export default class SprintGame extends BaseComponent {
   }
 
   private stopTimer() {
+    console.log(`timerId`+timerId)
     clearInterval (timerId)
   }
 
   private async getWordsArray() {
-    if (options.page === undefined) {
+    // if (options && options.page === undefined) {
+    if (this.page === '') {
       await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
         words.forEach((el) => {
           const elMod: IWordParams =  {
@@ -293,11 +297,30 @@ export default class SprintGame extends BaseComponent {
   }
 
   public listenEvents(): void {
+
     this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
     this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
     this.getMenuButton().then(val => {
-      val.addEventListener('click', this.stopTimer.bind(this) )
+      val.addEventListener('click', menuButtonHandler);
+      menuButton = val;
     });
+    let menuButtonHandler = () => {
+      this.getMenuModal().then(val => {
+        val.addEventListener('click', menuModalHandler)
+        menuModal = val;
+      })
+    }
+    let menuModalHandler = () => {
+      startTimerOnce = true;
+      scoreCounter = {
+        score: 0,
+        multiplyer: 1,
+        multiplyerIntermediateCounter: 0,
+      };
+      this.stopTimer();
+      menuButton.removeEventListener('click', menuButtonHandler);
+      menuModal.removeEventListener('click', menuModalHandler);
+    }
   }
 
   public setActions(): void {
@@ -331,8 +354,12 @@ export default class SprintGame extends BaseComponent {
   }
 
   private async getMenuButton(): Promise<HTMLButtonElement> {
-    return  await document.getElementsByClassName('menu__button icon-button')[0] as HTMLButtonElement;
+    return await document.getElementsByClassName('menu__button icon-button')[0] as HTMLButtonElement;
   }
+
+  private async getMenuModal(): Promise<HTMLUListElement> {
+    return await document.getElementsByClassName('menu__list')[0] as HTMLUListElement;
+  } 
 
   private showModalStatistics(): void {
     const modalStatistic = createDiv({
