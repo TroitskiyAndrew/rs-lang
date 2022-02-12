@@ -1,27 +1,29 @@
 import BaseComponent from '../../base';
 import { createButton, createDiv, createSpan, getRandom } from '../../../utils';
-import { pageChenging } from '../../../rooting';
+import { pageChenging, updateContent } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
-import { IGameOptions, IWordAndTranslation, IRoundResult, IScoreCounter } from './sprintGameTypes';
-// import GameLauncher from '../gameLauncher';
+import { IGameOptions, IWordParams, IScoreCounter } from './sprintGameTypes';
+import { IStatisticAnswer } from '../audioGame/index'
+import Menu from '../../menu/index';
+
+// IWordAndTranslation, IRoundResult, 
 
 const GROUP_WORDS_NUMBER = 600;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
 const MAX_SCORE_MULTIPLYER = 8;
-const TIME_FOR_GAME_MILISECONDS = 60000;
+const TIME_FOR_GAME_MILISECONDS = 20000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 
 let options: IGameOptions;
-let groupWordsArr: IWordAndTranslation[];
-let roundResults: IRoundResult[] = [];
+let groupWordsArr: IStatisticAnswer[] =[];
+let roundResults: IWordParams[] = [];
 let scoreCounter: IScoreCounter = {
   score: 0,
   multiplyer: 1,
   multiplyerIntermediateCounter: 0,
 };
-// let roundScore: number = 0;
-// let multiplyer: number = 1;
-//let translateCorrectness: boolean;
+let startTimerOnce: boolean = true;
+let timerId: NodeJS.Timer;
 
 export default class SprintGame extends BaseComponent {
 
@@ -54,8 +56,6 @@ export default class SprintGame extends BaseComponent {
     const gamepadWrapper = createDiv({ className: 'gamepad-wrapper' });
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
 
-    //this.getApi();
-
     this.getGroupAndPage();
 
     this.renderParams(paramsWrapper);
@@ -64,7 +64,6 @@ export default class SprintGame extends BaseComponent {
     this.renderWords(wordsWrapper);
     
     this.getWordsArray();
-    this.startTimer();
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
@@ -193,8 +192,6 @@ export default class SprintGame extends BaseComponent {
 
     gamepadWrapper.append(controlsWrapper);
     gamepadWrapper.append(buttonsWrapper);
-
-    // this.getNextRandomWords(buttonB, buttonA);
   }
 
   private renderWords(wordsWrapper: HTMLDivElement) {
@@ -208,44 +205,53 @@ export default class SprintGame extends BaseComponent {
   }
 
   private startTimer() {
-
-    const getSecondsLeft = () => {
-      const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
-      if (Math.round(delta / 1000) === 0) {
-        console.log(0)
-        this.paramsTime!.innerHTML = `time<br> 0`;
-        clearInterval (timerId)
-      } else {
-        console.log(Math.round(delta / 1000))
-        this.paramsTime!.innerHTML = `time<br> ${Math.round(delta / 1000)}`;
+    if (startTimerOnce === true) {
+      const getSecondsLeft = () => {
+        const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
+        if (Math.round(delta / 1000) === 0) {
+          console.log(0)
+          this.paramsTime!.innerHTML = `time<br> 0`;
+          this.stopTimer()
+          // this.giveScoreToModalStatistic()
+          this.showModalStatistics()
+        } else {
+          console.log(Math.round(delta / 1000))
+          this.paramsTime!.innerHTML = `time<br> ${Math.round(delta / 1000)}`;
+        }
       }
+      const start = Date.now();
+      timerId = setInterval(getSecondsLeft, 1000)
     }
+    startTimerOnce = false;
+  }
 
-    const start = Date.now();
-    const timerId = setInterval(getSecondsLeft, 1000)
+  private stopTimer() {
+    clearInterval (timerId)
   }
 
   private async getWordsArray() {
     if (options.page === undefined) {
-      groupWordsArr = [];
-      
       await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
         words.forEach((el) => {
-          const elMod: IWordAndTranslation =  {
+          const elMod: IWordParams =  {
+            id: `${el.id}`,
+            group: el.group,
+            image: `${el.image}`,
+            page: el.page,
             word: `${el.word}`, 
             wordTranslate: `${el.wordTranslate}`, 
             audio: `${el.audio}`,
+            answerCorrectness: false,
           };
            groupWordsArr.push(elMod);
         })
       });
       console.log(groupWordsArr)
-      
     }
     this.getRandomWords(groupWordsArr);
   }
 
-  private getRandomWords(groupWordsArr: IWordAndTranslation[]) {
+  private getRandomWords(groupWordsArr: IWordParams[]) {
     const word = this.elem.querySelector('.eng-word') as HTMLDivElement;
     const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
     const randomWordNumber = getRandom(0, GROUP_WORDS_NUMBER);
@@ -266,20 +272,29 @@ export default class SprintGame extends BaseComponent {
       }
       return randomWordAnotherNumber;
     }
+    this.startTimer();
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
     roundResults[roundResults.length] = {
+      id: `${groupWordsArr[randomWordNumber].id}`,
+      group: groupWordsArr[randomWordNumber].group,
+      image: `${groupWordsArr[randomWordNumber].image}`,
+      page: groupWordsArr[randomWordNumber].page,
       word: `${groupWordsArr[randomWordNumber].word}`,
       wordTranslate: `${groupWordsArr[randomWordNumber].wordTranslate}`,
       audio: `${groupWordsArr[randomWordNumber].audio}`,
       translateCorrectness: translateCorrectness,
+      answerCorrectness: false,
     };
   }
 
   public listenEvents(): void {
     this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
     this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
+    this.getMenuButton().then(val => {
+      val.addEventListener('click', this.stopTimer.bind(this) )
+    });
   }
 
   public setActions(): void {
@@ -312,17 +327,34 @@ export default class SprintGame extends BaseComponent {
     this.getRandomWords(groupWordsArr);
   }
 
-  private getApi() {
-    apiService.getUserStatistics(`1`).then(value => console.log(value))
+  private async getMenuButton(): Promise<HTMLButtonElement> {
+    return  await document.getElementsByClassName('menu__button icon-button')[0] as HTMLButtonElement;
   }
 
+  private showModalStatistics(): void {
+    const modalStatistic = createDiv({
+      className: '',
+      dataSet: {
+        widget: 'modalStatistic',
+        parentId: this.id,
+      },
+    });
+    this.elem.append(modalStatistic);
+    updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
+  }
 
-  // private getNextRandomWords() {
-  //   console.log('buttonB')
-  // }
+  public giveDataToModalStatistic(): IStatisticAnswer[] {
+    roundResults = roundResults.map(el =>  {
+      delete el.translateCorrectness;
+      return el
+    })
+    delete roundResults[roundResults.length - 1]
+    return roundResults;
+  }
 
-
-
+  public giveScoreToModalStatistic(): number {
+    return scoreCounter.score;
+  }
 }
 
 //TODO:
