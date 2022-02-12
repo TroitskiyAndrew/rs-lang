@@ -1,19 +1,22 @@
 import BaseComponent from '../../base';
 import { createButton, createDiv, createSpan, getRandom } from '../../../utils';
-import { pageChenging } from '../../../rooting';
+import { pageChenging, updateContent } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
-import { IGameOptions, IWordAndTranslation, IRoundResult, IScoreCounter } from './sprintGameTypes';
+import { IGameOptions, IWordParams, IScoreCounter } from './sprintGameTypes';
+import { IStatisticAnswer } from '../audioGame/index'
 import Menu from '../../menu/index';
+
+// IWordAndTranslation, IRoundResult, 
 
 const GROUP_WORDS_NUMBER = 600;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
 const MAX_SCORE_MULTIPLYER = 8;
-const TIME_FOR_GAME_MILISECONDS = 60000;
+const TIME_FOR_GAME_MILISECONDS = 20000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 
 let options: IGameOptions;
-let groupWordsArr: IWordAndTranslation[];
-let roundResults: IRoundResult[] = [];
+let groupWordsArr: IStatisticAnswer[] =[];
+let roundResults: IWordParams[] = [];
 let scoreCounter: IScoreCounter = {
   score: 0,
   multiplyer: 1,
@@ -21,9 +24,6 @@ let scoreCounter: IScoreCounter = {
 };
 let startTimerOnce: boolean = true;
 let timerId: NodeJS.Timer;
-// let roundScore: number = 0;
-// let multiplyer: number = 1;
-//let translateCorrectness: boolean;
 
 export default class SprintGame extends BaseComponent {
 
@@ -220,6 +220,7 @@ export default class SprintGame extends BaseComponent {
           console.log(0)
           this.paramsTime!.innerHTML = `time<br> 0`;
           this.stopTimer()
+          this.showModalStatistics()
         } else {
           console.log(Math.round(delta / 1000))
           this.paramsTime!.innerHTML = `time<br> ${Math.round(delta / 1000)}`;
@@ -237,14 +238,19 @@ export default class SprintGame extends BaseComponent {
 
   private async getWordsArray() {
     if (options.page === undefined) {
-      groupWordsArr = [];
+      // groupWordsArr = [];
       
       await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
         words.forEach((el) => {
-          const elMod: IWordAndTranslation =  {
+          const elMod: IWordParams =  {
+            id: `${el.id}`,
+            group: el.group,
+            image: `${el.image}`,
+            page: el.page,
             word: `${el.word}`, 
             wordTranslate: `${el.wordTranslate}`, 
             audio: `${el.audio}`,
+            answerCorrectness: false,
           };
            groupWordsArr.push(elMod);
         })
@@ -255,7 +261,7 @@ export default class SprintGame extends BaseComponent {
     this.getRandomWords(groupWordsArr);
   }
 
-  private getRandomWords(groupWordsArr: IWordAndTranslation[]) {
+  private getRandomWords(groupWordsArr: IWordParams[]) {
     const word = this.elem.querySelector('.eng-word') as HTMLDivElement;
     const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
     const randomWordNumber = getRandom(0, GROUP_WORDS_NUMBER);
@@ -281,10 +287,15 @@ export default class SprintGame extends BaseComponent {
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
     roundResults[roundResults.length] = {
+      id: `${groupWordsArr[randomWordNumber].id}`,
+      group: groupWordsArr[randomWordNumber].group,
+      image: `${groupWordsArr[randomWordNumber].image}`,
+      page: groupWordsArr[randomWordNumber].page,
       word: `${groupWordsArr[randomWordNumber].word}`,
       wordTranslate: `${groupWordsArr[randomWordNumber].wordTranslate}`,
       audio: `${groupWordsArr[randomWordNumber].audio}`,
       translateCorrectness: translateCorrectness,
+      answerCorrectness: false,
     };
   }
 
@@ -330,14 +341,28 @@ export default class SprintGame extends BaseComponent {
     return  await document.getElementsByClassName('menu__button icon-button')[0] as HTMLButtonElement;
   }
 
-  private getApi() {
-    apiService.getUserStatistics(`1`).then(value => console.log(value))
+  private showModalStatistics(): void {
+    const modalStatistic = createDiv({
+      className: '',
+      dataSet: {
+        widget: 'modalStatistic',
+        parentId: this.id,
+      },
+    });
+    this.elem.append(modalStatistic);
+    updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
   }
 
-
-  // private getNextRandomWords() {
-  //   console.log('buttonB')
-  // }
+  giveDataToModalStatistic(): IStatisticAnswer[] {
+    roundResults.map(el =>  {
+      if (el === roundResults[roundResults.length - 1]) {
+        delete roundResults[roundResults.length - 1]
+      }
+      delete el.translateCorrectness;
+      return el
+    })
+    return roundResults;
+  }
 
 
 
