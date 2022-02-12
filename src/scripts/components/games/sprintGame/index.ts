@@ -133,7 +133,6 @@ export default class SprintGame extends BaseComponent {
       // localStorage.setItem ('options', this.options);
       updateState({optionsSprint: this.options})
     } 
-    console.log(options)
     if (options) {
       this.group = options.group;
       if (options.page) this.page = options.page;
@@ -311,16 +310,23 @@ export default class SprintGame extends BaseComponent {
       })
     }
     let menuModalHandler = () => {
-      startTimerOnce = true;
-      scoreCounter = {
-        score: 0,
-        multiplyer: 1,
-        multiplyerIntermediateCounter: 0,
-      };
-      this.stopTimer();
+      this.playAgain()
       menuButton.removeEventListener('click', menuButtonHandler);
       menuModal.removeEventListener('click', menuModalHandler);
     }
+  }
+
+  public playAgain() {
+    this.stopTimer();
+    startTimerOnce = true;
+    scoreCounter = {
+      score: 0,
+      multiplyer: 1,
+      multiplyerIntermediateCounter: 0,
+    };
+    groupWordsArr = []
+    roundResults = [];
+
   }
 
   public setActions(): void {
@@ -378,7 +384,7 @@ export default class SprintGame extends BaseComponent {
       delete el.translateCorrectness;
       return el
     })
-    delete roundResults[roundResults.length - 1]
+    roundResults.splice(0, roundResults.length - 1)
     return roundResults;
   }
 
