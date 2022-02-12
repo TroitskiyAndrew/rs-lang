@@ -4,6 +4,7 @@ import { pageChenging, updateContent } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
 import { IGameOptions, IWordParams, IScoreCounter } from './sprintGameTypes';
 import { IStatisticAnswer } from '../audioGame/index'
+import { updateState, getState } from '../../../state'
 import Menu from '../../menu/index';
 
 // IWordAndTranslation, IRoundResult, 
@@ -127,16 +128,18 @@ export default class SprintGame extends BaseComponent {
   private getGroupAndPage() {
     if (this.options) {
       options = JSON.parse (this.options);
-      localStorage.setItem ('options', this.options);
+      // localStorage.setItem ('options', this.options);
+      updateState({optionsSprint: this.options})
     } 
     
     if (options) {
       this.group = options.group;
       if (options.page) this.page = options.page;
     } else {
-      localStorage.getItem ('options') ? options = JSON.parse (localStorage.getItem ('options') as string) : options = {group: '0'};
-      this.group = options.group;
-      if (options.page) this.page = options.page;
+      //localStorage.getItem ('options') ? options = JSON.parse (localStorage.getItem ('options') as string) : options = {group: '0'};
+      this.group = JSON.parse (getState().optionsSprint).group;
+      // this.group = options.group;
+      if (JSON.parse (getState().optionsSprint).page) this.page = JSON.parse (getState().optionsSprint).page;
     }
   }
 
