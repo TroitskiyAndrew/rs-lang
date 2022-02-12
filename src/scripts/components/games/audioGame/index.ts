@@ -102,6 +102,8 @@ export default class AudioGame extends BaseComponent {
     this.definePageAndGroup();
     const audioPage = createDiv({ className: 'audio-game' });
 
+    const audioGameContainer = createDiv({ className: 'audio-game__container' });
+
     const questionsAmount = createDiv({
       className: 'audio-game__questionsAmount questionsAmount',
     });
@@ -130,23 +132,44 @@ export default class AudioGame extends BaseComponent {
       className: 'audio-game__next',
     });
 
+    // const goomba =
+
+
     questionsAmount.append(questionCurrentAmount);
     questionsAmount.append(questionTotalAmount);
-    audioPage.append(questionsAmount);
+    audioGameContainer.append(questionsAmount);
 
     questionField.append(imageDiv);
     questionField.append(audioWrapper);
     questionField.append(audioWord);
 
-    audioPage.append(questionField);
-    audioPage.append(answersField);
-    audioPage.append(this.nextBtn);
+    audioGameContainer.append(questionField);
+    audioGameContainer.append(answersField);
+    audioGameContainer.append(this.nextBtn);
+    // audioGameContainer.append(this.getCoin());
+    // audioGameContainer.append(this.getGoomba());
+
+    audioPage.append(audioGameContainer);
 
     // todo temporary show modal
     // this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
+
+  /*   private getCoin() {
+      const coin = document.createElement('img');
+      coin.className = 'audio-game__coin';
+      coin.src = '/../../../../assets/img/sprintGame/gif/CoinSMW.gif';
+      return coin;
+    } */
+
+  /*  private getGoomba() {
+     const goomba = document.createElement('img');
+     goomba.className = 'audio-game__goomba';
+     goomba.src = '/../../../../assets/img/sprintGame/gif/goomba.gif';
+     return goomba;
+   } */
 
   public listenEvents(): void {
     (this.nextBtn as HTMLElement).addEventListener('click', this.nextQuestion.bind(this));
