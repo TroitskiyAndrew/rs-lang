@@ -28,7 +28,12 @@ export default class ModalStatistic extends BaseComponent {
 
     // процент правильных ответов
     const totalPercents = constants.hundred;
-    const percentOfRightAnswers = Math.floor(rightAnswers.length * totalPercents / this.resultArray.length);
+    let percentOfRightAnswers: number;
+    if (this.resultArray.length) {
+      percentOfRightAnswers = Math.floor(rightAnswers.length * totalPercents / this.resultArray.length);
+    } else {
+      percentOfRightAnswers = 0;
+    }
 
     const modalWindow = createDiv({
       className: 'game-modal',
