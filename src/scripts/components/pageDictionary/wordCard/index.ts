@@ -2,6 +2,8 @@ import BaseComponent from '../../base';
 import { createButton, createDiv } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 import { WordCard } from '../../../api/api.types';
+import { instances } from '../../components';
+import PageDictionary from '..';
 
 export default class WordsCard extends BaseComponent {
   word: HTMLElement = createDiv({ className: 'wordCard__word' });
@@ -17,6 +19,8 @@ export default class WordsCard extends BaseComponent {
   exampleRu: HTMLElement = createDiv({ className: 'wordCard__exampleRu' });
 
   transcription: HTMLElement = createDiv({ className: 'wordCard__transcription' });
+
+  img: HTMLImageElement = new Image();
 
   file: string;
 
@@ -45,6 +49,8 @@ export default class WordsCard extends BaseComponent {
       this.exampleRu.innerHTML = word.textExampleTranslate;
       this.transcription.innerHTML = word.transcription;
 
+      this.img.src = `${baseUrl}/files/${this.file}.jpg`;
+
       this.word.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayWord' }));
       this.example.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayExample' }));
       this.meaning.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayMeaning' }));
@@ -56,14 +62,14 @@ export default class WordsCard extends BaseComponent {
     const engHolder = createDiv({ className: 'wordCard__text-part _eng' });
     const ruHolder = createDiv({ className: 'wordCard__text-part _ru' });
     const contorls = createDiv({ className: 'wordCard__controls' });
-    const imgHolder = createDiv({ className: 'wordCard__img _blocked' });
-    imgHolder.append(createDiv({ className: 'wordCard__bricks' }));
+    const contorlsHolder = createDiv({ className: 'wordCard__controls-holder' });
 
     contorls.append(this.createButtonHolder('visibility'));
     contorls.append(this.createButtonHolder('difficult'));
     contorls.append(this.createButtonHolder('studied'));
 
-    ruHolder.append(createDiv({ className: 'wordCard__bricks' }));
+    this.img.classList.add('wordCard__img');
+    ruHolder.append(createDiv({ className: 'bricks' }));
     engHolder.append(this.word);
     engHolder.append(this.transcription);
     engHolder.append(this.meaning);
@@ -73,10 +79,11 @@ export default class WordsCard extends BaseComponent {
     ruHolder.append(this.exampleRu);
     textHolder.append(engHolder);
     textHolder.append(ruHolder);
-
-    this.fragment.append(contorls);
     this.fragment.append(textHolder);
-    this.fragment.append(imgHolder);
+    contorlsHolder.append(this.img);
+    contorlsHolder.append(contorls);
+    this.fragment.append(contorlsHolder);
+
   }
 
   private createButtonHolder(type: string): HTMLDivElement {

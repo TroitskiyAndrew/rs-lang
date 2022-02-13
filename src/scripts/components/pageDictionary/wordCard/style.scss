@@ -1,12 +1,50 @@
 .wordCard {
-  padding: 10px;
-}
-
-.wordCard {
-  @include flex($ai: flex-end);
+  @include flex($ai: flex-start);
+  height: 400px;
 
   &__controls {
     @include flex;
+  }
+
+  &__text-holder {
+    color: white;
+    @include flex($fd: column, $jc: space-between);
+    height: 100%;
+  }
+
+  &__controls-holder {
+    @include flex($fd: column, $jc: space-between, $ai: flex-start);
+    height: 100%;
+  }
+
+  &__text-part {
+    position: relative;
+    color: white;
+    width: 100%;
+    overflow: hidden;
+    &._ru {
+      max-height: 75px;
+    }
+    .bricks {
+      @include position;
+      width: 100%;
+      height: 100%;
+      background-image: url("/src/assets/img/png/wall.png");
+    }
+  }
+
+  &__img {
+    height: 200px;
+    border-radius: 10px;
+  }
+}
+
+._visible-translate {
+  .wordCard__text-part._ru {
+    max-height: none !important;
+    .bricks {
+      height: 0 !important;
+    }
   }
 }
 
@@ -14,10 +52,45 @@
   position: relative;
   overflow: hidden;
   border-radius: 5px;
+  border: solid 1px black;
+  height: 75px;
+  width: 75px;
   &__overlay {
-    position: absolute;
+    @include position;
     width: 100%;
     height: 100%;
     background-color: rgb(182, 67, 46);
+  }
+
+  &__circle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: black;
+    &.left-top {
+      left: 8%;
+      top: 8%;
+    }
+    &.left-bottom {
+      left: 8%;
+      bottom: 8%;
+    }
+    &.right-top {
+      right: 8%;
+      top: 8%;
+    }
+    &.right-bottom {
+      right: 8%;
+      bottom: 8%;
+    }
+  }
+
+  &__marker {
+    @include position;
+  }
+
+  &__button {
+    @include position;
   }
 }
