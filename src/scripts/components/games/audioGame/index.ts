@@ -104,6 +104,8 @@ export default class AudioGame extends BaseComponent {
 
     const audioGameContainer = createDiv({ className: 'audio-game__container' });
 
+    const audioGameContent = createDiv({ className: 'audio-game__content' });
+
     const questionsAmount = createDiv({
       className: 'audio-game__questionsAmount questionsAmount',
     });
@@ -132,9 +134,6 @@ export default class AudioGame extends BaseComponent {
       className: 'audio-game__next',
     });
 
-    // const goomba =
-
-
     questionsAmount.append(questionCurrentAmount);
     questionsAmount.append(questionTotalAmount);
     audioGameContainer.append(questionsAmount);
@@ -143,16 +142,17 @@ export default class AudioGame extends BaseComponent {
     questionField.append(audioWrapper);
     questionField.append(audioWord);
 
-    audioGameContainer.append(questionField);
-    audioGameContainer.append(answersField);
-    audioGameContainer.append(this.nextBtn);
+    audioGameContent.append(questionField);
+    audioGameContent.append(answersField);
+    audioGameContent.append(this.nextBtn);
+    audioGameContainer.append(audioGameContent);
     // audioGameContainer.append(this.getCoin());
     // audioGameContainer.append(this.getGoomba());
 
     audioPage.append(audioGameContainer);
 
     // todo temporary show modal
-    // this.showModalStatistics();
+    this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
@@ -413,8 +413,8 @@ export default class AudioGame extends BaseComponent {
   }
 
   giveDataToModalStatistic(): IStatisticAnswer[] {
-    // return this.fake();
-    return this.answersArray;
+    return this.fake();
+    // return this.answersArray;
   }
 
   public playAgain() {

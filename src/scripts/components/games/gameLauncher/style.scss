@@ -1,10 +1,19 @@
 .launcher-games {
-  position: relative;
   height: 100%;
-  background-image: url('/src/assets/img/background-gameLauncher.jpg');
-  background-repeat-y: no-repeat;
-  background-size: cover;
-  background-position: -350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+
+  &__container {
+    width: 80%;
+    height: 80%;
+    position: relative;
+    background-image: url('/src/assets/img/background-gameLauncher.jpg');
+    background-repeat-y: no-repeat;
+    background-size: cover;
+    background-position: -280px 0;
+  }
 
   &__description {
     .game-description__title {
@@ -28,5 +37,11 @@
     transform: translate(-50%, -50%);
     background-color: $brand-color;
     cursor: pointer;
+  }
+
+  .launcher-games__flagPole {
+    position: absolute;
+    bottom: calc(12% + 60px);
+    left: 0;
   }
 }

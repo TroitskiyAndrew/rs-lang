@@ -23,6 +23,8 @@ export default class GameLauncher extends BaseComponent {
 
   public createHTML(): void {
     const page = createDiv({ className: 'launcher-games' });
+    const pageContainer = createDiv({ className: 'launcher-games__container' });
+
     const backBtn = createDiv({
       className: 'launcher-games__link games__link ',
       dataSet: {
@@ -61,7 +63,7 @@ export default class GameLauncher extends BaseComponent {
       gameAudio.dataset.options = JSON.stringify({
         'group': '0',
       });
-      page.append(gameAudio);
+      pageContainer.append(gameAudio);
     } else if (this.options === 'sprint-game') {
       titleDescription.textContent = '«Спринт»';
       textDescription.innerText = `«Спринт» - Тренирует навык быстрого перевода с английского языка на русский. Вам нужно выбрать соответствует ли перевод предложенному слову.
@@ -79,19 +81,21 @@ export default class GameLauncher extends BaseComponent {
       gameSprint.dataset.options = JSON.stringify({
         'group': '0',
       });
-      page.append(gameSprint);
+      pageContainer.append(gameSprint);
     }
 
     backBtn.append(createSpan({ text: 'back' }));
-    page.append(backBtn);
+    pageContainer.append(backBtn);
     description.append(titleDescription);
     description.append(textDescription);
-    page.append(description);
+    pageContainer.append(description);
 
-    page.append(createDiv({
-      className: '',
+    pageContainer.append(createDiv({
+      className: 'launcher-games__flagPole',
       dataSet: { widget: 'flagPole' },
     }));
+
+    page.append(pageContainer);
     this.fragment.append(page);
   }
 

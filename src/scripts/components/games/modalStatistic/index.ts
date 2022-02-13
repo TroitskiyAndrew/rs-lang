@@ -54,6 +54,9 @@ export default class ModalStatistic extends BaseComponent {
     const gameInfoRight = createDiv({
       className: 'game-modal__info-right',
     });
+    const headerGif = createDiv({
+      className: 'game-modal__logo-gif',
+    });
     const accuracy = createSpan({
       text: `Точность ответов - ${percentOfRightAnswers}%`,
     });
@@ -99,6 +102,8 @@ export default class ModalStatistic extends BaseComponent {
       const wordRow = this.drawWord(wrongAnswers[i]);
       wrongWordsWrapper.append(wordRow);
     }
+
+    gameContent.append(headerGif);
 
     gameInfoRight.append(accuracy);
     gameInfoRight.append(inARow);

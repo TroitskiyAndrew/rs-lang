@@ -27,6 +27,14 @@
     right: 0;
   } */
 
+  &__logo-gif {
+    width: 100px;
+    height: 70px;
+    margin: 0 auto;
+    background: url('/src/assets/img/sprintGame/gif/mario-luigi.gif')
+      center/cover no-repeat;
+  }
+
   &__content {
     min-width: 500px;
     max-height: 500px;
