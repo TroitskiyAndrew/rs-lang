@@ -254,4 +254,8 @@ export default class PageDictionary extends BaseComponent {
       this.mario.classList.add('_reversed');
     }
   }
+
+  public giveMeData(): string {
+    return 'some Data';
+  }
 }

@@ -21,7 +21,7 @@ export default class BaseComponent {
 
   private isDisposed: boolean;
 
-  private id: string;
+  public id: string;
 
   public options = '';
 
