@@ -152,7 +152,7 @@ export default class AudioGame extends BaseComponent {
     audioPage.append(audioGameContainer);
 
     // todo temporary show modal
-    this.showModalStatistics();
+    // this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
@@ -413,8 +413,8 @@ export default class AudioGame extends BaseComponent {
   }
 
   giveDataToModalStatistic(): IStatisticAnswer[] {
-    return this.fake();
-    // return this.answersArray;
+    // return this.fake();
+    return this.answersArray;
   }
 
   public playAgain() {

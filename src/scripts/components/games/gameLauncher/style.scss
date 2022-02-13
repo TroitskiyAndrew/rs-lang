@@ -15,7 +15,23 @@
     background-position: -280px 0;
   }
 
+  &__navigation {
+    display: flex;
+    justify-content: center;
+    column-gap: 20px;
+  }
+
   &__description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 25px;
+    margin-left: 200px;
+    padding: 15px;
+
     .game-description__title {
       text-align: center;
     }
@@ -31,12 +47,12 @@
   }
 
   .start-game {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: $brand-color;
-    cursor: pointer;
+    // position: absolute;
+    // left: 50%;
+    // top: 50%;
+    // transform: translate(-50%, -50%);
+    // background-color: $brand-color;
+    // cursor: pointer;
   }
 
   .launcher-games__flagPole {

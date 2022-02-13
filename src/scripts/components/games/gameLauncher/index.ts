@@ -25,6 +25,9 @@ export default class GameLauncher extends BaseComponent {
     const page = createDiv({ className: 'launcher-games' });
     const pageContainer = createDiv({ className: 'launcher-games__container' });
 
+    const pageNavigation = createDiv({
+      className: 'launcher-games__navigation',
+    });
     const backBtn = createDiv({
       className: 'launcher-games__link games__link ',
       dataSet: {
@@ -59,11 +62,11 @@ export default class GameLauncher extends BaseComponent {
           direction: 'audioGame',
         },
       });
-      gameAudio.append(createSpan({ text: 'Начать игру Аудиовызов' }));
+      gameAudio.append(createSpan({ text: 'Начать игру' }));
       gameAudio.dataset.options = JSON.stringify({
         'group': '0',
       });
-      pageContainer.append(gameAudio);
+      pageNavigation.append(gameAudio);
     } else if (this.options === 'sprint-game') {
       titleDescription.textContent = '«Спринт»';
       textDescription.innerText = `«Спринт» - Тренирует навык быстрого перевода с английского языка на русский. Вам нужно выбрать соответствует ли перевод предложенному слову.
@@ -77,18 +80,20 @@ export default class GameLauncher extends BaseComponent {
           direction: 'sprintGame',
         },
       });
-      gameSprint.append(createSpan({ text: 'Начать игру Спринт' }));
+      gameSprint.append(createSpan({ text: 'Начать игру' }));
       gameSprint.dataset.options = JSON.stringify({
         'group': '0',
       });
-      pageContainer.append(gameSprint);
+      pageNavigation.append(gameSprint);
     }
 
-    backBtn.append(createSpan({ text: 'back' }));
-    pageContainer.append(backBtn);
+    backBtn.append(createSpan({ text: 'Назад' }));
+    pageNavigation.append(backBtn);
+
     description.append(titleDescription);
     description.append(textDescription);
     pageContainer.append(description);
+    pageContainer.append(pageNavigation);
 
     pageContainer.append(createDiv({
       className: 'launcher-games__flagPole',

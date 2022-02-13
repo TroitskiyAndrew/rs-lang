@@ -16,7 +16,6 @@ export default class ModalStatistic extends BaseComponent {
   }
 
   public createHTML(): void {
-    // const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame;
     const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame | SprintGame;
     this.resultArray = parenWidget.giveDataToModalStatistic();
 
@@ -30,14 +29,6 @@ export default class ModalStatistic extends BaseComponent {
     // процент правильных ответов
     const totalPercents = constants.hundred;
     const percentOfRightAnswers = Math.floor(rightAnswers.length * totalPercents / this.resultArray.length);
-
-    // выходные данные
-    // console.log('resultArray', this.resultArray);
-    // console.log('rightAnswers', rightAnswers);
-    // console.log('wrongAnswers', wrongAnswers);
-    // console.log('right Percent', percentOfRightAnswers + '%');
-    // самая длинная серия правильных ответов
-    // console.log('Sequence length=', this.longestRightRange());
 
     const modalWindow = createDiv({
       className: 'game-modal',
@@ -120,7 +111,6 @@ export default class ModalStatistic extends BaseComponent {
     wordsWrapper.append(wrongWordsTitle);
     wordsWrapper.append(wrongWordsWrapper);
 
-    // todo btns
     const navigationModal = createDiv({
       className: 'game-modal__navigation',
     });
@@ -200,9 +190,6 @@ export default class ModalStatistic extends BaseComponent {
 
     return wordRow;
   }
-
-  // В этот раз не получилось, но продолжай тренироваться!
-
 
   longestRightRange() {
     const array = this.resultArray.map(word => word.answerCorrectness);
