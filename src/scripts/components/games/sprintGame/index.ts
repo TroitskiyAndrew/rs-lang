@@ -4,10 +4,7 @@ import { pageChenging, updateContent } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
 import { IGameOptions, IWordParams, IScoreCounter } from './sprintGameTypes';
 import { IStatisticAnswer } from '../audioGame/index'
-import { updateState, getState } from '../../../state'
-import Menu from '../../menu/index';
-
-// IWordAndTranslation, IRoundResult, 
+import { updateState, getState } from '../../../state';
 
 const GROUP_WORDS_NUMBER = 600;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
@@ -27,6 +24,7 @@ let startTimerOnce: boolean = true;
 let timerId: NodeJS.Timer;
 let menuButton: HTMLButtonElement
 let menuModal: HTMLUListElement
+let audioIsPlaying = true;
 
 export default class SprintGame extends BaseComponent {
 
@@ -38,6 +36,7 @@ export default class SprintGame extends BaseComponent {
   buttonA: HTMLButtonElement | undefined;
   paramsScore: HTMLDivElement | undefined;
   paramsTime: HTMLDivElement | undefined;
+  controlSelect: HTMLButtonElement | undefined;
   
   constructor(elem: HTMLElement) {
     super(elem);
@@ -65,8 +64,9 @@ export default class SprintGame extends BaseComponent {
     this.renderMario(marioWrapper);
     this.renderGamepad(gamepadWrapper);
     this.renderWords(wordsWrapper);
-    
     this.getWordsArray();
+    this.playAudio('../../../../assets/sounds/1 - Title Bgm.mp3');
+    if (!audioIsPlaying) this.audioPlayer.pause();
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
@@ -172,6 +172,7 @@ export default class SprintGame extends BaseComponent {
     const controlsBack = createDiv({ className: 'controls-wrapper__back' });
     const controlsCapture = createDiv({ className: 'controls-wrapper__capture' });
     const controlSelect = createButton({ className: 'controls-wrapper__select' });
+    this.controlSelect = controlSelect;
     const controlStart = createButton({ className: 'controls-wrapper__start' }); 
 
     controlsWrapper.append(controlsCapture);
@@ -316,6 +317,17 @@ export default class SprintGame extends BaseComponent {
       menuModal.removeEventListener('click', menuModalHandler);
       this.clearGameParams()
     }
+    this.controlSelect?.addEventListener('click', this.switchAudio.bind(this))
+  }
+
+  private switchAudio() {
+    if (audioIsPlaying) {
+      this.audioPlayer.pause();
+      audioIsPlaying = false;
+    } else {
+      this.audioPlayer.play()
+      audioIsPlaying = true;
+    }
   }
 
   private clearGameParams() {
@@ -327,7 +339,8 @@ export default class SprintGame extends BaseComponent {
       multiplyerIntermediateCounter: 0,
     };
     roundResults = [];
-    this.stopTimer()
+    this.stopTimer();
+    this.audioPlayer.pause();
   }
 
   public playAgain() {
@@ -339,7 +352,7 @@ export default class SprintGame extends BaseComponent {
     };
     roundResults = [];
     this.getRandomWords(groupWordsArr)
-    //this.startTimer();
+    if (audioIsPlaying) this.playAudio('../../../../assets/sounds/1 - Title Bgm.mp3');
   }
 
   public setActions(): void {
@@ -399,6 +412,7 @@ export default class SprintGame extends BaseComponent {
     })
     console.log(roundResults)
     roundResults = roundResults.slice(0, roundResults.length - 1);
+    this.audioPlayer.pause();
     return roundResults;
   }
 
