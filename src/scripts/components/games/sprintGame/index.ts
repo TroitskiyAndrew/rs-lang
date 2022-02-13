@@ -317,16 +317,16 @@ export default class SprintGame extends BaseComponent {
   }
 
   public playAgain() {
-    this.stopTimer();
     startTimerOnce = true;
     scoreCounter = {
       score: 0,
       multiplyer: 1,
       multiplyerIntermediateCounter: 0,
     };
-    groupWordsArr = []
+    //groupWordsArr = []
     roundResults = [];
-
+    this.getRandomWords(groupWordsArr)
+    this.startTimer();
   }
 
   public setActions(): void {
@@ -384,7 +384,8 @@ export default class SprintGame extends BaseComponent {
       delete el.translateCorrectness;
       return el
     })
-    roundResults.splice(0, roundResults.length - 1)
+    console.log(roundResults)
+    roundResults = roundResults.slice(0, roundResults.length - 1);
     return roundResults;
   }
 
