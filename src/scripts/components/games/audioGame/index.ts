@@ -1,5 +1,5 @@
 import BaseComponent from '../../base';
-import { pageChenging, updateContent } from '../../../rooting';
+import { updateContent } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 // import { updateState, getState } from '../../../state';
@@ -52,10 +52,6 @@ export default class AudioGame extends BaseComponent {
 
   currentQuestionCard: Partial<WordCard> = {};
 
-  // correctAnswersArray: Partial<WordCard>[] = [];
-
-  // wrongAnswersArray: Partial<WordCard>[] = [];
-
   answersArray: IStatisticAnswer[] = [];
 
 
@@ -66,6 +62,7 @@ export default class AudioGame extends BaseComponent {
 
   public async oninit(): Promise<void> {
     // pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
+    // pageChenging(createSpan({}), this.name);
 
     // получаю с АПИ данные
     // todo новые слова перезаписать ТУТ!, которые придут не связанные с группой
@@ -81,7 +78,6 @@ export default class AudioGame extends BaseComponent {
     } else {
       totalQuestionSpan.textContent = '/20';
     }
-    // стартуем первый раз игру
     this.showNextQuestion();
 
     return Promise.resolve();
@@ -105,6 +101,10 @@ export default class AudioGame extends BaseComponent {
   public createHTML(): void {
     this.definePageAndGroup();
     const audioPage = createDiv({ className: 'audio-game' });
+
+    const audioGameContainer = createDiv({ className: 'audio-game__container' });
+
+    const audioGameContent = createDiv({ className: 'audio-game__content' });
 
     const questionsAmount = createDiv({
       className: 'audio-game__questionsAmount questionsAmount',
@@ -136,21 +136,40 @@ export default class AudioGame extends BaseComponent {
 
     questionsAmount.append(questionCurrentAmount);
     questionsAmount.append(questionTotalAmount);
-    audioPage.append(questionsAmount);
+    audioGameContainer.append(questionsAmount);
 
     questionField.append(imageDiv);
     questionField.append(audioWrapper);
     questionField.append(audioWord);
 
-    audioPage.append(questionField);
-    audioPage.append(answersField);
-    audioPage.append(this.nextBtn);
+    audioGameContent.append(questionField);
+    audioGameContent.append(answersField);
+    audioGameContent.append(this.nextBtn);
+    audioGameContainer.append(audioGameContent);
+    // audioGameContainer.append(this.getCoin());
+    // audioGameContainer.append(this.getGoomba());
+
+    audioPage.append(audioGameContainer);
 
     // todo temporary show modal
     // this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
+
+  /*   private getCoin() {
+      const coin = document.createElement('img');
+      coin.className = 'audio-game__coin';
+      coin.src = '/../../../../assets/img/sprintGame/gif/CoinSMW.gif';
+      return coin;
+    } */
+
+  /*  private getGoomba() {
+     const goomba = document.createElement('img');
+     goomba.className = 'audio-game__goomba';
+     goomba.src = '/../../../../assets/img/sprintGame/gif/goomba.gif';
+     return goomba;
+   } */
 
   public listenEvents(): void {
     (this.nextBtn as HTMLElement).addEventListener('click', this.nextQuestion.bind(this));
@@ -204,10 +223,12 @@ export default class AudioGame extends BaseComponent {
     if (this.questionNumber > this.totalQuestions) return;
     if (this.isChangeablePage) {
       this.questionNumber++;
+      this.enableKeyAnswer = false;
       this.showNextQuestion();
       this.isChangeablePage = false;
     } else {
       (this.nextBtn as HTMLElement).textContent = this.nextTextBtn;
+      this.enableKeyAnswer = false;
       this.answerResult(false);
       this.isChangeablePage = true;
     }
@@ -220,7 +241,6 @@ export default class AudioGame extends BaseComponent {
     if (!this.totalQuestions || !this.nextBtn) return;
     // модальное окно со статистикой
     if (this.questionNumber > this.totalQuestions) {
-      console.log('STATISTICS!');
       this.nextBtn.style.pointerEvents = 'none';
       this.showModalStatistics();
       return;
@@ -306,11 +326,9 @@ export default class AudioGame extends BaseComponent {
     if (answer) {
       answerToStatistic.answerCorrectness = true;
       this.answersArray.push(answerToStatistic);
-      // this.correctAnswersArray.push(this.currentQuestionCard);
     } else {
       answerToStatistic.answerCorrectness = false;
       this.answersArray.push(answerToStatistic);
-      // this.wrongAnswersArray.push(this.currentQuestionCard);
     }
     allDivAnswers.forEach(divAnswer => {
       if (divAnswer.textContent) {
@@ -395,119 +413,130 @@ export default class AudioGame extends BaseComponent {
   }
 
   giveDataToModalStatistic(): IStatisticAnswer[] {
-    // return [
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0192.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0192.jpg',
-    //     page: 9,
-    //     word: 'immediate',
-    //     wordTranslate: 'немедленно',
-    //   },
-    //   {
-    //     answerCorrectness: true,
-    //     audio: 'files/10_0191.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0191.jpg',
-    //     page: 9,
-    //     word: 'unknown_2',
-    //     wordTranslate: 'неизвестно_2',
-    //   },
-    //   {
-    //     answerCorrectness: true,
-    //     audio: 'files/10_0191.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0191.jpg',
-    //     page: 9,
-    //     word: 'unknown_2',
-    //     wordTranslate: 'неизвестно_2',
-    //   },
-    //   {
-    //     answerCorrectness: true,
-    //     audio: 'files/10_0191.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0191.jpg',
-    //     page: 9,
-    //     word: 'unknown_2',
-    //     wordTranslate: 'неизвестно_2',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    //   {
-    //     answerCorrectness: false,
-    //     audio: 'files/10_0190.mp3',
-    //     group: 0,
-    //     id: '5e9f5ee35eb9e72bc21af55f',
-    //     image: 'files/10_0190.jpg',
-    //     page: 9,
-    //     word: 'unknown_3',
-    //     wordTranslate: 'неизвестно_3',
-    //   },
-    // ];
+    // return this.fake();
     return this.answersArray;
   }
 
+  public playAgain() {
+    this.questionNumber = 0;
+    this.currentQuestionCard = {};
+    this.answersArray = [];
+    (this.nextBtn as HTMLElement).style.pointerEvents = 'auto';
+    this.showNextQuestion();
+  }
+
+  private fake() {
+    return [
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0192.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0192.jpg',
+        page: 9,
+        word: 'immediate',
+        wordTranslate: 'немедленно',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0191.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0191.jpg',
+        page: 9,
+        word: 'unknown_2',
+        wordTranslate: 'неизвестно_2',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0191.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0191.jpg',
+        page: 9,
+        word: 'unknown_2',
+        wordTranslate: 'неизвестно_2',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0191.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0191.jpg',
+        page: 9,
+        word: 'unknown_2',
+        wordTranslate: 'неизвестно_2',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: false,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+      {
+        answerCorrectness: true,
+        audio: 'files/10_0190.mp3',
+        group: 0,
+        id: '5e9f5ee35eb9e72bc21af55f',
+        image: 'files/10_0190.jpg',
+        page: 9,
+        word: 'unknown_3',
+        wordTranslate: 'неизвестно_3',
+      },
+    ];
+  }
 }

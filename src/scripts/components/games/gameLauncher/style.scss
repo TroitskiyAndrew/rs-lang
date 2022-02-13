@@ -1,12 +1,37 @@
 .launcher-games {
-  position: relative;
   height: 100%;
-  background-image: url('/src/assets/img/background-gameLauncher.jpg');
-  background-repeat-y: no-repeat;
-  background-size: cover;
-  background-position: -350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+
+  &__container {
+    width: 80%;
+    height: 80%;
+    position: relative;
+    background-image: url('/src/assets/img/background-gameLauncher.jpg');
+    background-repeat-y: no-repeat;
+    background-size: cover;
+    background-position: -280px 0;
+  }
+
+  &__navigation {
+    display: flex;
+    justify-content: center;
+    column-gap: 20px;
+  }
 
   &__description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 25px;
+    margin-left: 200px;
+    padding: 15px;
+
     .game-description__title {
       text-align: center;
     }
@@ -22,11 +47,17 @@
   }
 
   .start-game {
+    // position: absolute;
+    // left: 50%;
+    // top: 50%;
+    // transform: translate(-50%, -50%);
+    // background-color: $brand-color;
+    // cursor: pointer;
+  }
+
+  .launcher-games__flagPole {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: $brand-color;
-    cursor: pointer;
+    bottom: calc(12% + 60px);
+    left: 0;
   }
 }
