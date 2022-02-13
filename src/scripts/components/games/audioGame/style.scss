@@ -133,17 +133,3 @@
   background: rgba(0, 0, 0, 0.8);
   width: 80%;
 }
-
-.audio-game__coin,
-.audio-game__goomba {
-  position: absolute;
-  height: 8%;
-}
-.audio-game__coin {
-  top: -3%;
-  left: 0;
-}
-.audio-game__goomba {
-  bottom: 5%;
-  left: 700px;
-}

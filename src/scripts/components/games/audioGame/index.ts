@@ -131,7 +131,7 @@ export default class AudioGame extends BaseComponent {
       className: 'audio-game__answers audio-answers',
     });
     this.nextBtn = createButton({
-      className: 'audio-game__next',
+      className: 'audio-game__next games__link',
     });
 
     questionsAmount.append(questionCurrentAmount);
@@ -146,8 +146,6 @@ export default class AudioGame extends BaseComponent {
     audioGameContent.append(answersField);
     audioGameContent.append(this.nextBtn);
     audioGameContainer.append(audioGameContent);
-    // audioGameContainer.append(this.getCoin());
-    // audioGameContainer.append(this.getGoomba());
 
     audioPage.append(audioGameContainer);
 
@@ -156,20 +154,6 @@ export default class AudioGame extends BaseComponent {
 
     this.fragment.append(audioPage);
   }
-
-  /*   private getCoin() {
-      const coin = document.createElement('img');
-      coin.className = 'audio-game__coin';
-      coin.src = '/../../../../assets/img/sprintGame/gif/CoinSMW.gif';
-      return coin;
-    } */
-
-  /*  private getGoomba() {
-     const goomba = document.createElement('img');
-     goomba.className = 'audio-game__goomba';
-     goomba.src = '/../../../../assets/img/sprintGame/gif/goomba.gif';
-     return goomba;
-   } */
 
   public listenEvents(): void {
     (this.nextBtn as HTMLElement).addEventListener('click', this.nextQuestion.bind(this));

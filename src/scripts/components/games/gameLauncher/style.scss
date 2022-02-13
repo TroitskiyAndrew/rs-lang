@@ -4,11 +4,16 @@
   justify-content: center;
   align-items: center;
   background: black;
+  color: white;
 
   &__container {
     width: 80%;
     height: 80%;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     background-image: url('/src/assets/img/background-gameLauncher.jpg');
     background-repeat-y: no-repeat;
     background-size: cover;
@@ -19,6 +24,10 @@
     display: flex;
     justify-content: center;
     column-gap: 20px;
+
+    .launcher-games__link {
+      min-width: 115px;
+    }
   }
 
   &__description {
@@ -27,23 +36,24 @@
     align-items: center;
     backdrop-filter: blur(6px);
     background-color: rgba(0, 0, 0, 0.8);
-    color: white;
     border-radius: 25px;
     margin-left: 200px;
+    margin-right: 20px;
     padding: 15px;
 
     .game-description__title {
       text-align: center;
+      font-size: 1.4em;
     }
     .game-description__text {
-      display: block;
-      text-align: justify;
       margin: 20px;
-    }
-  }
 
-  &__link {
-    max-width: 300px;
+      span {
+        display: block;
+        margin: 10px 0;
+        text-align: justify;
+      }
+    }
   }
 
   .start-game {
