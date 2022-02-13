@@ -209,7 +209,7 @@ export default class SprintGame extends BaseComponent {
   }
 
   private startTimer() {
-    if (startTimerOnce === true) {
+    if (startTimerOnce) {
       const getSecondsLeft = () => {
         const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
         if (Math.round(delta / 1000) === 0) {
@@ -308,12 +308,26 @@ export default class SprintGame extends BaseComponent {
         val.addEventListener('click', menuModalHandler)
         menuModal = val;
       })
+      
     }
     let menuModalHandler = () => {
-      this.playAgain()
+      
       menuButton.removeEventListener('click', menuButtonHandler);
       menuModal.removeEventListener('click', menuModalHandler);
+      this.clearGameParams()
     }
+  }
+
+  private clearGameParams() {
+    groupWordsArr = [];
+    startTimerOnce = true;
+    scoreCounter = {
+      score: 0,
+      multiplyer: 1,
+      multiplyerIntermediateCounter: 0,
+    };
+    roundResults = [];
+    this.stopTimer()
   }
 
   public playAgain() {
@@ -323,10 +337,9 @@ export default class SprintGame extends BaseComponent {
       multiplyer: 1,
       multiplyerIntermediateCounter: 0,
     };
-    //groupWordsArr = []
     roundResults = [];
     this.getRandomWords(groupWordsArr)
-    this.startTimer();
+    //this.startTimer();
   }
 
   public setActions(): void {
