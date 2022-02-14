@@ -93,6 +93,10 @@ export default class AudioGame extends BaseComponent {
     if (options.group) {
       this.group = +options.group;
     }
+    // todo delete
+    this.page = 0;
+    this.group = 0;
+
     console.log('this.page', this.page);
     console.log('this.group', this.group);
   }

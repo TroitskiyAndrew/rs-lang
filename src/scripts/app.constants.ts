@@ -6,6 +6,8 @@ type Constnts = {
   maxWordsPage: number;
   answersInAudioGame: number;
   hundred: number;
+  wordCommonRightRange: number;
+  wordDifficultRightRange: number;
 };
 
 const constants: Constnts = {
@@ -16,6 +18,8 @@ const constants: Constnts = {
   maxWordsPage: 29,
   answersInAudioGame: 4,
   hundred: 100,
+  wordCommonRightRange: 3,
+  wordDifficultRightRange: 5,
 };
 
 export default constants;

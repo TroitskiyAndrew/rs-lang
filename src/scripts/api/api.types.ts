@@ -40,13 +40,12 @@ export interface WordCard {
   wordTranslate: string,
 }
 
-// "common" | 'difficult'
 export interface UserWord {
-  difficulty: 'common' | 'difficult',
+  difficulty?: 'common' | 'difficult' | string,
   optional?: {
-    new: boolean,
-    learned: boolean,
-    rightRange: number,
+    new?: boolean,
+    learned?: boolean,
+    rightRange?: number,
   };
 }
 export interface PaginatedResults {
