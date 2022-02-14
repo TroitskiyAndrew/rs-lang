@@ -166,11 +166,13 @@ export default class SprintGame extends BaseComponent {
     const buttonBCapture = createDiv({ className: 'buttons-wrapper__capture' });
     const buttonB = createButton({className: 'buttons-wrapper__button-b', action: 'getNextRandomWords'})
     this.buttonB = buttonB;
+    buttonB.innerHTML = '&#215;';
 
     const buttonAWrapper = createDiv({ className: 'buttons-wrapper__button-wrapper' });
     const buttonABack = createDiv({ className: 'buttons-wrapper__back' });
     const buttonACapture = createDiv({ className: 'buttons-wrapper__capture' });
     const buttonA = createButton({className: 'buttons-wrapper__button-a', action: 'getNextRandomWords'})
+    buttonA.innerHTML = '	&#10004;';
     this.buttonA = buttonA;
 
     const controlsBack = createDiv({ className: 'controls-wrapper__back' });
@@ -180,7 +182,7 @@ export default class SprintGame extends BaseComponent {
     const controlStart = createButton({ className: 'controls-wrapper__start' }); 
 
     controlsWrapper.append(controlsCapture);
-    controlsCapture.innerHTML = 'select&nbsp;&nbsp;&nbsp;&nbsp;start';
+    controlsCapture.innerHTML = 'sound&nbsp;&nbsp;resume';
     controlsWrapper.append(controlsBack);
     controlsBack.append(controlSelect);
     controlsBack.append(controlStart);
@@ -190,13 +192,13 @@ export default class SprintGame extends BaseComponent {
     buttonsWrapper.append(buttonBWrapper);
     buttonBWrapper.append(buttonBBack);
     buttonBWrapper.append(buttonBCapture);
-    buttonBCapture.textContent = 'B';
+    buttonBCapture.innerHTML = '&larr;';
     buttonBBack.append(buttonB);
 
     buttonsWrapper.append(buttonAWrapper);
     buttonAWrapper.append(buttonABack);
     buttonAWrapper.append(buttonACapture);
-    buttonACapture.textContent = 'A';
+    buttonACapture.innerHTML = '&rarr;';
     buttonABack.append(buttonA);
 
     gamepadWrapper.append(controlsWrapper);
@@ -283,7 +285,7 @@ export default class SprintGame extends BaseComponent {
       }
       return randomWordAnotherNumber;
     }
-    this.startTimer();
+    //this.startTimer();
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {

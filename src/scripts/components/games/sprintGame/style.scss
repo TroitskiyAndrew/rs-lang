@@ -3,6 +3,7 @@
   align-items: center;
   justify-content: center;
   color: white;
+  background-color: #28282B;
 }
 
 .sprint-wrapper {
@@ -10,10 +11,11 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-image: url("/src/assets/img/sprintGame/jpg/3-cut.jpg");
+  align-items: center;
+  background-image: url("/src/assets/img/sprintGame/png/SuperMarioBrosMap2-2BG-cut2.png");
   width: 80%;
   height: 80%;
-  background-size: 1080px;
+  background-size: auto 802px;
   background-repeat: no-repeat;
   background-position: bottom;
 
@@ -88,24 +90,27 @@
 .mario-wrapper {
   // gap: 20px;
   position: absolute;
-  bottom: 165px;
+  bottom: 108px;
   left: 50%;
 }
 
 .gamepad-wrapper {
   display: flex;
-  // flex-direction: row;
   justify-content: center;
   text-transform: uppercase;
   color: #DD3836;
   font-weight: 800;
-  margin-bottom: 15px;
+  margin-bottom: -48px;
   gap: 25px;
+  width: 360px;
+  background-color: #3b3b3b;
+  border-radius: 5px;
 }
 
 .buttons-wrapper {
   display: flex;
   gap: 15px;
+
 }
 
 .controls-wrapper__back{
@@ -124,10 +129,18 @@
   border-radius: 4px;
 }
 
+.controls-wrapper__capture {
+  background-color: #90948e;
+  border-radius: 5px;
+  // opacity: 0.5;
+  
+}
+
 .buttons-wrapper__button-wrapper {
   flex-direction: column;
   margin-top: 26px;
 }
+
 .buttons-wrapper__back {
   background-color: #DADADA;
   display: flex;
@@ -143,6 +156,15 @@
   border-radius: 50%;
   width: 40px;
   height: 40px;
+  
+}
+
+.buttons-wrapper__button-a {
+  background-color: #09774a;
+}
+
+.buttons-wrapper__button-b {
+  font-size: 2rem;
 }
 
 .buttons-wrapper__capture {
