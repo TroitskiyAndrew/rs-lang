@@ -164,17 +164,19 @@ export default class User extends BaseComponent {
       const email = this.verifyUser()?.email as string;
       const password = this.verifyUser()?.password as string;
       const name = this.verifyUser()?.name as string;
-      try {
-        await apiService.createUser({ name, email, password });
-      } catch (error) {
-        // todo
+
+      const createUser = await apiService.createUser({ name, email, password });
+      // console.log('createUser', createUser);
+      if (typeof (createUser) !== 'number') {
+        this.loginUser();
+      } else {
         const existWarning = this.elem.querySelector('.form-exist__warning') as HTMLElement;
         existWarning.textContent = 'Such user is already exists, sign in';
         existWarning.classList.add('active');
-        console.log('such User exists!!!!');
+        // console.log('such User exists!!!!');
         return;
       }
-      this.loginUser();
+
     }
   }
 
@@ -257,18 +259,21 @@ export default class User extends BaseComponent {
       const password = this.verifyUser()?.password as string;
       try {
         await apiService.loginUser({ email, password });
+
         updateState({
           userEmail: email,
           userPassword: password,
         });
         this.closeModalWindow();
         this.disableLogo();
+
       } catch (error) {
         const existWarning = this.elem.querySelector('.form-exist__warning') as HTMLElement;
         existWarning.textContent = 'Incorrect e-mail or password!';
         existWarning.classList.add('active');
         // console.log('Incorrect e-mail or password!');
         return;
+
       }
     }
   }
