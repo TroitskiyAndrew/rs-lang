@@ -5,7 +5,9 @@ import BaseComponent from '../../base';
 import { instances } from '../../components';
 import AudioGame, { IStatisticAnswer } from '../audioGame';
 import SprintGame from '../sprintGame';
-import { baseUrl } from '../../../api/apiMethods';
+import { apiService, baseUrl } from '../../../api/apiMethods';
+import { getState, updateState } from '../../../state';
+import { UserWord } from '../../../api/api.types';
 
 export default class ModalStatistic extends BaseComponent {
   resultArray: IStatisticAnswer[] = [];
@@ -144,7 +146,67 @@ export default class ModalStatistic extends BaseComponent {
     modalWindow.append(gameContent);
     modalWindow.append(navigationModal);
 
+    // todo
+    this.updateUserWords();
+
     this.fragment.append(modalWindow);
+  }
+
+  async updateUserWords() {
+    const userID = getState().userId;
+    this.resultArray.forEach(async wordObj => {
+      // если if(rightRange >= 3 подряд && wordObj.answerCorrectness){
+      // learned: true
+      // }, то слово - learned
+      /*      try {
+             // получаем каждое слово
+             const response = await apiService.getUserWordResponse(userID, wordObj.id);
+             if (response.status === 200) {
+               const word: UserWord = await response.json();
+               if (word.difficulty === 'common' && wordObj.answerCorrectness) {
+                 const rightRange = word.optional.rightRange;
+               }
+               // если оно есть в базе, то обновляем слово
+               const wordBody = {
+                 difficulty: 'common',
+                 optional: {
+                   new: true,
+                   learned: wordObj.answerCorrectness,
+                   rightRange: wordObj.answerCorrectness ? 1 : 0,
+                 },
+               };
+     
+               await apiService.updateUserWord(userID, wordObj.id, wordBody);
+     
+             } else if (response.status === 404) {
+               // если его нет в базе, то создаем слово
+               const wordBody = {
+                 difficulty: 'common',
+                 optional: {
+                   new: true,
+                   learned: false,
+                   rightRange: wordObj.answerCorrectness ? 1 : 0,
+                 },
+               };
+               await apiService.createUserWord(userID, wordObj.id, wordBody);
+             }
+           } catch (error) {
+             console.log('bad request');
+           } */
+    });
+    /*     difficulty: "common";
+        id: "620a393f84610d0016232546";
+        optional: { new: true, learned: false; }
+        wordId: "5e9f5ee35eb9e72bc21af69a"; */
+
+    // const crateWord = await apiService.createUserWord(userID, this.resultArray[0].id, wordBody);
+
+    // const newWords =;
+
+    // this.resultArray
+
+    const allUserWords = await apiService.getAllUserWords(userID);
+    console.log('userWords', allUserWords);
   }
 
   drawWord(card: IStatisticAnswer) {

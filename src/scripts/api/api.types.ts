@@ -31,10 +31,14 @@ export interface WordCard {
   word: string,
   wordTranslate: string,
 }
+
+// "common" | 'difficult'
 export interface UserWord {
   difficulty: string,
   optional?: {
-    [key: string]: string | boolean;
+    new: boolean,
+    learned: boolean,
+    rightRange: number,
   };
 }
 // export interface State {

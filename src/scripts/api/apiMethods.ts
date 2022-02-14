@@ -179,7 +179,6 @@ class ApiResourceService {
       },
     });
     const userWord = await rawResponse.json();
-
     // console.log(userWord);
     return userWord;
   }
