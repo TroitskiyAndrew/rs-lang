@@ -1,4 +1,4 @@
-import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics } from './api.types';
+import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, APISStatus } from './api.types';
 import { updateState, getState } from '../state';
 import constants from '../app.constants';
 
@@ -17,7 +17,6 @@ class ApiResourceService {
       `${words}?page=${page}&group=${group}`,
     );
     const wordsResult: WordCard[] = await response.json();
-    // console.log(wordsResult);
     return wordsResult;
   }
 
@@ -38,12 +37,11 @@ class ApiResourceService {
       `${words}/${id}`,
     );
     const wordResult = await response.json();
-    // console.log(wordResult);
     return wordResult;
   }
 
   // !User
-  async createUser(user: User): Promise<void> {
+  async createUser(user: User): Promise<void | number> {
     const rawResponse = await fetch(`${users}`, {
       method: 'POST',
       headers: {
@@ -52,12 +50,14 @@ class ApiResourceService {
       },
       body: JSON.stringify(user),
     });
-    await rawResponse.json();
-
-    // console.log(content);
+    if (rawResponse.status === APISStatus.ok) {
+      return rawResponse.json();
+    } else {
+      return rawResponse.status;
+    }
   }
 
-  async loginUser(user: User): Promise<Authorization> {
+  async loginUser(user: User): Promise<Authorization | number> {
     const rawResponse = await fetch(`${signIn}`, {
       method: 'POST',
       headers: {
@@ -76,10 +76,14 @@ class ApiResourceService {
       userName: name,
     });
 
-    return authorization;
+    if (rawResponse.status === APISStatus.ok) {
+      return authorization;
+    } else {
+      return rawResponse.status;
+    }
   }
 
-  async getUser(userId: string): Promise<UserId> {
+  async getUser(userId: string): Promise<UserId | number> {
     const rawResponse = await fetch(`${users}/${userId}`, {
       method: 'GET',
       headers: {
@@ -88,10 +92,14 @@ class ApiResourceService {
       },
     });
     const userResult: UserId = await rawResponse.json();
-    return userResult;
+    if (rawResponse.status === APISStatus.ok) {
+      return userResult;
+    } else {
+      return rawResponse.status;
+    }
   }
 
-  async updateUser(userId: string, user: User): Promise<User> {
+  async updateUser(userId: string, user: User): Promise<User | number> {
     const rawResponse = await fetch(`${users}/${userId}`, {
       method: 'PUT',
       headers: {
@@ -102,7 +110,11 @@ class ApiResourceService {
       body: JSON.stringify(user),
     });
     const updatedUser: User = await rawResponse.json();
-    return updatedUser;
+    if (rawResponse.status === APISStatus.ok) {
+      return updatedUser;
+    } else {
+      return rawResponse.status;
+    }
   }
 
   async deleteUser(userId: string): Promise<void> {
@@ -121,7 +133,7 @@ class ApiResourceService {
     });
   }
 
-  async getNewUserTokens(userId: string): Promise<Authorization> {
+  async getNewUserTokens(userId: string): Promise<Authorization | number> {
     const rawResponse = await fetch(`${users}/${userId}/tokens`, {
       method: 'GET',
       headers: {
@@ -137,11 +149,15 @@ class ApiResourceService {
       refreshToken: refreshToken,
     });
 
-    return authorization;
+    if (rawResponse.status === APISStatus.ok) {
+      return authorization;
+    } else {
+      return rawResponse.status;
+    }
   }
 
   // !Users/Words
-  async getAllUserWords(userId: string): Promise<UserWord[]> {
+  async getAllUserWords(userId: string): Promise<UserWord[] | number> {
     const rawResponse = await fetch(`${users}/${userId}/words`, {
       method: 'GET',
       headers: {
@@ -152,11 +168,14 @@ class ApiResourceService {
     });
     const userWords: UserWord[] = await rawResponse.json();
 
-    // console.log(userWords);
-    return userWords;
+    if (rawResponse.status === APISStatus.ok) {
+      return userWords;
+    } else {
+      return rawResponse.status;
+    }
   }
 
-  async createUserWord(userId: string, wordId: string, wordBody: UserWord) {
+  async createUserWord(userId: string, wordId: string, wordBody: UserWord): Promise<UserWord | number> {
     const rawResponse = await fetch(`${users}//${userId}/words/${wordId}`, {
       method: 'POST',
       headers: {
@@ -166,10 +185,16 @@ class ApiResourceService {
       },
       body: JSON.stringify(wordBody),
     });
-    await rawResponse.json();
+    const createdWord = await rawResponse.json();
+
+    if (rawResponse.status === APISStatus.ok) {
+      return createdWord;
+    } else {
+      return rawResponse.status;
+    }
   }
 
-  async getUserWord(userId: string, wordId: string): Promise<UserWord> {
+  async getUserWord(userId: string, wordId: string): Promise<UserWord | number> {
     const rawResponse = await fetch(`${users}/${userId}/words/${wordId}`, {
       method: 'GET',
       headers: {
@@ -179,11 +204,15 @@ class ApiResourceService {
       },
     });
     const userWord = await rawResponse.json();
-    // console.log(userWord);
-    return userWord;
+
+    if (rawResponse.status === APISStatus.ok) {
+      return userWord;
+    } else {
+      return rawResponse.status;
+    }
   }
 
-  async updateUserWord(userId: string, wordId: string, wordBody: UserWord): Promise<UserWord> {
+  async updateUserWord(userId: string, wordId: string, wordBody: UserWord): Promise<UserWord | number> {
     const rawResponse = await fetch(`${users}/${userId}/words/${wordId}`, {
       method: 'PUT',
       headers: {
@@ -194,7 +223,12 @@ class ApiResourceService {
       body: JSON.stringify(wordBody),
     });
     const updatedUserWord: UserWord = await rawResponse.json();
-    return updatedUserWord;
+
+    if (rawResponse.status === APISStatus.ok) {
+      return updatedUserWord;
+    } else {
+      return rawResponse.status;
+    }
   }
 
   async deleteUserWord(userId: string, wordId: string): Promise<void> {
@@ -208,7 +242,7 @@ class ApiResourceService {
   }
 
   // !Users/AggregatedWords
-  async getAllUserAggregatedWords(userId: string): Promise<PaginatedResults> {
+  async getAllUserAggregatedWords(userId: string): Promise<PaginatedResults | number> {
     const group = getState().aggregatedWords.group ? `&group=${getState().aggregatedWords.group}` : '';
     const page = getState().aggregatedWords.page ? `&page=${getState().aggregatedWords.page}` : '';
     const wordsPerPage = getState().aggregatedWords.wordsPerPage ? `&wordsPerPage=${getState().aggregatedWords.wordsPerPage}` : '';
@@ -223,11 +257,14 @@ class ApiResourceService {
     });
     const userWords: PaginatedResults = await rawResponse.json();
 
-    // console.log(userWords);
-    return userWords;
+    if (rawResponse.status === APISStatus.ok) {
+      return userWords;
+    } else {
+      return rawResponse.status;
+    }
   }
 
-  async getAggregatedWord(userId: string, wordId: string): Promise<UserWord> {
+  async getAggregatedWord(userId: string, wordId: string): Promise<UserWord | number> {
     const rawResponse = await fetch(`${users}/${userId}/aggregatedWords/${wordId}`, {
       method: 'GET',
       headers: {
@@ -238,12 +275,15 @@ class ApiResourceService {
     });
     const userWord = await rawResponse.json();
 
-    // console.log(userWord);
-    return userWord;
+    if (rawResponse.status === APISStatus.ok) {
+      return userWord;
+    } else {
+      return rawResponse.status;
+    }
   }
 
   // !Users/Statistic
-  async getUserStatistics(userId: string): Promise<Statistics> {
+  async getUserStatistics(userId: string): Promise<Statistics | number> {
     const rawResponse = await fetch(`${users}/${userId}/statistics`, {
       method: 'GET',
       headers: {
@@ -254,11 +294,14 @@ class ApiResourceService {
     });
     const userStatistics: Statistics = await rawResponse.json();
 
-    // console.log(userStatistics);
-    return userStatistics;
+    if (rawResponse.status === APISStatus.ok) {
+      return userStatistics;
+    } else {
+      return rawResponse.status;
+    }
   }
 
-  async updateUserStatistics(userId: string, statisticsBody: Statistics): Promise<Statistics> {
+  async updateUserStatistics(userId: string, statisticsBody: Statistics): Promise<Statistics | number> {
     const rawResponse = await fetch(`${users}/${userId}/statistics`, {
       method: 'PUT',
       headers: {
@@ -269,7 +312,12 @@ class ApiResourceService {
       body: JSON.stringify(statisticsBody),
     });
     const updatedUserStatistics: Statistics = await rawResponse.json();
-    return updatedUserStatistics;
+
+    if (rawResponse.status === APISStatus.ok) {
+      return updatedUserStatistics;
+    } else {
+      return rawResponse.status;
+    }
   }
 }
 
