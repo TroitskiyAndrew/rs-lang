@@ -2,21 +2,24 @@ import BaseComponent from '../../base';
 import { createButton, createDiv } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 import { WordCard } from '../../../api/api.types';
-import { instances } from '../../components';
-import PageDictionary from '..';
+import { getState } from '../../../state';
 
 export default class WordsCard extends BaseComponent {
+  wordId = '';
+
+  userId = '';
+
   word: HTMLElement = createDiv({ className: 'wordCard__word' });
 
-  wordRu: HTMLElement = createDiv({ className: 'wordCard__wordRu' });
+  wordRu: HTMLElement = createDiv({ className: 'wordCard__word' });
 
   meaning: HTMLElement = createDiv({ className: 'wordCard__meaning' });
 
-  meaningRu: HTMLElement = createDiv({ className: 'wordCard__meaningRu' });
+  meaningRu: HTMLElement = createDiv({ className: 'wordCard__meaning' });
 
   example: HTMLElement = createDiv({ className: 'wordCard__example' });
 
-  exampleRu: HTMLElement = createDiv({ className: 'wordCard__exampleRu' });
+  exampleRu: HTMLElement = createDiv({ className: 'wordCard__example' });
 
   transcription: HTMLElement = createDiv({ className: 'wordCard__transcription' });
 
@@ -24,16 +27,25 @@ export default class WordsCard extends BaseComponent {
 
   file: string;
 
+  visibility = false;
+
+  difficult = false;
+
+  studied = false;
+
 
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'wordsCard';
     this.extraClass = 'wordCard';
     this.file = '';
+    this.wordId = this.elem.dataset.wordId as string;
+    this.userId = getState().userId;
   }
 
-  public oninit(): Promise<void> {
-    const wordRequest = apiService.getWord(this.elem.dataset.wordId as string);
+  public async oninit(): Promise<void> {
+    const wordRequest = apiService.getWord(this.wordId);
+
     return wordRequest.then((word: WordCard) => {
       const match = word.image.match(/\d*_\d*/);
 
@@ -41,19 +53,17 @@ export default class WordsCard extends BaseComponent {
         this.file = match[0] as string;
       }
 
-      this.word.innerHTML = word.word;
-      this.wordRu.innerHTML = word.wordTranslate;
-      this.meaning.innerHTML = word.textMeaning;
-      this.meaningRu.innerHTML = word.textMeaningTranslate;
-      this.example.innerHTML = word.textExample;
-      this.exampleRu.innerHTML = word.textExampleTranslate;
-      this.transcription.innerHTML = word.transcription;
+      this.word.innerHTML += word.word;
+      this.wordRu.innerHTML += word.wordTranslate;
+      this.meaning.innerHTML += word.textMeaning;
+      this.meaningRu.innerHTML += word.textMeaningTranslate;
+      this.example.innerHTML += word.textExample;
+      this.exampleRu.innerHTML += word.textExampleTranslate;
+      this.transcription.innerHTML += word.transcription;
 
       this.img.src = `${baseUrl}/files/${this.file}.jpg`;
 
-      this.word.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayWord' }));
-      this.example.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayExample' }));
-      this.meaning.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayMeaning' }));
+      this.changeStatus();
     });
   }
 
@@ -64,9 +74,9 @@ export default class WordsCard extends BaseComponent {
     const contorls = createDiv({ className: 'wordCard__controls' });
     const contorlsHolder = createDiv({ className: 'wordCard__controls-holder' });
 
-    contorls.append(this.createButtonHolder('visibility'));
-    contorls.append(this.createButtonHolder('difficult'));
-    contorls.append(this.createButtonHolder('studied'));
+    contorls.append(this.createButtonBlock('visibility', 'Показать/скрыть перевод'));
+    contorls.append(this.createButtonBlock('difficult', 'Добавить/убрать из списка сложных слов'));
+    contorls.append(this.createButtonBlock('studied', 'Добавить/убрать из списка выученных слов'));
 
     this.img.classList.add('wordCard__img');
     ruHolder.append(createDiv({ className: 'bricks' }));
@@ -82,24 +92,24 @@ export default class WordsCard extends BaseComponent {
     this.fragment.append(textHolder);
     contorlsHolder.append(this.img);
     contorlsHolder.append(contorls);
+    this.word.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayWord' }));
+    this.example.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayExample' }));
+    this.meaning.append(createButton({ className: 'wordCard__audio-button icon-button volume', action: 'sayMeaning' }));
     this.fragment.append(contorlsHolder);
 
   }
 
-  private createButtonHolder(type: string): HTMLDivElement {
-    const holder = createDiv({ className: `wordCard__button-block button-block ${type}` });
-    const overlay = createDiv({ className: 'button-block__overlay' });
-    const marker = createDiv({ className: 'button-block__marker' });
+  private createButtonBlock(type: string, hint: string): HTMLDivElement {
+    const block = createDiv({ className: `wordCard__button-block button-block ${type}` });
+    block.setAttribute('title', hint);
 
-    holder.append(marker);
-    holder.append(overlay);
-    overlay.append(createDiv({ className: 'button-block__circle left-top' }));
-    overlay.append(createDiv({ className: 'button-block__circle left-bottom' }));
-    overlay.append(createDiv({ className: 'button-block__circle right-top' }));
-    overlay.append(createDiv({ className: 'button-block__circle right-bottom' }));
-    holder.append(createButton({ className: `button-block__button icon-button btn-${type}`, action: `${type}` }));
+    block.append(createDiv({ className: 'button-block__circle left-top' }));
+    block.append(createDiv({ className: 'button-block__circle left-bottom' }));
+    block.append(createDiv({ className: 'button-block__circle right-top' }));
+    block.append(createDiv({ className: 'button-block__circle right-bottom' }));
+    block.append(createButton({ className: `button-block__button icon-button btn-${type}`, action: `${type}` }));
 
-    return holder;
+    return block;
   }
 
   public listenEvents(): void {
@@ -110,24 +120,86 @@ export default class WordsCard extends BaseComponent {
     this.actions.sayWord = this.sayWord;
     this.actions.sayExample = this.sayExample;
     this.actions.sayMeaning = this.sayMeaning;
+    this.actions.visibility = this.toggleVisibility;
+    this.actions.difficult = this.toggleDifficult;
+    this.actions.studied = this.toggleStudied;
   }
 
-  sayWord(): void {
+  private sayWord(): void {
     const url = `${baseUrl}/files/${this.file}.mp3`;
 
     this.playAudio(url);
   }
 
-  sayExample(): void {
+  private sayExample(): void {
     const url = `${baseUrl}/files/${this.file}_example.mp3`;
 
     this.playAudio(url);
   }
 
-  sayMeaning(): void {
+  private sayMeaning(): void {
     const url = `${baseUrl}/files/${this.file}_meaning.mp3`;
 
     this.playAudio(url);
+  }
+
+  private toggleVisibility(): void {
+    this.visibility = !this.visibility;
+    // this.changeStatus();
+    if (this.visibility) {
+      this.sendEvent('button-pressed');
+      setTimeout(this.changeStatus.bind(this), Number('500'));
+    } else {
+      this.changeStatus();
+    }
+  }
+
+  private toggleDifficult(): void {
+    this.difficult = !this.difficult;
+    if (this.difficult) {
+      apiService.createUserWord(this.userId, this.wordId, {
+        difficulty: 'difficult',
+      });
+    } else {
+      apiService.deleteUserWord(this.userId, this.wordId);
+    }
+    this.changeStatus();
+  }
+
+  private toggleStudied(): void {
+    this.studied = !this.studied;
+    if (this.studied) {
+      apiService.createUserWord(this.userId, this.wordId, {
+        difficulty: 'studied',
+      });
+    } else {
+      apiService.deleteUserWord(this.userId, this.wordId);
+    }
+    this.changeStatus();
+  }
+
+  private changeStatus(): void {
+    if (this.visibility) {
+      this.elem.classList.add('_visible-translate');
+      (this.elem.querySelector('.button-block.visibility') as HTMLElement).classList.add('_active');
+    } else {
+      this.elem.classList.remove('_visible-translate');
+      (this.elem.querySelector('.button-block.visibility') as HTMLElement).classList.remove('_active');
+    }
+    if (this.difficult) {
+      this.elem.classList.add('_difficult');
+      (this.elem.querySelector('.button-block.difficult') as HTMLElement).classList.add('_active');
+    } else {
+      this.elem.classList.remove('_difficult');
+      (this.elem.querySelector('.button-block.difficult') as HTMLElement).classList.remove('_active');
+    }
+    if (this.studied) {
+      this.elem.classList.add('_studied');
+      (this.elem.querySelector('.button-block.studied') as HTMLElement).classList.add('_active');
+    } else {
+      this.elem.classList.remove('_studied');
+      (this.elem.querySelector('.button-block.studied') as HTMLElement).classList.remove('_active');
+    }
   }
 
 }
