@@ -62,6 +62,7 @@ export default class SprintGame extends BaseComponent {
     const sprintWrapper = createDiv({ className: 'sprint-wrapper' });
     const paramsWrapper = createDiv({ className: 'params-wrapper' });
     const marioWrapper = createDiv({ className: 'mario-wrapper' });
+    const pipeWrapper = createDiv({ className: 'pipe-wrapper' });
     const gamepadWrapper = createDiv({ className: 'gamepad-wrapper' });
     this.gamepadWrapper = gamepadWrapper;
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
@@ -71,6 +72,7 @@ export default class SprintGame extends BaseComponent {
 
     this.renderParams(paramsWrapper);
     this.renderMario(marioWrapper);
+    this.renderPipe(pipeWrapper)
     this.renderGamepad(gamepadWrapper);
     this.renderWords(wordsWrapper);
     this.getWordsArray();
@@ -80,6 +82,7 @@ export default class SprintGame extends BaseComponent {
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
     sprintWrapper.append(marioWrapper);
+    sprintWrapper.append(pipeWrapper);
     sprintWrapper.append(gamepadWrapper);
 
     page.append(sprintWrapper);
@@ -131,30 +134,41 @@ export default class SprintGame extends BaseComponent {
     paramsWrapper.append(paramsCoinsWrapper);
   }
 
-  private getGroupAndPage() {
-    if (this.options) {
-      options = JSON.parse (this.options);
-      // localStorage.setItem ('options', this.options);
-      updateState({optionsSprint: this.options})
-    } 
-    if (options) {
-      this.group = options.group;
-      if (options.page) this.page = options.page;
-    } else {
-      //localStorage.getItem ('options') ? options = JSON.parse (localStorage.getItem ('options') as string) : options = {group: '0'};
-      this.group = JSON.parse (getState().optionsSprint).group;
-      // this.group = options.group;
-      if (JSON.parse (getState().optionsSprint).page) this.page = JSON.parse (getState().optionsSprint).page;
-    }
-  }
-
   private renderMario(marioWrapper: HTMLDivElement) {
     const mario = document.createElement('img');
     mario.className = 'mario-img'
-    mario.src = '/../../../../assets/img/sprintGame/gif/Mario_SMW.gif';
+    mario.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
 
     marioWrapper.append(mario);
-    marioWrapper.append(this.getCoin('medium'));
+    // marioWrapper.append(this.getCoin('medium'));
+  }
+
+  private renderPipe(pipeWrapper: HTMLDivElement) {
+    const block = document.createElement('img');
+    const pipe = document.createElement('img');
+
+    const blocksWrapper = createDiv({ className: 'blocks-wrapper' });
+    const itemWrapper = createDiv({ className: 'item-wrapper' });
+
+    block.className = 'block-img'
+    block.src = '/../../../../assets/img/sprintGame/png/SMW_Hard_Block.png';
+    for (let i = 0; i < 3; i++) {
+      let newBlock = block.cloneNode();
+      blocksWrapper.append(newBlock);
+    }    
+    pipe.className = 'pipe-img'
+    pipe.src = '/../../../../assets/img/sprintGame/png/Warp_Pipe_SMW.png';
+
+    for (let i = 0; i < 1; i++) {
+      let newCoin = this.getCoin('small').cloneNode();
+      // blocksWrapper.append(newBlock);
+      itemWrapper.append(newCoin)
+    }    
+    
+    pipeWrapper.append(blocksWrapper);
+    pipeWrapper.append(pipe);
+    pipeWrapper.append(itemWrapper);
+
   }
 
   private renderGamepad(gamepadWrapper: HTMLDivElement) {
@@ -213,6 +227,23 @@ export default class SprintGame extends BaseComponent {
     translatedWord.textContent = '';
     wordsWrapper.append(engWord);
     wordsWrapper.append(translatedWord);
+  }
+
+  private getGroupAndPage() {
+    if (this.options) {
+      options = JSON.parse (this.options);
+      // localStorage.setItem ('options', this.options);
+      updateState({optionsSprint: this.options})
+    } 
+    if (options) {
+      this.group = options.group;
+      if (options.page) this.page = options.page;
+    } else {
+      //localStorage.getItem ('options') ? options = JSON.parse (localStorage.getItem ('options') as string) : options = {group: '0'};
+      this.group = JSON.parse (getState().optionsSprint).group;
+      // this.group = options.group;
+      if (JSON.parse (getState().optionsSprint).page) this.page = JSON.parse (getState().optionsSprint).page;
+    }
   }
 
   private startTimer() {

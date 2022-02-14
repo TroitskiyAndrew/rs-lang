@@ -12,7 +12,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  background-image: url("/src/assets/img/sprintGame/png/SuperMarioBrosMap2-2BG-cut2.png");
+  background-image: url("/src/assets/img/sprintGame/png/SuperMarioBrosMap2-2BG-cut4.png");
   width: 80%;
   height: 80%;
   background-size: auto 802px;
@@ -71,27 +71,59 @@
 }
 
 .mario-img {
-  transform: scale(-1, 1);
-  margin-right: 20px;
-}
-
-.mario-img {
   height: 3.6rem;
+  // transform: scale(-1, 1);
+  // margin-right: 20px;
 }
 
 .coin-img_medium {
-  height: 2.6rem;
+  // height: 1rem;
 }
 
 .coin-img_small {
   height: 1.6rem;
+  width: 1.6rem;
 }
 
 .mario-wrapper {
   // gap: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: baseline;
   position: absolute;
   bottom: 108px;
-  left: 50%;
+  left: calc(50% - 325px);
+  height: 300px;
+}
+
+.pipe-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+  left: calc(50% - 325px);
+  bottom: 390px;
+}
+
+.blocks-wrapper {
+  height: 33px;
+}
+
+.item-wrapper {
+  height: 155px;
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.block-img {
+  height: 32px;
+}
+
+.pipe-img {
+  height: 96px;
+  transform: rotate(180deg);
 }
 
 .gamepad-wrapper {
@@ -176,7 +208,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  
+  z-index: 1;
 }
 
 .eng-word {
