@@ -4,11 +4,13 @@ export interface User {
   password: string;
 }
 export interface UserId {
+  name: string,
   id: string,
   email: string,
 }
 export interface Authorization {
   message: string,
+  name: string,
   refreshToken: string,
   token: string,
   userId: string,
@@ -30,23 +32,12 @@ export interface WordCard {
   wordTranslate: string,
 }
 export interface UserWord {
-  difficulty: string,
+  difficulty: 'common' | 'difficult',
   optional?: {
-    [key: string]: string | boolean;
+    new: boolean,
+    learned: boolean,
+    rightRange: number,
   };
-}
-export interface State {
-  page: number,
-  group: number,
-  aggregatedWords: {
-    page: number,
-    group: number,
-    wordsPerPage: number,
-    filter: string,
-  },
-  userId: string,
-  token: string,
-  refreshToken: string,
 }
 export interface PaginatedResults {
   paginatedResults: WordCard[],

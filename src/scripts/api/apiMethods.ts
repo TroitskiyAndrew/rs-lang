@@ -1,34 +1,11 @@
-import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, State } from './api.types';
+import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics } from './api.types';
 
-const baseUrl = 'http://127.0.0.1:3000';
-// const baseUrl = 'https://rs-learning-words.herokuapp.com'
+const baseUrl = 'https://rs-learning-words.herokuapp.com';
 const signIn = `${baseUrl}/signin`;
 const users = `${baseUrl}/users`;
 const words = `${baseUrl}/words`;
 
 class ApiResourceService {
-
-  private _state: State = {
-    page: 0,
-    group: 0,
-    aggregatedWords: {
-      page: 0,
-      group: 1,
-      wordsPerPage: 3,
-      filter: '{"$or":[{"userWord.difficulty":"easy"},{"userWord":null}]}',
-    },
-    userId: '',
-    token: '',
-    refreshToken: '',
-  };
-
-  get state(): State {
-    return this._state;
-  }
-
-  set state(newState: State) {
-    this._state = newState;
-  }
 
   // !Words
   // Всего 6 групп(от 0 до 5) и в каждой группе по 30 страниц(от 0 до 29). В каждой странице по 20 слов. Группы разбиты по сложности от самой простой(0) до самой сложной(5)
