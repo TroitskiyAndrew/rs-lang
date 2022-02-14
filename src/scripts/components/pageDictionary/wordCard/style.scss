@@ -1,6 +1,10 @@
 .wordCard {
   @include flex($ai: flex-start);
   height: 400px;
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    align-items: center;
+  }
 
   &__controls {
     @include flex;
@@ -10,11 +14,17 @@
     color: white;
     @include flex($fd: column, $jc: space-between);
     height: 100%;
+    @media (max-width: 1024px) {
+      order: 1;
+    }
   }
 
   &__controls-holder {
     @include flex($fd: column, $jc: space-between, $ai: flex-start);
     height: 100%;
+    @media (max-width: 1024px) {
+      align-items: center;
+    }
   }
 
   &__text-part {
@@ -22,6 +32,20 @@
     color: white;
     width: 100%;
     overflow: hidden;
+    *::before {
+      font-size: 1rem;
+      color: white;
+    }
+    .wordCard__word {
+      font-size: 2em;
+    }
+    &._eng {
+      .wordCard__word,
+      .wordCard__transcription {
+        display: inline;
+      }
+    }
+
     &._ru {
       max-height: 75px;
     }
@@ -34,7 +58,7 @@
   }
 
   &__img {
-    height: 200px;
+    width: 300px;
     border-radius: 10px;
   }
 }
@@ -48,18 +72,22 @@
   }
 }
 
+.wordCard:not(._authorized) {
+  .button-block.difficult,
+  .button-block.studied {
+    display: none;
+  }
+}
+
 .button-block {
   position: relative;
-  overflow: hidden;
   border-radius: 5px;
   border: solid 1px black;
   height: 75px;
   width: 75px;
-  &__overlay {
-    @include position;
-    width: 100%;
-    height: 100%;
-    background-color: rgb(182, 67, 46);
+  background-color: rgb(182, 67, 46);
+  &._active {
+    background-color: #e9b818;
   }
 
   &__circle {
@@ -86,11 +114,10 @@
     }
   }
 
-  &__marker {
-    @include position;
-  }
-
   &__button {
     @include position;
+    &::before {
+      font-size: 40px;
+    }
   }
 }
