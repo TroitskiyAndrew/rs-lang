@@ -1,4 +1,5 @@
 import { components, instances } from './components/components';
+import { updateState } from './state';
 
 
 
@@ -16,7 +17,7 @@ export function disposeElem(elem: HTMLElement): void {
   }
 }
 
-export function updateContent(elem: HTMLElement, name: string): void {
+export function updateContent(elem: HTMLElement, name: string, options?: string): void {
   if (components[name] === undefined) {
     return;
   }
@@ -24,6 +25,9 @@ export function updateContent(elem: HTMLElement, name: string): void {
 
   const x = new components[name](elem);
 
+  if (options) {
+    x.options = options;
+  }
   x.init();
 }
 
@@ -37,4 +41,12 @@ export function initChildren(elem: HTMLElement): void {
     }
     updateContent(child, child.getAttribute('data-widget') as string);
   }
+}
+
+export function pageChenging(elem: HTMLElement, page: string): void {
+  const container = document.querySelector('.header__page') as HTMLElement;
+
+  updateState({ currentPage: page });
+  container.innerHTML = '';
+  container.append(elem);
 }

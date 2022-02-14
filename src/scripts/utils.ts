@@ -1,4 +1,6 @@
 import { TableHeader, DivOptions, SpanOptions, ButtonOptions, InputOptions } from './common.types';
+import { instances } from './components/components';
+import Menu from './components/menu';
 
 export function createDiv(options: DivOptions): HTMLDivElement {
   const div: HTMLDivElement = document.createElement('div');
@@ -51,6 +53,15 @@ export function createInput(options: InputOptions): HTMLInputElement {
   if (options.type) {
     input.type = options.type;
   }
+  if (options.placeholder) {
+    input.placeholder = options.placeholder;
+  }
+  if (options.value) {
+    input.value = options.value;
+  }
+  if (options.required) {
+    input.required = options.required;
+  }
   return input;
 }
 
@@ -98,3 +109,9 @@ export function getRandom(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+export function closeMenu(): void {
+  const menuElem = document.querySelector('[data-widget="menu"]') as HTMLElement;
+  const widgetId = menuElem.dataset.widgetId as string;
+  const widget = instances[widgetId] as Menu;
+  widget.hideMenu();
+}

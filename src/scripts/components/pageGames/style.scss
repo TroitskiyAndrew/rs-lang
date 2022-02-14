@@ -1,0 +1,8 @@
+.games {
+  @include flex;
+  gap: 20px;
+  &__link {
+    background-color: $brand-color;
+    padding: 10px;
+  }
+}

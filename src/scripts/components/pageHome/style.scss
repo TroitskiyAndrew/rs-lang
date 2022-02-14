@@ -1,0 +1,6 @@
+.home {
+  position: relative;
+  span {
+    @include position;
+  }
+}

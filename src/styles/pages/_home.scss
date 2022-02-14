@@ -2,6 +2,20 @@ html {
   height: 100%;
 }
 
-.page {
-  padding: 0 20px;
+body {
+  @include flex($fd: column, $jc: flex-start, $ai: flex-start);
+  height: 100%;
+}
+
+main {
+  width: 100%;
+  flex-grow: 1;
+}
+
+#page-holder {
+  .page {
+    padding: 0 20px;
+    height: 100%;
+    width: 100%;
+  }
 }
