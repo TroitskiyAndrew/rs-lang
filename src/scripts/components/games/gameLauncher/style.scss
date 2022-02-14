@@ -1,0 +1,32 @@
+.launcher-games {
+  position: relative;
+  height: 100%;
+  background-image: url('/src/assets/img/background-gameLauncher.jpg');
+  background-repeat-y: no-repeat;
+  background-size: cover;
+  background-position: -350px;
+
+  &__description {
+    .game-description__title {
+      text-align: center;
+    }
+    .game-description__text {
+      display: block;
+      text-align: justify;
+      margin: 20px;
+    }
+  }
+
+  &__link {
+    max-width: 300px;
+  }
+
+  .start-game {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: $brand-color;
+    cursor: pointer;
+  }
+}

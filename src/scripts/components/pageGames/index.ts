@@ -15,8 +15,18 @@ export default class PageGames extends BaseComponent {
 
   public createHTML(): void {
     const page = createDiv({ className: 'page games' });
-    const gameAudio = createDiv({ className: 'games__link', dataSet: { direction: 'audioGame' } });
-    const gameSprint = createDiv({ className: 'games__link', dataSet: { direction: 'sprintGame' } });
+    const gameAudio = createDiv({
+      className: 'games__link', dataSet: {
+        direction: 'gameLauncher',
+        options: 'audio-game',
+      },
+    });
+    const gameSprint = createDiv({
+      className: 'games__link', dataSet: {
+        direction: 'gameLauncher',
+        options: 'sprint-game',
+      },
+    });
 
     gameAudio.append(createSpan({ text: 'Игра Аудио' }));
     gameSprint.append(createSpan({ text: 'Игра Спринт' }));
