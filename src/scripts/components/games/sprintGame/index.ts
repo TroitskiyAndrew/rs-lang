@@ -24,7 +24,8 @@ let startTimerOnce: boolean = true;
 let timerId: NodeJS.Timer;
 let menuButton: HTMLButtonElement
 let menuModal: HTMLUListElement
-let audioIsPlaying = true;
+let audioIsPlaying = false;
+// let startAudioOnce = true;
 
 export default class SprintGame extends BaseComponent {
 
@@ -36,8 +37,14 @@ export default class SprintGame extends BaseComponent {
   buttonA: HTMLButtonElement | undefined;
   paramsScore: HTMLDivElement | undefined;
   paramsTime: HTMLDivElement | undefined;
+  gamepadWrapper: HTMLDivElement | undefined;
   controlSelect: HTMLButtonElement | undefined;
-  
+  startAudioOnce: boolean = true;
+  audioSprint: HTMLAudioElement = new Audio();
+  audioModal: HTMLAudioElement = new Audio();
+  audioCoin: HTMLAudioElement = new Audio();
+  audioMushroom: HTMLAudioElement = new Audio();
+
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'sprintGame';
@@ -56,8 +63,10 @@ export default class SprintGame extends BaseComponent {
     const paramsWrapper = createDiv({ className: 'params-wrapper' });
     const marioWrapper = createDiv({ className: 'mario-wrapper' });
     const gamepadWrapper = createDiv({ className: 'gamepad-wrapper' });
+    this.gamepadWrapper = gamepadWrapper;
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
 
+    this.clearGameParams();
     this.getGroupAndPage();
 
     this.renderParams(paramsWrapper);
@@ -65,8 +74,8 @@ export default class SprintGame extends BaseComponent {
     this.renderGamepad(gamepadWrapper);
     this.renderWords(wordsWrapper);
     this.getWordsArray();
-    this.playAudio('../../../../assets/sounds/1 - Title Bgm.mp3');
-    if (!audioIsPlaying) this.audioPlayer.pause();
+
+    this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
@@ -75,11 +84,6 @@ export default class SprintGame extends BaseComponent {
 
     page.append(sprintWrapper);
     this.fragment.append(page);
-    
-    // window.onload = () => {
-    //   console.log('111')
-    //   this.startTimer()
-    // };
   }
 
   private getCoin(size: string) {
@@ -312,22 +316,34 @@ export default class SprintGame extends BaseComponent {
       
     }
     let menuModalHandler = () => {
-      
       menuButton.removeEventListener('click', menuButtonHandler);
       menuModal.removeEventListener('click', menuModalHandler);
       this.clearGameParams()
+      this.audioSprint.pause();
     }
     this.controlSelect?.addEventListener('click', this.switchAudio.bind(this))
   }
 
   private switchAudio() {
+    if (this.startAudioOnce) {
+      this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', true)
+      this.startAudioOnce = false;
+    }
     if (audioIsPlaying) {
-      this.audioPlayer.pause();
+      this.audioSprint.pause();
       audioIsPlaying = false;
     } else {
-      this.audioPlayer.play()
+      this.audioSprint.play();
       audioIsPlaying = true;
     }
+  }
+
+  private playAudioSprint(player: HTMLAudioElement, src: string, status: boolean) {
+    if (status) {
+      player.src = src;
+      player.play();
+    }
+
   }
 
   private clearGameParams() {
@@ -340,7 +356,6 @@ export default class SprintGame extends BaseComponent {
     };
     roundResults = [];
     this.stopTimer();
-    this.audioPlayer.pause();
   }
 
   public playAgain() {
@@ -351,8 +366,11 @@ export default class SprintGame extends BaseComponent {
       multiplyerIntermediateCounter: 0,
     };
     roundResults = [];
-    this.getRandomWords(groupWordsArr)
-    if (audioIsPlaying) this.playAudio('../../../../assets/sounds/1 - Title Bgm.mp3');
+    this.gamepadWrapper!.style.display = "flex";
+    this.getRandomWords(groupWordsArr);
+    this.startAudioOnce = true;
+    this.audioModal.pause();
+    this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
   }
 
   public setActions(): void {
@@ -370,6 +388,9 @@ export default class SprintGame extends BaseComponent {
         && scoreCounter.multiplyer !== MAX_SCORE_MULTIPLYER) {
         scoreCounter.multiplyer = scoreCounter.multiplyer * 2;
         scoreCounter.multiplyerIntermediateCounter = 0;
+        this.playAudioSprint(this.audioMushroom, '../../../../assets/sounds/smw_1-up.wav', audioIsPlaying);
+      } else {
+        this.playAudioSprint(this.audioCoin, '../../../../assets/sounds/smw_coin.wav', audioIsPlaying);
       }
       
     } else {
@@ -403,6 +424,8 @@ export default class SprintGame extends BaseComponent {
     });
     this.elem.append(modalStatistic);
     updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
+    this.playAudioSprint(this.audioModal, '../../../../assets/sounds/22 - Course Clear Fanfare.mp3', audioIsPlaying);
+    this.gamepadWrapper!.style.display = "none";
   }
 
   public giveDataToModalStatistic(): IStatisticAnswer[] {
@@ -412,7 +435,7 @@ export default class SprintGame extends BaseComponent {
     })
     console.log(roundResults)
     roundResults = roundResults.slice(0, roundResults.length - 1);
-    this.audioPlayer.pause();
+    this.audioSprint.pause();
     return roundResults;
   }
 
