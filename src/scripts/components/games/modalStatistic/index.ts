@@ -72,6 +72,7 @@ export default class ModalStatistic extends BaseComponent {
     if (parenWidget instanceof AudioGame) {
       console.log('AUDIO GAME');
     } else if (parenWidget instanceof SprintGame) {
+      console.log('Sprint Game');
       const totalScore = createSpan({
         text: `К-во баллов - ${parenWidget.giveScoreToModalStatistic()}`,
       });
@@ -150,13 +151,15 @@ export default class ModalStatistic extends BaseComponent {
     modalWindow.append(gameContent);
     modalWindow.append(navigationModal);
 
-    // todo
-    this.updateUserWords();
+    // todo if user log in
+    if (getState().userId) {
+      this.updateOrCreateUserWords();
+    }
 
     this.fragment.append(modalWindow);
   }
 
-  async updateUserWords() {
+  async updateOrCreateUserWords(): Promise<void> {
     const userID = getState().userId;
 
     await Promise.all(this.resultArray.map(async (wordObj) => {
@@ -185,6 +188,7 @@ export default class ModalStatistic extends BaseComponent {
           if (userWord.difficulty === 'common' && wordBody.optional.rightRange >= constants.wordCommonRightRange) {
             wordBody.optional.learned = true;
           } else if (userWord.difficulty === 'difficult' && wordBody.optional.rightRange >= constants.wordDifficultRightRange) {
+            wordBody.difficulty = 'common';
             wordBody.optional.learned = true;
           } else {
             wordBody.optional.learned = false;
