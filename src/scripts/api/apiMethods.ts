@@ -66,17 +66,16 @@ class ApiResourceService {
       },
       body: JSON.stringify(user),
     });
-    const authorization: Authorization = await rawResponse.json();
-    const { refreshToken, token, userId, name } = authorization;
-
-    updateState({
-      token: token,
-      refreshToken: refreshToken,
-      userId: userId,
-      userName: name,
-    });
 
     if (rawResponse.status === APISStatus.ok) {
+      const authorization: Authorization = await rawResponse.json();
+      const { refreshToken, token, userId, name } = authorization;
+      updateState({
+        token: token,
+        refreshToken: refreshToken,
+        userId: userId,
+        userName: name,
+      });
       return authorization;
     } else {
       return rawResponse.status;
@@ -91,9 +90,9 @@ class ApiResourceService {
         'Accept': 'application/json',
       },
     });
-    const userResult: UserId = await rawResponse.json();
     if (rawResponse.status === APISStatus.ok) {
-      return userResult;
+      const user: UserId = await rawResponse.json();
+      return user;
     } else {
       return rawResponse.status;
     }
@@ -109,8 +108,8 @@ class ApiResourceService {
       },
       body: JSON.stringify(user),
     });
-    const updatedUser: User = await rawResponse.json();
     if (rawResponse.status === APISStatus.ok) {
+      const updatedUser: User = await rawResponse.json();
       return updatedUser;
     } else {
       return rawResponse.status;
@@ -141,15 +140,15 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    const authorization: Authorization = await rawResponse.json();
-    const { refreshToken, token } = authorization;
-
-    updateState({
-      token: token,
-      refreshToken: refreshToken,
-    });
 
     if (rawResponse.status === APISStatus.ok) {
+      const authorization: Authorization = await rawResponse.json();
+      const { refreshToken, token } = authorization;
+
+      updateState({
+        token: token,
+        refreshToken: refreshToken,
+      });
       return authorization;
     } else {
       return rawResponse.status;
@@ -166,9 +165,9 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    const userWords: UserWord[] = await rawResponse.json();
 
     if (rawResponse.status === APISStatus.ok) {
+      const userWords: UserWord[] = await rawResponse.json();
       return userWords;
     } else {
       return rawResponse.status;
@@ -185,9 +184,9 @@ class ApiResourceService {
       },
       body: JSON.stringify(wordBody),
     });
-    const createdWord = await rawResponse.json();
 
     if (rawResponse.status === APISStatus.ok) {
+      const createdWord: UserWord = await rawResponse.json();
       return createdWord;
     } else {
       return rawResponse.status;
@@ -203,9 +202,9 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    const userWord = await rawResponse.json();
 
     if (rawResponse.status === APISStatus.ok) {
+      const userWord: UserWord = await rawResponse.json();
       return userWord;
     } else {
       return rawResponse.status;
@@ -222,9 +221,9 @@ class ApiResourceService {
       },
       body: JSON.stringify(wordBody),
     });
-    const updatedUserWord: UserWord = await rawResponse.json();
 
     if (rawResponse.status === APISStatus.ok) {
+      const updatedUserWord: UserWord = await rawResponse.json();
       return updatedUserWord;
     } else {
       return rawResponse.status;
@@ -255,9 +254,9 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    const userWords: PaginatedResults = await rawResponse.json();
 
     if (rawResponse.status === APISStatus.ok) {
+      const userWords: PaginatedResults = await rawResponse.json();
       return userWords;
     } else {
       return rawResponse.status;
@@ -273,9 +272,9 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    const userWord = await rawResponse.json();
 
     if (rawResponse.status === APISStatus.ok) {
+      const userWord: UserWord = await rawResponse.json();
       return userWord;
     } else {
       return rawResponse.status;
@@ -292,9 +291,9 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    const userStatistics: Statistics = await rawResponse.json();
 
     if (rawResponse.status === APISStatus.ok) {
+      const userStatistics: Statistics = await rawResponse.json();
       return userStatistics;
     } else {
       return rawResponse.status;
@@ -311,9 +310,9 @@ class ApiResourceService {
       },
       body: JSON.stringify(statisticsBody),
     });
-    const updatedUserStatistics: Statistics = await rawResponse.json();
 
     if (rawResponse.status === APISStatus.ok) {
+      const updatedUserStatistics: Statistics = await rawResponse.json();
       return updatedUserStatistics;
     } else {
       return rawResponse.status;
