@@ -25,7 +25,7 @@ let timerId: NodeJS.Timer;
 let menuButton: HTMLButtonElement
 let menuModal: HTMLUListElement
 let audioIsPlaying = false;
-// let startAudioOnce = true;
+let coincounter: number = 0;
 
 export default class SprintGame extends BaseComponent {
 
@@ -489,7 +489,8 @@ export default class SprintGame extends BaseComponent {
   private addCoin() {
     let newCoin = this.getCoin('small').cloneNode() as HTMLImageElement;
     this.itemWrapper!.append(newCoin);
-    this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d/g, '2') 
+    coincounter += 1;
+    this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, String(coincounter)) 
   }
 
   private addItem(itemNumber: number) {
