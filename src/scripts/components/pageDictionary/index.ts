@@ -82,6 +82,7 @@ export default class PageDictionary extends BaseComponent {
     this.goInput.addEventListener('change', this.goComand.bind(this));
     this.pageSelector.addEventListener('input', this.changePage.bind(this));
     this.page.addEventListener('change-flag', this.groupChangeFromFlag.bind(this));
+    this.page.addEventListener('button-pressed', this.marioJump.bind(this));
   }
 
   public setActions(): void {

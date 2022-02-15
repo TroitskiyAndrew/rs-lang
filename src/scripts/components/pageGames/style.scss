@@ -1,6 +1,7 @@
 .games {
   @include flex;
   background: black;
+  color: white;
 
   &__container {
     width: 80%;
@@ -18,7 +19,12 @@
   }
 
   &__link {
-    background-color: $brand-color;
+    background-color: #e5005091;
     padding: 10px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    border: 0;
   }
 }

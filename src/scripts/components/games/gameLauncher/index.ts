@@ -40,9 +40,14 @@ export default class GameLauncher extends BaseComponent {
     const titleDescription = createDiv({
       className: 'game-description__title',
     });
-    const textDescription = createSpan({
+    const textDescription = createDiv({
       className: 'game-description__text',
     });
+    const textDescription1 = createSpan({});
+    const textDescription2 = createSpan({});
+    const textDescription3 = createSpan({});
+    const textDescription4 = createSpan({});
+    const textDescription5 = createSpan({});
 
     if (!this.options) {
       this.options = getState().launchGame;
@@ -50,11 +55,11 @@ export default class GameLauncher extends BaseComponent {
 
     if (this.options === 'audio-game') {
       titleDescription.textContent = '«Аудиовызов»';
-      textDescription.innerText = `«Аудиовызов» - это тренировка, которая улучшает восприятие речи на слух.
-      Используйте мышь, чтобы выбрать.
-      Используйте цифровые клавиши от 1 до 4 для выбора ответа
-      Используйте пробел для подсказки или для перехода к следующему слову.
-      Для выбора уровня сложности подымите флаг)`;
+      textDescription1.innerText = '«Аудиовызов» - это тренировка, которая улучшает восприятие речи на слух.';
+      textDescription2.innerText = 'Используйте мышь, чтобы выбрать правильный вариант ответа.';
+      textDescription3.innerText = 'Используйте цифровые клавиши от 1 до 4 для выбора ответа.';
+      textDescription4.innerText = 'Используйте пробел для подсказки и перехода к следующему слову.';
+      textDescription5.innerText = 'Для выбора уровня сложности подымите флаг)';
 
       const gameAudio = createDiv({
         className: 'launcher-games__link games__link start-game',
@@ -69,10 +74,10 @@ export default class GameLauncher extends BaseComponent {
       pageNavigation.append(gameAudio);
     } else if (this.options === 'sprint-game') {
       titleDescription.textContent = '«Спринт»';
-      textDescription.innerText = `«Спринт» - Тренирует навык быстрого перевода с английского языка на русский. Вам нужно выбрать соответствует ли перевод предложенному слову.
-      Используйте мышь, чтобы выбрать.
-      Используйте цифровые клавиши 1 или 2 для выбора ответа.
-      Для выбора уровня сложности подымите флаг)`;
+      textDescription1.innerText = '«Спринт» - Тренирует навык быстрого перевода с английского языка на русский. Вам нужно выбрать соответствует ли перевод предложенному слову.';
+      textDescription2.innerText = 'Используйте мышь, чтобы выбрать правильный вариант ответа.';
+      textDescription3.innerText = 'Используйте цифровые клавиши 1 или 2 для выбора ответа.';
+      textDescription4.innerText = 'Для выбора уровня сложности подымите флаг)';
 
       const gameSprint = createDiv({
         className: 'launcher-games__link games__link start-game',
@@ -91,9 +96,14 @@ export default class GameLauncher extends BaseComponent {
     pageNavigation.append(backBtn);
 
     description.append(titleDescription);
+    textDescription.append(textDescription1);
+    textDescription.append(textDescription2);
+    textDescription.append(textDescription3);
+    textDescription.append(textDescription4);
+    textDescription.append(textDescription5);
     description.append(textDescription);
+    description.append(pageNavigation);
     pageContainer.append(description);
-    pageContainer.append(pageNavigation);
 
     pageContainer.append(createDiv({
       className: 'launcher-games__flagPole',

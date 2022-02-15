@@ -5,7 +5,9 @@ import BaseComponent from '../../base';
 import { instances } from '../../components';
 import AudioGame, { IStatisticAnswer } from '../audioGame';
 import SprintGame from '../sprintGame';
-import { baseUrl } from '../../../api/apiMethods';
+import { apiService, baseUrl } from '../../../api/apiMethods';
+import { getState, updateState } from '../../../state';
+import { UserWord } from '../../../api/api.types';
 
 export default class ModalStatistic extends BaseComponent {
   resultArray: IStatisticAnswer[] = [];
@@ -13,6 +15,10 @@ export default class ModalStatistic extends BaseComponent {
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'modalStatistic';
+  }
+
+  public async oninit(): Promise<void> {
+    return Promise.resolve();
   }
 
   public createHTML(): void {
@@ -28,7 +34,12 @@ export default class ModalStatistic extends BaseComponent {
 
     // процент правильных ответов
     const totalPercents = constants.hundred;
-    const percentOfRightAnswers = Math.floor(rightAnswers.length * totalPercents / this.resultArray.length);
+    let percentOfRightAnswers: number;
+    if (this.resultArray.length) {
+      percentOfRightAnswers = Math.floor(rightAnswers.length * totalPercents / this.resultArray.length);
+    } else {
+      percentOfRightAnswers = 0;
+    }
 
     const modalWindow = createDiv({
       className: 'game-modal',
@@ -61,6 +72,7 @@ export default class ModalStatistic extends BaseComponent {
     if (parenWidget instanceof AudioGame) {
       console.log('AUDIO GAME');
     } else if (parenWidget instanceof SprintGame) {
+      console.log('Sprint Game');
       const totalScore = createSpan({
         text: `К-во баллов - ${parenWidget.giveScoreToModalStatistic()}`,
       });
@@ -115,7 +127,7 @@ export default class ModalStatistic extends BaseComponent {
       className: 'game-modal__navigation',
     });
     const againBtn = createButton({
-      className: 'game-modal__button game-modal__play-again',
+      className: 'game-modal__button game-modal__play-again games__link',
       text: 'повторить',
     });
     againBtn.onclick = () => {
@@ -124,7 +136,7 @@ export default class ModalStatistic extends BaseComponent {
     };
 
     const toGamesBtn = createButton({
-      className: 'game-modal__button game-modal__to-games',
+      className: 'game-modal__button game-modal__to-games games__link',
       text: 'к играм',
       dataSet: {
         direction: 'pageGames',
@@ -139,7 +151,68 @@ export default class ModalStatistic extends BaseComponent {
     modalWindow.append(gameContent);
     modalWindow.append(navigationModal);
 
+    // todo if user log in
+    if (getState().userId) {
+      this.updateOrCreateUserWords();
+    }
+
     this.fragment.append(modalWindow);
+  }
+
+  async updateOrCreateUserWords(): Promise<void> {
+    const userID = getState().userId;
+
+    await Promise.all(this.resultArray.map(async (wordObj) => {
+      // получаем каждое слово
+      const userWordResponse = await apiService.getUserWord(userID, wordObj.id);
+
+      if (typeof (userWordResponse) !== 'number') {
+        // если оно есть в базе, то обновляем слово
+        const userWord = userWordResponse;
+
+        const wordBody: Partial<UserWord> = {
+          optional: {
+            new: true,
+            word: wordObj.word,
+          },
+        };
+
+        if (!wordBody.optional) return;
+        if (!wordObj.answerCorrectness) {
+          wordBody.optional.rightRange = 0;
+          wordBody.optional.learned = false;
+        } else if (userWord.optional && wordObj.answerCorrectness) {
+          let rightWordRange = userWord.optional.rightRange as number;
+          wordBody.optional.rightRange = ++rightWordRange;
+
+          if (userWord.difficulty === 'common' && wordBody.optional.rightRange >= constants.wordCommonRightRange) {
+            wordBody.optional.learned = true;
+          } else if (userWord.difficulty === 'difficult' && wordBody.optional.rightRange >= constants.wordDifficultRightRange) {
+            wordBody.difficulty = 'common';
+            wordBody.optional.learned = true;
+          } else {
+            wordBody.optional.learned = false;
+          }
+        }
+        await apiService.updateUserWord(userID, wordObj.id, wordBody);
+
+      } else {
+        const wordBody = {
+          difficulty: 'common',
+          optional: {
+            new: true,
+            learned: false,
+            rightRange: wordObj.answerCorrectness ? 1 : 0,
+            word: wordObj.word,
+          },
+        };
+        await apiService.createUserWord(userID, wordObj.id, wordBody);
+      }
+
+    }));
+
+    const allUserWords = await apiService.getAllUserWords(userID);
+    console.log('userWords', allUserWords);
   }
 
   drawWord(card: IStatisticAnswer) {
