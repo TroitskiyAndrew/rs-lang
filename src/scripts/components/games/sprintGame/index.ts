@@ -495,13 +495,13 @@ export default class SprintGame extends BaseComponent {
   private addItem(itemNumber: number) {
     switch (itemNumber) {
       case 2:
-        this.itemAddHandler(this.getMushroom(), 'Mario_SMW', '-1');
+        this.addItemHandler(this.getMushroom(), 'Mario_SMW', '-1');
         break;
       case 4:
-        this.itemAddHandler(this.getFeather(), 'Navmario', '1');
+        this.addItemHandler(this.getFeather(), 'Navmario', '1');
       break;
       case 8:
-        this.itemAddHandler(this.getEgg(), 'SMW_MarioCapeSpin', '1');
+        this.addItemHandler(this.getEgg(), 'SMW_MarioCapeSpin', '1');
       break;
     }
   }
@@ -509,18 +509,18 @@ export default class SprintGame extends BaseComponent {
   private deleteItem(itemNumber: number) {
     switch (itemNumber) {
       case 1:
-        this.itemDeleteHandler(null, 'SMWSmallMarioSprite', '3.6');
+        this.deleteItemHandler(null, 'SMWSmallMarioSprite', '3.6');
         break;
       case 2:
-        this.itemDeleteHandler(this.getMushroom(), 'SMW_Mario', '4.6');
+        this.deleteItemHandler(this.getMushroom(), 'SMW_Mario', '4.6');
         break;
       case 4:
-        this.itemDeleteHandler(this.getFeather(), 'SMWCapeMarioSprite', '4.6');
+        this.deleteItemHandler(this.getFeather(), 'SMWCapeMarioSprite', '4.6');
       break;
     }
   }
 
-  private itemAddHandler(item: HTMLImageElement, gifName: string, scaleNum: string/*, pngName: string, imgSize: string*/) {
+  private addItemHandler(item: HTMLImageElement, gifName: string, scaleNum: string) {
     let newItem = item.cloneNode();
     let newItemParams = item.cloneNode() as HTMLImageElement;
 
@@ -545,21 +545,21 @@ export default class SprintGame extends BaseComponent {
   private getDownItem() {
     switch (scoreCounter.multiplyer) {
       case 1:
-        this.itemDownHandler('SMWSmallMarioSprite', '3.6');
+        this.getDownItemHandler('SMWSmallMarioSprite', '3.6');
         break;
       case 2:
-        this.itemDownHandler('SMW_Mario', '4.6');
+        this.getDownItemHandler('SMW_Mario', '4.6');
         break;
       case 4:
-        this.itemDownHandler('SMWCapeMarioSprite', '4.6');
+        this.getDownItemHandler('SMWCapeMarioSprite', '4.6');
       break;
       case 8:
-        this.itemDownHandler('Green_Yoshi_SMW', '5.6');
+        this.getDownItemHandler('Green_Yoshi_SMW', '5.6');
       break;
     }
   }
 
-  private itemDownHandler(pngName: string, imgSize: string) {
+  private getDownItemHandler(pngName: string, imgSize: string) {
     this.mario!.src = `/../../../../assets/img/sprintGame/png/${pngName}.png`
     this.mario!.onload = () => {
       this.mario!.style.transform = 'scale(1, 1)';
@@ -575,7 +575,7 @@ export default class SprintGame extends BaseComponent {
     }
   }
 
-  private itemDeleteHandler(item: HTMLImageElement | null, pngName: string, imgSize: string) {
+  private deleteItemHandler(item: HTMLImageElement | null, pngName: string, imgSize: string) {
     this.mario?.classList.remove('up');
     this.mario?.classList.remove('yoshi');
 
@@ -599,7 +599,7 @@ export default class SprintGame extends BaseComponent {
         this.mario?.classList.add('small');
       }
     }
-    
+
   }
 
   private showModalStatistics(): void {
