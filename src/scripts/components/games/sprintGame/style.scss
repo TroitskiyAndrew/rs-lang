@@ -70,30 +70,22 @@
   align-items: flex-end;
 }
 
-.mario-img {
-  height: 3.6rem;
-  // transform: scale(-1, 1);
-  // margin-right: 20px;
-}
-
-.coin-img_medium {
-  // height: 1rem;
-}
-
-.coin-img_small {
-  height: 1.6rem;
-  width: 1.6rem;
-}
-
 .mario-wrapper {
   // gap: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: baseline;
+  justify-content: end;
   position: absolute;
   bottom: 108px;
   left: calc(50% - 325px);
   height: 300px;
+}
+
+
+.mario-img {
+  height: 3.6rem;
+  // transform: scale(-1, 1);
+  // margin-right: 20px;
 }
 
 .pipe-wrapper {
@@ -110,11 +102,15 @@
 }
 
 .item-wrapper {
+  position: relative;
   height: 155px;
   display: flex;
   flex: none;
   flex-wrap: wrap;
   flex-direction: column;
+  align-content: center;
+  justify-content: end;
+  transition: all 3s ease-out 0.5s;
 }
 
 .block-img {
@@ -125,6 +121,37 @@
   height: 96px;
   transform: rotate(180deg);
 }
+
+// .coin-img_medium {
+//   // height: 1rem;
+// }
+
+.coin-img_params {
+  width: 1.4rem;
+}
+
+.coin-img_small {
+  position: absolute;
+  top: 0;
+  left: calc(50% - 12.8px);
+  width: 1.6rem;
+  animation-name: coin-animation;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes coin-animation {
+  from {top: 0;};
+  to {top: calc(100% - 34px)}
+}
+
+// .coin-img_small.start {
+//   position: absolute;
+//   top: 0;
+//   left: calc(50% - 12.8px);
+//   width: 1.6rem;
+//   transition: all 3s;
+// }
 
 .gamepad-wrapper {
   display: flex;

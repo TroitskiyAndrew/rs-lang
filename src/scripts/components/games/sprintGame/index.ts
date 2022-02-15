@@ -33,13 +33,18 @@ export default class SprintGame extends BaseComponent {
   // groupsWrapperButton: HTMLButtonElement | undefined;
   group: string = '';
   page: string = '';
-  buttonB: HTMLButtonElement | undefined;
-  buttonA: HTMLButtonElement | undefined;
+
+  startAudioOnce: boolean = true;
+
   paramsScore: HTMLDivElement | undefined;
   paramsTime: HTMLDivElement | undefined;
   gamepadWrapper: HTMLDivElement | undefined;
+  itemWrapper: HTMLDivElement | undefined;
+
   controlSelect: HTMLButtonElement | undefined;
-  startAudioOnce: boolean = true;
+  buttonB: HTMLButtonElement | undefined;
+  buttonA: HTMLButtonElement | undefined;
+
   audioSprint: HTMLAudioElement = new Audio();
   audioModal: HTMLAudioElement = new Audio();
   audioCoin: HTMLAudioElement = new Audio();
@@ -96,6 +101,21 @@ export default class SprintGame extends BaseComponent {
     return coin;
   }
 
+  private getMushroom() {
+    const mushroom = document.createElement('img');
+    mushroom.className = 'mushroom-img';
+    mushroom.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
+    return mushroom;
+  }
+
+  private async getMenuButton(): Promise<HTMLButtonElement> {
+    return await document.getElementsByClassName('menu__button icon-button')[0] as HTMLButtonElement;
+  }
+
+  private async getMenuModal(): Promise<HTMLUListElement> {
+    return await document.getElementsByClassName('menu__list')[0] as HTMLUListElement;
+  } 
+
   private renderParams(paramsWrapper: HTMLDivElement) {
     const paramsLevelWrapper = createDiv({ className: 'params-wrapper__level' });
     const paramsMultiplyerWrapper = createDiv({ className: 'params-wrapper__multiplyer' });
@@ -122,7 +142,7 @@ export default class SprintGame extends BaseComponent {
 
     paramsTime.innerHTML = `time<br> 60`;
     
-    paramsCoins.append(this.getCoin('small'))
+    paramsCoins.append(this.getCoin('params'))
     paramsCoins.innerHTML += `&#215; ${'1'}`
     paramsScore.textContent = '0';
     paramsCoinsWrapper.append(paramsCoins);
@@ -149,6 +169,7 @@ export default class SprintGame extends BaseComponent {
 
     const blocksWrapper = createDiv({ className: 'blocks-wrapper' });
     const itemWrapper = createDiv({ className: 'item-wrapper' });
+    this.itemWrapper = itemWrapper;
 
     block.className = 'block-img'
     block.src = '/../../../../assets/img/sprintGame/png/SMW_Hard_Block.png';
@@ -159,11 +180,10 @@ export default class SprintGame extends BaseComponent {
     pipe.className = 'pipe-img'
     pipe.src = '/../../../../assets/img/sprintGame/png/Warp_Pipe_SMW.png';
 
-    for (let i = 0; i < 1; i++) {
-      let newCoin = this.getCoin('small').cloneNode();
-      // blocksWrapper.append(newBlock);
-      itemWrapper.append(newCoin)
-    }    
+    // for (let i = 0; i < 5; i++) {
+    //   let newCoin = this.getCoin('small').cloneNode();
+    //   itemWrapper.append(newCoin)
+    // }    
     
     pipeWrapper.append(blocksWrapper);
     pipeWrapper.append(pipe);
@@ -335,12 +355,11 @@ export default class SprintGame extends BaseComponent {
 
   public listenEvents(): void {
 
-    this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
-    this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
     this.getMenuButton().then(val => {
       val.addEventListener('click', menuButtonHandler);
       menuButton = val;
     });
+
     let menuButtonHandler = () => {
       this.getMenuModal().then(val => {
         val.addEventListener('click', menuModalHandler)
@@ -354,7 +373,14 @@ export default class SprintGame extends BaseComponent {
       this.clearGameParams()
       this.audioSprint.pause();
     }
-    this.controlSelect?.addEventListener('click', this.switchAudio.bind(this))
+
+    this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
+    this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
+    this.controlSelect?.addEventListener('click', this.switchAudio.bind(this));
+  }
+
+  private leaveGame() {
+    
   }
 
   private switchAudio() {
@@ -422,7 +448,9 @@ export default class SprintGame extends BaseComponent {
         scoreCounter.multiplyer = scoreCounter.multiplyer * 2;
         scoreCounter.multiplyerIntermediateCounter = 0;
         this.playAudioSprint(this.audioMushroom, '../../../../assets/sounds/smw_1-up.wav', audioIsPlaying);
+        this.addItem(scoreCounter.multiplyer);
       } else {
+        this.addCoin();
         this.playAudioSprint(this.audioCoin, '../../../../assets/sounds/smw_coin.wav', audioIsPlaying);
       }
       
@@ -439,13 +467,26 @@ export default class SprintGame extends BaseComponent {
     this.getRandomWords(groupWordsArr);
   }
 
-  private async getMenuButton(): Promise<HTMLButtonElement> {
-    return await document.getElementsByClassName('menu__button icon-button')[0] as HTMLButtonElement;
+  private addCoin() {
+    let newCoin = this.getCoin('small').cloneNode() as HTMLImageElement;
+    // newCoin.classList.add('start');
+    this.itemWrapper!.append(newCoin);
+    // newCoin.style.top = 'calc(100% - 34px)'
+    // setTimeout(newCoin.style.top = 'calc(100% - 34px)', 1000) 
+    // newCoin.classList.remove('start');
+
   }
 
-  private async getMenuModal(): Promise<HTMLUListElement> {
-    return await document.getElementsByClassName('menu__list')[0] as HTMLUListElement;
-  } 
+  private addItem(itemNumber: number) {
+    switch (itemNumber) {
+      case 2:
+        let newItem = this.getMushroom().cloneNode();
+        this.itemWrapper!.append(newItem);
+
+        break;
+    }
+
+  }
 
   private showModalStatistics(): void {
     const modalStatistic = createDiv({
