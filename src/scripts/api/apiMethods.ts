@@ -141,7 +141,9 @@ class ApiResourceService {
       },
     });
 
+    console.log('user State before', getState());
     if (rawResponse.status === APISStatus.ok) {
+
       const authorization: Authorization = await rawResponse.json();
       const { refreshToken, token } = authorization;
 
@@ -149,6 +151,9 @@ class ApiResourceService {
         token: token,
         refreshToken: refreshToken,
       });
+
+      console.log('user State after', getState());
+
       return authorization;
     } else {
       return rawResponse.status;
@@ -360,12 +365,16 @@ export default class AudioGame extends BaseComponent {
 
   public createHTML(): void {
     this.test = createButton({
-      text: 'test span Audio game',
+      text: 'test1 span',
     });
     const test2 = createButton({
       text: 'test 2',
       className: 'first-answer',
     });
+    this.test.onclick = async () => {
+      const words = await apiService.getAllUserWords(getState().userId);
+      console.log('refresh tokens', words);
+    };
     test2.onclick = async () => {
       const tokens = await apiService.getNewUserTokens(getState().userId);
       console.log('refresh tokens', tokens);
@@ -379,5 +388,6 @@ export default class AudioGame extends BaseComponent {
     // (this.test as HTMLElement).addEventListener('click', this.showQuestion.bind(this, undefined));
   }
 }
+
 
 */
