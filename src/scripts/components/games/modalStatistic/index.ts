@@ -17,6 +17,10 @@ export default class ModalStatistic extends BaseComponent {
     this.name = 'modalStatistic';
   }
 
+  public async oninit(): Promise<void> {
+    return Promise.resolve();
+  }
+
   public createHTML(): void {
     const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame | SprintGame;
     this.resultArray = parenWidget.giveDataToModalStatistic();
@@ -154,107 +158,54 @@ export default class ModalStatistic extends BaseComponent {
 
   async updateUserWords() {
     const userID = getState().userId;
-    // const wordObjID = '5e9f5ee35eb9e72bc21af643';
-    // const userWordResponse = await apiService.getUserWord(userID, wordObjID);
-    // если его нет в базе (ошибка 404), то создаем слово
-    // console.log('userWordResponse', userWordResponse);
-    const textObjWords = [
-      { id: '620a393f84610d0016232546', difficulty: 'common', wordId: '5e9f5ee35eb9e72bc21af69a' },
-      { id: '620a3e2284610d0016232547', difficulty: 'common', wordId: '5e9f5ee35eb9e72bc21af5c5' },
-      { id: '620a425a84610d0016232548', difficulty: 'common', wordId: '5e9f5ee35eb9e72bc21af637' },
-      {
-        difficulty: 'fake',
-        id: '620a393f84610d0016232546',
-        optional: { new: true, learned: false },
-        wordId: '5e9f5ee35eb9e72bc21af691',
-      },
-    ];
-    for await (const word of textObjWords) {
-      // let userWordResponse1: number | UserWord;
-      const userWordResponse1 = await apiService.getUserWord(userID, word.wordId);
 
-      if (typeof (userWordResponse1) !== 'number') {
-        console.log('userWordResponse1RESPONSE', userWordResponse1);
-      } else {
-        // если его нет в базе (ошибка 404), то создаем слово
-        console.log('userWordResponse1NUMBER', userWordResponse1);
-      }
-    }
+    await Promise.all(this.resultArray.map(async (wordObj) => {
+      // получаем каждое слово
+      const userWordResponse = await apiService.getUserWord(userID, wordObj.id);
 
+      if (typeof (userWordResponse) !== 'number') {
+        // если оно есть в базе, то обновляем слово
+        const userWord = userWordResponse;
 
-
-
-    // todo down
-    /*     const userID = getState().userId;
-        this.resultArray.forEach(async wordObj => {
-
-          try {
-            // получаем каждое слово
-
-            const userWordResponse = await apiService.getUserWord(userID, wordObj.id);
-            // если его нет в базе (ошибка 404), то создаем слово
-            // console.log('userWordResponse', userWordResponse);
-            // Couldn't find a(an) user word with: {"wordId":"5e9f5ee35eb9e72bc21af4ae","userId":"620a968d4c676f00163750eb"}
-
-            if (typeof (userWordResponse) == 'number') return;
-            // если оно есть в базе, то обновляем слово
-            const userWord = userWordResponse;
-
-            const wordBody: Partial<UserWord> = {
-              difficulty: userWord.difficulty,
-              optional: {},
-            };
-
-            if (!wordBody.optional) return;
-            if (!wordObj.answerCorrectness) {
-              wordBody.optional.rightRange = 0;
-              wordBody.optional.learned = false;
-            } else if (userWord.optional && wordObj.answerCorrectness) {
-              let rightWordRange = userWord.optional.rightRange as number;
-              wordBody.optional.rightRange = rightWordRange++;
-
-              if (userWord.difficulty === 'common' && wordBody.optional.rightRange >= constants.wordCommonRightRange) {
-                wordBody.optional.learned = true;
-              } else if (userWord.difficulty === 'difficult' && wordBody.optional.rightRange >= constants.wordDifficultRightRange) {
-                wordBody.optional.learned = true;
-              }
-            }
-
-            await apiService.updateUserWord(userID, wordObj.id, wordBody);
-
-          } catch (error) {
-            console.log('bad request');
-            const wordBody = {
-              difficulty: 'common',
-              optional: {
-                new: true,
-                learned: false,
-                rightRange: wordObj.answerCorrectness ? 1 : 0,
-              },
-            };
-            await apiService.createUserWord(userID, wordObj.id, wordBody);
-          }
-        }); */
-    // todo up
-    /*
-      export interface UserWord {
-        difficulty: 'common' | 'difficult' | string,
-        optional?: {
-          new?: boolean,
-          learned?: boolean,
-          rightRange?: number,
+        const wordBody: Partial<UserWord> = {
+          optional: {
+            new: true,
+            word: wordObj.word,
+          },
         };
+
+        if (!wordBody.optional) return;
+        if (!wordObj.answerCorrectness) {
+          wordBody.optional.rightRange = 0;
+          wordBody.optional.learned = false;
+        } else if (userWord.optional && wordObj.answerCorrectness) {
+          let rightWordRange = userWord.optional.rightRange as number;
+          wordBody.optional.rightRange = ++rightWordRange;
+
+          if (userWord.difficulty === 'common' && wordBody.optional.rightRange >= constants.wordCommonRightRange) {
+            wordBody.optional.learned = true;
+          } else if (userWord.difficulty === 'difficult' && wordBody.optional.rightRange >= constants.wordDifficultRightRange) {
+            wordBody.optional.learned = true;
+          } else {
+            wordBody.optional.learned = false;
+          }
+        }
+        await apiService.updateUserWord(userID, wordObj.id, wordBody);
+
+      } else {
+        const wordBody = {
+          difficulty: 'common',
+          optional: {
+            new: true,
+            learned: false,
+            rightRange: wordObj.answerCorrectness ? 1 : 0,
+            word: wordObj.word,
+          },
+        };
+        await apiService.createUserWord(userID, wordObj.id, wordBody);
       }
-        difficulty: "common";
-        id: "620a393f84610d0016232546";
-        optional: { new: true, learned: false; }
-        wordId: "5e9f5ee35eb9e72bc21af69a"; */
 
-    // const crateWord = await apiService.createUserWord(userID, this.resultArray[0].id, wordBody);
-
-    // const newWords =;
-
-    // this.resultArray
+    }));
 
     const allUserWords = await apiService.getAllUserWords(userID);
     console.log('userWords', allUserWords);

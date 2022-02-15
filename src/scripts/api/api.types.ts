@@ -46,6 +46,7 @@ export interface UserWord {
     new?: boolean,
     learned?: boolean,
     rightRange?: number,
+    word?: string,
   };
 }
 export interface PaginatedResults {
