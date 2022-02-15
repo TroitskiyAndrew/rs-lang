@@ -203,10 +203,9 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    const userWord = await rawResponse.json();
 
     if (rawResponse.status === APISStatus.ok) {
-      return userWord;
+      return rawResponse.json();
     } else {
       return rawResponse.status;
     }
