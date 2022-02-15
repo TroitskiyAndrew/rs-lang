@@ -84,8 +84,43 @@
 
 .mario-img {
   height: 3.6rem;
+  position: absolute;
+  top: calc(100% - 58px);
   // transform: scale(-1, 1);
   // margin-right: 20px;
+}
+
+.mario-img.up {
+  animation-name: mario-up-animation;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes mario-up-animation {
+  from {top: calc(100% - 74px)}
+  to {top: 0}
+}
+
+.mario-img.down {
+  animation-name: mario-down-animation;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes mario-down-animation {
+  from {top: 0}
+  to {top: calc(100% - 74px)}
+}
+
+.mario-img.down.yoshi {
+  animation-name: yoshi-down-animation;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes yoshi-down-animation {
+  from {top: 0}
+  to {top: calc(100% - 90px)}
 }
 
 .pipe-wrapper {
@@ -133,25 +168,38 @@
 .coin-img_small {
   position: absolute;
   top: 0;
-  left: calc(50% - 12.8px);
-  width: 1.6rem;
+  left: calc(50% - 13px);
+  width: 26px;
   animation-name: coin-animation;
   animation-duration: 3s;
   animation-fill-mode: forwards;
 }
 
 @keyframes coin-animation {
-  from {top: 0;};
+  // from {top: 0;};
   to {top: calc(100% - 34px)}
 }
 
-// .coin-img_small.start {
-//   position: absolute;
-//   top: 0;
-//   left: calc(50% - 12.8px);
-//   width: 1.6rem;
-//   transition: all 3s;
-// }
+.mushroom-img, .feather-img, .egg-img {
+  position: absolute;
+  top: 0;
+  left: calc(50% - 20px);
+  width: 40px;
+  height: 40px;
+  animation-name: item-animation;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+
+.mushroom-img.params, .feather-img.params, .egg-img.params {
+  position: static;
+  animation-name: none;
+}
+
+@keyframes item-animation {
+  from {top: 0;};
+  to {top: calc(100% - 40px)}
+}
 
 .gamepad-wrapper {
   display: flex;

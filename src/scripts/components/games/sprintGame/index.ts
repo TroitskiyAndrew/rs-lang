@@ -40,10 +40,13 @@ export default class SprintGame extends BaseComponent {
   paramsTime: HTMLDivElement | undefined;
   gamepadWrapper: HTMLDivElement | undefined;
   itemWrapper: HTMLDivElement | undefined;
+  paramsMultiplyerWrapper: HTMLDivElement | undefined;
 
   controlSelect: HTMLButtonElement | undefined;
   buttonB: HTMLButtonElement | undefined;
   buttonA: HTMLButtonElement | undefined;
+
+  mario: HTMLImageElement | undefined;
 
   audioSprint: HTMLAudioElement = new Audio();
   audioModal: HTMLAudioElement = new Audio();
@@ -108,6 +111,20 @@ export default class SprintGame extends BaseComponent {
     return mushroom;
   }
 
+  private getFeather() {
+    const feather = document.createElement('img');
+    feather.className = 'feather-img';
+    feather.src = '/../../../../assets/img/sprintGame/png/Feather.png';
+    return feather;
+  }
+
+  private getEgg() {
+    const egg = document.createElement('img');
+    egg.className = 'egg-img';
+    egg.src = '/../../../../assets/img/sprintGame/png/SMW_YoshiEgg_Green.png';
+    return egg;
+  }
+
   private async getMenuButton(): Promise<HTMLButtonElement> {
     return await document.getElementsByClassName('menu__button icon-button')[0] as HTMLButtonElement;
   }
@@ -123,22 +140,19 @@ export default class SprintGame extends BaseComponent {
     const paramsCoinsWrapper = createDiv({ className: 'params-wrapper__coins-wrapper' });
     const paramsCoins = createDiv({ className: 'params-wrapper__coins' });
     const paramsScore = createDiv({ className: 'params-wrapper__score' });
-    this.paramsScore = paramsScore;
+    this.paramsMultiplyerWrapper = paramsMultiplyerWrapper;
     this.paramsTime = paramsTime;
-
+    this.paramsScore = paramsScore;
+    
     const star = document.createElement('img');
     star.className = 'group-img'
     star.src = '/../../../../assets/img/sprintGame/png/pixel_star_50px.png';
-    
-    const multiplyerItem = document.createElement('img');
-    multiplyerItem.className = 'params-wrapper__multiplyer-item';
-    multiplyerItem.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
 
     paramsLevelWrapper.append(star);
     paramsLevelWrapper.innerHTML += `&#215;`;
     paramsLevelWrapper.append(this.group);
 
-    paramsMultiplyerWrapper.append(multiplyerItem);
+    //paramsMultiplyerWrapper.append(multiplyerItem);
 
     paramsTime.innerHTML = `time<br> 60`;
     
@@ -157,6 +171,7 @@ export default class SprintGame extends BaseComponent {
   private renderMario(marioWrapper: HTMLDivElement) {
     const mario = document.createElement('img');
     mario.className = 'mario-img'
+    this.mario = mario;
     mario.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
 
     marioWrapper.append(mario);
@@ -469,24 +484,80 @@ export default class SprintGame extends BaseComponent {
 
   private addCoin() {
     let newCoin = this.getCoin('small').cloneNode() as HTMLImageElement;
-    // newCoin.classList.add('start');
     this.itemWrapper!.append(newCoin);
-    // newCoin.style.top = 'calc(100% - 34px)'
-    // setTimeout(newCoin.style.top = 'calc(100% - 34px)', 1000) 
-    // newCoin.classList.remove('start');
-
   }
 
   private addItem(itemNumber: number) {
     switch (itemNumber) {
       case 2:
-        let newItem = this.getMushroom().cloneNode();
-        this.itemWrapper!.append(newItem);
-
+        this.itemHandler(this.getMushroom(), 'Mario_SMW', '-1', 'SMW_Mario', '4.6');
         break;
+      case 4:
+        this.itemHandler(this.getFeather(), 'Navmario', '1', 'SMWCapeMarioSprite', '4.6');
+      break;
+      case 8:
+        this.itemHandler(this.getEgg(), 'SMW_MarioCapeSpin', '1', 'Green_Yoshi_SMW', '5.6');
+      break;
     }
 
   }
+
+  private itemHandler(item: HTMLImageElement, gifName: string, scaleNum: string, pngName: string, imgSize: string) {
+    let newItem = item.cloneNode();
+    let newItemParams = item.cloneNode() as HTMLImageElement;
+
+    newItemParams.classList.add('params');
+
+    console.log(newItem)
+    this.paramsMultiplyerWrapper!.innerHTML = ''
+    this.itemWrapper!.append(newItem);
+    this.paramsMultiplyerWrapper?.append(newItemParams);
+
+    this.mario!.src = `/../../../../assets/img/sprintGame/gif/${gifName}.gif`;
+    this.mario!.onload = () => {
+      this.mario!.style.transform = `scale(${scaleNum}, 1)`;
+      this.mario?.classList.remove('down');
+      this.mario?.classList.add('up');
+    }
+    setTimeout(() => {
+      this.mario!.src = `/../../../../assets/img/sprintGame/png/${pngName}.png`
+      this.mario!.onload = () => {
+        this.mario!.style.transform = 'scale(1, 1)';
+        this.mario!.style.height = `${imgSize}rem`
+
+        this.mario?.classList.remove('up');
+        this.mario?.classList.add('down');
+        if (imgSize === '5.6') {
+          this.mario?.classList.add('yoshi');
+        }
+        this.itemWrapper!.innerHTML = '';
+      }
+    }, 3000);
+  }
+
+  // let newItem = this.getMushroom().cloneNode();
+  // let newItemParams = this.getMushroom().cloneNode() as HTMLImageElement;
+
+  // newItemParams.classList.add('params');
+
+  // this.itemWrapper!.append(newItem);
+  // this.paramsMultiplyerWrapper?.append(newItemParams);
+
+  // this.mario!.src = '/../../../../assets/img/sprintGame/gif/Mario_SMW.gif';
+  // this.mario!.onload = () => {
+  //   this.mario!.style.transform = 'scale(-1, 1)';
+  //   this.mario?.classList.add('up');
+  // }
+  // setTimeout(() => {
+  //   this.mario!.src = '/../../../../assets/img/sprintGame/png/SMW_Mario.png'
+  //   this.mario!.onload = () => {
+  //     this.mario!.style.transform = 'scale(1, 1)';
+  //     this.mario!.style.height = '4.6rem'
+  //     this.mario?.classList.remove('up');
+  //     this.mario?.classList.add('down');
+  //     this.itemWrapper!.innerHTML = '';
+  //   }
+  // }, 3000);
 
   private showModalStatistics(): void {
     const modalStatistic = createDiv({
