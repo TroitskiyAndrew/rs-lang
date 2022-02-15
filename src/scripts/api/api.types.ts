@@ -1,11 +1,6 @@
 export const APISStatus = {
   'ok': 200,
 };
-// export enum APISStatus {
-//   ok = 200,
-//   stopped = 'stopped',
-//   drive = 'drive',
-// }
 export interface User {
   name?: string,
   email: string,
@@ -63,9 +58,3 @@ export interface Statistics {
     [key: string]: string | boolean;
   };
 }
-
-/* export enum EEngineStatus {
-  started = 'started',
-  stopped = 'stopped',
-  drive = 'drive',
-} */
