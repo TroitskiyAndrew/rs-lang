@@ -14,7 +14,7 @@
   align-items: center;
   background-image: url("/src/assets/img/sprintGame/png/SuperMarioBrosMap2-2BG-cut4.png");
   width: 80%;
-  height: 80%;
+  height: 100%;
   background-size: auto 802px;
   background-repeat: no-repeat;
   background-position: bottom;
@@ -48,8 +48,6 @@
   background-image: url("/src/assets/img/sprintGame/png/ItemStock-cut.png");
   background-size: cover;
   background-repeat: no-repeat;
-  //border: 10px solid #5aacf6;
-  //border-radius: 20px;
   display: inherit;
   justify-content: center;
   align-items: center;
@@ -68,6 +66,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+}
+
+.params-wrapper__coins {
+  display: flex;
+  align-items: center;
 }
 
 .mario-wrapper {
@@ -110,6 +113,17 @@
 @keyframes mario-down-animation {
   from {top: 0}
   to {top: calc(100% - 74px)}
+}
+
+.mario-img.down.small {
+  animation-name: mario-small-down-animation;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes mario-small-down-animation {
+  from {top: 0}
+  to {top: calc(100% - 58px)}
 }
 
 .mario-img.down.yoshi {
@@ -207,7 +221,7 @@
   text-transform: uppercase;
   color: #DD3836;
   font-weight: 800;
-  margin-bottom: -48px;
+  margin-bottom: 0px;
   gap: 25px;
   width: 360px;
   background-color: #3b3b3b;
