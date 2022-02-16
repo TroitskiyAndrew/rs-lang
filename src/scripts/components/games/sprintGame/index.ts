@@ -50,7 +50,8 @@ export default class SprintGame extends BaseComponent {
   paramsCoins: HTMLDivElement | undefined;
   buttonsWrapper: HTMLDivElement | undefined;
 
-  controlSelect: HTMLButtonElement | undefined;
+  controlSound: HTMLButtonElement | undefined;
+  controlResume: HTMLButtonElement | undefined;
   buttonB: HTMLButtonElement | undefined;
   buttonA: HTMLButtonElement | undefined;
 
@@ -231,15 +232,16 @@ export default class SprintGame extends BaseComponent {
 
     const controlsBack = createDiv({ className: 'controls-wrapper__back' });
     const controlsCapture = createDiv({ className: 'controls-wrapper__capture' });
-    const controlSelect = createButton({ className: 'controls-wrapper__select' });
-    this.controlSelect = controlSelect;
-    const controlStart = createButton({ className: 'controls-wrapper__start' }); 
+    const controlSound = createButton({ className: 'controls-wrapper__select' });
+    const controlResume = createButton({ className: 'controls-wrapper__start' }); 
+    this.controlSound = controlSound;
+    this.controlResume = controlResume;
 
     controlsWrapper.append(controlsCapture);
     controlsCapture.innerHTML = 'sound&nbsp;&nbsp;resume';
     controlsWrapper.append(controlsBack);
-    controlsBack.append(controlSelect);
-    controlsBack.append(controlStart);
+    controlsBack.append(controlSound);
+    controlsBack.append(controlResume);
 
     controlsWrapper.append(buttonsWrapper);
     
@@ -471,7 +473,13 @@ export default class SprintGame extends BaseComponent {
       document.addEventListener('keyup', this.checkKeyboard.bind(this));
     }
 
-    this.controlSelect?.addEventListener('click', this.switchAudio.bind(this));
+    this.controlSound?.addEventListener('click', this.switchAudio.bind(this));
+    this.controlResume?.addEventListener('click', this.resume.bind(this));
+  }
+
+  private resume() {
+    this.stopTimer();
+    this.playAgain();
   }
 
   private checkKeyboard(ev: KeyboardEvent) {
@@ -527,6 +535,8 @@ export default class SprintGame extends BaseComponent {
     this.gamepadWrapper!.style.display = "flex";
     groupWordsArrMod = groupWordsArr.slice();
     wordsOnPageLeft = wordsArrNumber;
+    this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, '0');
+    this.paramsScore!.textContent = `0`;
     this.getRandomWords(groupWordsArrMod, wordsArrNumber);
     this.startAudioOnce = true;
     this.audioModal.pause();
