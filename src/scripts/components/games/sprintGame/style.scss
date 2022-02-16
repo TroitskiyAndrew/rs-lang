@@ -1,9 +1,13 @@
-.page {
+.page.sprint {
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   background-color: #28282B;
+}
+
+.loading {
+  z-index: 1;
 }
 
 .sprint-wrapper {
