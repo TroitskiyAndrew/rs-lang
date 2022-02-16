@@ -49,6 +49,7 @@ export default class SprintGame extends BaseComponent {
   paramsMultiplyerWrapper: HTMLDivElement | undefined;
   paramsCoins: HTMLDivElement | undefined;
   buttonsWrapper: HTMLDivElement | undefined;
+  wordsWrapper: HTMLDivElement | undefined;
 
   controlSound: HTMLButtonElement | undefined;
   controlResume: HTMLButtonElement | undefined;
@@ -83,6 +84,7 @@ export default class SprintGame extends BaseComponent {
     const gamepadWrapper = createDiv({ className: 'gamepad-wrapper' });
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
     this.gamepadWrapper = gamepadWrapper;
+    this.wordsWrapper = wordsWrapper;
 
     this.addLoading();
 
@@ -388,7 +390,7 @@ export default class SprintGame extends BaseComponent {
 
     groupWordsArrMod.splice(randomWordNumber, 1);
     wordsOnPageLeft -= 1;
-    this.startTimer();
+    // this.startTimer();
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
@@ -432,7 +434,7 @@ export default class SprintGame extends BaseComponent {
       roundResults[roundResults.length - 1].answerCorrectness = false;
     }
     this.paramsScore!.textContent = `${scoreCounter.score}`;
-    console.log(scoreCounter)
+    // console.log(scoreCounter)
     if (this.page) {
       if (groupWordsArrMod.length && wordsOnPageLeft) {
         this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
@@ -535,7 +537,8 @@ export default class SprintGame extends BaseComponent {
       multiplyerIntermediateCounter: 0,
     };
     roundResults = [];
-    this.gamepadWrapper!.style.display = "flex";
+    this.gamepadWrapper!.style.visibility = 'visible';
+    this.wordsWrapper!.style.visibility = 'visible';
     groupWordsArrMod = groupWordsArr.slice();
     wordsOnPageLeft = wordsArrNumber;
     this.mario!.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
@@ -688,7 +691,8 @@ export default class SprintGame extends BaseComponent {
     this.elem.append(modalStatistic);
     updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
     this.playAudioSprint(this.audioModal, '../../../../assets/sounds/22 - Course Clear Fanfare.mp3', audioIsPlaying);
-    this.gamepadWrapper!.style.display = "none";
+    this.gamepadWrapper!.style.visibility = 'hidden';
+    this.wordsWrapper!.style.visibility = 'hidden';
   }
 
   public giveDataToModalStatistic(): IStatisticAnswer[] {
