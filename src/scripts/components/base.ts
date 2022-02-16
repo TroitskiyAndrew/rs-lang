@@ -21,9 +21,11 @@ export default class BaseComponent {
 
   private isDisposed: boolean;
 
-  private id: string;
+  public id: string;
 
   public options = '';
+
+  public audioPlayer = new Audio();
 
   constructor(elem: HTMLElement) {
     this.name = '';
@@ -131,6 +133,12 @@ export default class BaseComponent {
 
   public remoteControle(): void {
 
+  }
+
+  public playAudio(src: string): void {
+    this.audioPlayer.src = src;
+    this.audioPlayer.currentTime = 0;
+    this.audioPlayer.play();
   }
 
 }

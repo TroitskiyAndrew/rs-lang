@@ -38,6 +38,11 @@ export function createButton(options: ButtonOptions): HTMLButtonElement {
   if (options.action) {
     button.dataset.action = options.action;
   }
+  if (options.dataSet) {
+    for (const key of Object.keys(options.dataSet)) {
+      button.dataset[key] = options.dataSet[key];
+    }
+  }
   if (options.disabled) {
     button.disabled = true;
   }
@@ -114,4 +119,11 @@ export function closeMenu(): void {
   const widgetId = menuElem.dataset.widgetId as string;
   const widget = instances[widgetId] as Menu;
   widget.hideMenu();
+}
+
+export function shuffleArray<T>(array: Array<T>) {
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }

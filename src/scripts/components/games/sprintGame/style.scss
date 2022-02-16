@@ -1,0 +1,197 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.sprint-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-image: url("/src/assets/img/sprintGame/jpg/3-cut.jpg");
+  width: 80%;
+  height: 80%;
+  background-size: 1080px;
+  background-repeat: no-repeat;
+  background-position: bottom;
+
+}
+
+.params-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+
+}
+
+.params-wrapper__level {
+  display: inherit;
+  align-items: center;
+}
+
+.group-img {
+  width: 35px;
+}
+
+.params-wrapper__multiplyer {
+  width: 80px;
+  height: 80px;
+  background-image: url("/src/assets/img/sprintGame/png/ItemStock-cut.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  //border: 10px solid #5aacf6;
+  //border-radius: 20px;
+  display: inherit;
+  justify-content: center;
+  align-items: center;
+}
+
+.params-wrapper__multiplyer-item {
+  width: 40px;
+  height: 40px;
+}
+
+.params-wrapper__time {
+  text-align: center;
+}
+
+.params-wrapper__coins-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.mario-img {
+  transform: scale(-1, 1);
+  margin-right: 20px;
+}
+
+.mario-img {
+  height: 3.6rem;
+}
+
+.coin-img_medium {
+  height: 2.6rem;
+}
+
+.coin-img_small {
+  height: 1.6rem;
+}
+
+.mario-wrapper {
+  // gap: 20px;
+  position: absolute;
+  bottom: 165px;
+  left: 50%;
+}
+
+.gamepad-wrapper {
+  display: flex;
+  // flex-direction: row;
+  justify-content: center;
+  text-transform: uppercase;
+  color: #DD3836;
+  font-weight: 800;
+  margin-bottom: 15px;
+  gap: 25px;
+}
+
+.buttons-wrapper {
+  display: flex;
+  gap: 15px;
+}
+
+.controls-wrapper__back{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 45px;
+  border-radius: 5px;
+  background-color: #DADADA;
+}
+
+.controls-wrapper__select, .controls-wrapper__start {
+  background-color: #4E4E4E;
+  width: 50px;
+  height: 15px;
+  border-radius: 4px;
+}
+
+.buttons-wrapper__button-wrapper {
+  flex-direction: column;
+  margin-top: 26px;
+}
+.buttons-wrapper__back {
+  background-color: #DADADA;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+}
+
+.buttons-wrapper__button-a, .buttons-wrapper__button-b {
+  background-color: #DD3836;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.buttons-wrapper__capture {
+  text-align: end;
+}
+
+.words-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+.eng-word {
+  font-size: 4.6rem;
+  font-weight: bold;
+}
+
+.translated-word {
+  font-size: 2.6rem;
+}
+
+
+// .sprint {
+//   background-color: #6ce8e8;
+// }
+
+// .sprint__groups-wrapper {
+//   width: 60%;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   background-color: #d7d7bd;
+//   padding: 1rem;
+//   border: 1px solid #eefbe8;
+// }
+
+// .sprint__groups-wrapper_text {
+//   display: flex;
+//   flex-direction: inherit;
+//   align-items: inherit;
+// }
+
+// .sprint__groups-wrapper_paragraph {
+//   text-align: center;
+// }
+
+// [class|=group] {
+//   height: 2.6rem;
+//   width: 2.6rem;
+// }

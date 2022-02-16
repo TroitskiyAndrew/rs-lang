@@ -1,0 +1,135 @@
+.audio-game {
+  color: white;
+  background-color: black;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__container {
+    width: 80%;
+    height: 80%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: url('/src/assets/img/sprintGame/gif/CoinSMW.gif') no-repeat 0 0 /
+        auto 5%,
+      url('/src/assets/img/sprintGame/gif/goomba.gif') no-repeat 350px 95% /
+        auto 9%,
+      url('/src/assets/img/audioGame/sm1.jpg') no-repeat 0 0 / cover;
+  }
+
+  &__content {
+    margin-top: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 25px;
+    padding: 15px;
+  }
+
+  &__questionsAmount {
+    position: absolute;
+    left: 5%;
+    top: 0;
+    font-size: 1.1em;
+  }
+
+  .audio-game__answers {
+    margin: 20px;
+  }
+}
+
+.questionField {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 20px;
+
+  .questionField__image {
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    width: 180px;
+    height: 120px;
+    border-radius: 20px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    transition: all 0.3s ease 0s;
+  }
+
+  .questionField__audio {
+    display: block;
+
+    &.icon-button::before {
+      content: '\f144';
+      color: white;
+      font-size: 120px;
+    }
+  }
+  .questionField__word {
+    display: block;
+    font-size: 28px;
+    width: 180px;
+    color: $brand-color;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease 0s;
+  }
+}
+
+.questionField.show {
+  .questionField__image {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .questionField__word {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.audio-answers {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .audio-answers__answer {
+    cursor: pointer;
+    margin: 10px;
+    padding: 10px;
+    font-size: 18px;
+
+    &.correct {
+      color: green;
+      pointer-events: none;
+    }
+    &.wrong {
+      color: red;
+      pointer-events: none;
+    }
+    &.disable {
+      color: rgba(255, 255, 255, 0.4);
+      pointer-events: none;
+    }
+  }
+}
+
+.audio__statistics {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  width: 80%;
+}

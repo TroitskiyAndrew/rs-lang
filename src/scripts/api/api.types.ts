@@ -1,11 +1,6 @@
 export const APISStatus = {
   'ok': 200,
 };
-// export enum APISStatus {
-//   ok = 200,
-//   stopped = 'stopped',
-//   drive = 'drive',
-// }
 export interface User {
   name?: string,
   email: string,
@@ -39,12 +34,16 @@ export interface WordCard {
   word: string,
   wordTranslate: string,
 }
+
 export interface UserWord {
-  difficulty: 'common' | 'difficult',
+  difficulty?: 'common' | 'difficult' | string,
   optional?: {
-    new: boolean,
-    learned: boolean,
-    rightRange: number,
+    new?: boolean,
+    learned?: boolean,
+    rightRange?: number,
+    word?: string,
+    correctAnswersAllTime?: number,
+    answersAllTime?: number,
   };
 }
 export interface PaginatedResults {
@@ -56,14 +55,20 @@ export interface PaginatedResults {
   ];
 }
 export interface Statistics {
-  learnedWords: number,
+  learnedWords?: number,
   optional?: {
-    [key: string]: string | boolean;
+    correctAnswersSprint?: DateNumber,
+    correctAnswersAudio?: DateNumber,
+    answersSprint?: DateNumber,
+    answersAudio?: DateNumber,
+    correctAnswersRangeSprint?: number,
+    correctAnswersRangeAudio?: number,
+    // [key: string]: string | boolean | { [x: string]: number; }[];
   };
 }
-
-/* export enum EEngineStatus {
-  started = 'started',
-  stopped = 'stopped',
-  drive = 'drive',
-} */
+export interface DateNumber {
+  [x: string]: number;
+}
+export interface DateBoolean {
+  [x: string]: boolean;
+}
