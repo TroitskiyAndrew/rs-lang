@@ -535,6 +535,15 @@ export default class SprintGame extends BaseComponent {
     this.gamepadWrapper!.style.display = "flex";
     groupWordsArrMod = groupWordsArr.slice();
     wordsOnPageLeft = wordsArrNumber;
+    this.mario!.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
+    this.mario!.onload = () => {
+      this.mario!.style.height = '3.6rem';
+      this.mario!.classList.remove('yoshi');
+      this.mario!.classList.remove('small');
+      this.mario!.classList.remove('up');
+      this.mario!.classList.remove('down');
+    }
+    this.itemWrapper!.innerHTML = '';
     this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, '0');
     this.paramsScore!.textContent = `0`;
     this.getRandomWords(groupWordsArrMod, wordsArrNumber);
@@ -638,7 +647,7 @@ export default class SprintGame extends BaseComponent {
   }
 
   private deleteItemHandler(item: HTMLImageElement | null, pngName: string, imgSize: string) {
-    this.mario?.classList.remove('up');
+    //this.mario?.classList.remove('up');
     this.mario?.classList.remove('yoshi');
 
     if (item === null) {
