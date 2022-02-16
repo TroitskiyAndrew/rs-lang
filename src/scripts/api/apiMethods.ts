@@ -142,6 +142,12 @@ class ApiResourceService {
       },
     });
 
+    if (rawResponse.status === APISStatus['403']) {
+      // exit from current user, show login? refresh page
+      localStorage.clear();
+      location.reload();
+    }
+
     if (rawResponse.status === APISStatus.ok) {
       const authorization: Authorization = await rawResponse.json();
       const { refreshToken, token } = authorization;
@@ -415,68 +421,3 @@ class ApiResourceService {
 }
 
 export const apiService = new ApiResourceService();
-
-
-/*
-import BaseComponent from '../../base';
-import { pageChenging } from '../../../rooting';
-import { createSpan, createDiv, createInput, createButton, getRandom } from '../../../utils';
-import { apiService, baseUrl } from '../../../api/apiMethods';
-// import { updateState, getState } from '../../../state';
-import constants from '../../../app.constants';
-import { WordCard } from '../../../api/api.types';
-import { getState } from '../../../state';
-
-interface IState {
-  questionWords: WordCard[];
-  translateWords: string[];
-}
-export default class AudioGame extends BaseComponent {
-  test: HTMLElement | undefined;
-
-  wordsFromAPI: Partial<IState> = {};
-
-  page: number | undefined;
-
-  group: number | undefined;
-
-
-  constructor(elem: HTMLElement) {
-    super(elem);
-    this.name = 'audioGame';
-  }
-
-  public oninit(): Promise<void> {
-    pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
-
-    return Promise.resolve();
-  }
-
-  public createHTML(): void {
-    this.test = createButton({
-      text: 'test1 span',
-    });
-    const test2 = createButton({
-      text: 'test 2',
-      className: 'first-answer',
-    });
-    this.test.onclick = async () => {
-      const words = await apiService.getAllUserWords(getState().userId);
-      console.log('refresh tokens', words);
-    };
-    test2.onclick = async () => {
-      const tokens = await apiService.getNewUserTokens(getState().userId);
-      console.log('refresh tokens', tokens);
-    };
-
-    this.fragment.append(this.test);
-    this.fragment.append(test2);
-  }
-
-  public listenEvents(): void {
-    // (this.test as HTMLElement).addEventListener('click', this.showQuestion.bind(this, undefined));
-  }
-}
-
-
-*/
