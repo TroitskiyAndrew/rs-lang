@@ -57,16 +57,18 @@ export interface PaginatedResults {
 export interface Statistics {
   learnedWords?: number,
   optional?: {
-    correctAnswersSprint: DateValue,
-    correctAnswersAudio: DateValue,
-    answersSprint: DateValue,
-    answersAudio: DateValue,
-    correctAnswersRangeSprint: number,
-    correctAnswersRangeAudio: number,
+    correctAnswersSprint?: DateNumber,
+    correctAnswersAudio?: DateNumber,
+    answersSprint?: DateNumber,
+    answersAudio?: DateNumber,
+    correctAnswersRangeSprint?: number,
+    correctAnswersRangeAudio?: number,
     // [key: string]: string | boolean | { [x: string]: number; }[];
   };
 }
-
-export interface DateValue {
+export interface DateNumber {
   [x: string]: number;
+}
+export interface DateBoolean {
+  [x: string]: boolean;
 }
