@@ -1,5 +1,7 @@
 export const APISStatus = {
   'ok': 200,
+  '401': 401,
+  '402': 402,
 };
 export interface User {
   name?: string,
@@ -71,4 +73,11 @@ export interface DateNumber {
 }
 export interface DateBoolean {
   [x: string]: boolean;
+}
+
+export interface Settings {
+  wordsPerDay?: number,
+  optional?: {
+    [key: string]: string | boolean | number;
+  };
 }

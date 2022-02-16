@@ -165,6 +165,10 @@ export default class ModalStatistic extends BaseComponent {
     await this.updateOrCreateUserWords(game);
 
     await this.updateOrCreateStatistic(game);
+
+    // todo checking refresh token
+    // const userID = getState().userId;
+    // await apiService.getNewUserTokens(userID)
   }
 
   updateObjDate(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
