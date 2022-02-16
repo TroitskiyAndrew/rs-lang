@@ -1,0 +1,73 @@
+.launcher-games {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+  color: white;
+
+  &__container {
+    width: 80%;
+    height: 80%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url('/src/assets/img/background-gameLauncher.jpg');
+    background-repeat-y: no-repeat;
+    background-size: cover;
+    background-position: -280px 0;
+  }
+
+  &__navigation {
+    display: flex;
+    justify-content: center;
+    column-gap: 20px;
+
+    .launcher-games__link {
+      min-width: 115px;
+    }
+  }
+
+  &__description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 25px;
+    margin-left: 200px;
+    margin-right: 20px;
+    padding: 15px;
+
+    .game-description__title {
+      text-align: center;
+      font-size: 1.4em;
+    }
+    .game-description__text {
+      margin: 20px;
+
+      span {
+        display: block;
+        margin: 10px 0;
+        text-align: justify;
+      }
+    }
+  }
+
+  .start-game {
+    // position: absolute;
+    // left: 50%;
+    // top: 50%;
+    // transform: translate(-50%, -50%);
+    // background-color: $brand-color;
+    // cursor: pointer;
+  }
+
+  .launcher-games__flagPole {
+    position: absolute;
+    bottom: calc(12% + 60px);
+    left: 0;
+  }
+}

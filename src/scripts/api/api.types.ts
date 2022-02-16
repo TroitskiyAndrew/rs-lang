@@ -1,3 +1,11 @@
+export const APISStatus = {
+  'ok': 200,
+};
+// export enum APISStatus {
+//   ok = 200,
+//   stopped = 'stopped',
+//   drive = 'drive',
+// }
 export interface User {
   name?: string,
   email: string,
@@ -31,25 +39,16 @@ export interface WordCard {
   word: string,
   wordTranslate: string,
 }
+
 export interface UserWord {
-  difficulty: string,
+  difficulty?: 'common' | 'difficult' | string,
   optional?: {
-    [key: string]: string | boolean;
+    new?: boolean,
+    learned?: boolean,
+    rightRange?: number,
+    word?: string,
   };
 }
-// export interface State {
-//   page: number,
-//   group: number,
-//   aggregatedWords: {
-//     page: number,
-//     group: number,
-//     wordsPerPage: number,
-//     filter: string,
-//   },
-//   userId: string,
-//   token: string,
-//   refreshToken: string,
-// }
 export interface PaginatedResults {
   paginatedResults: WordCard[],
   totalCount: [
