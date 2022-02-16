@@ -12,7 +12,7 @@ const GROUP_WORDS_NUMBER = 600;
 const PAGE_WORDS_NUMBER = 20;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
 const MAX_SCORE_MULTIPLYER = 8;
-const TIME_FOR_GAME_MILISECONDS = 30000;
+const TIME_FOR_GAME_MILISECONDS = 60000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 
 let options: IGameOptions;
@@ -81,8 +81,10 @@ export default class SprintGame extends BaseComponent {
     const marioWrapper = createDiv({ className: 'mario-wrapper' });
     const pipeWrapper = createDiv({ className: 'pipe-wrapper' });
     const gamepadWrapper = createDiv({ className: 'gamepad-wrapper' });
-    this.gamepadWrapper = gamepadWrapper;
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
+    this.gamepadWrapper = gamepadWrapper;
+
+    this.addLoading();
 
     this.clearGameParams();
     this.getGroupAndPage();
@@ -430,6 +432,7 @@ export default class SprintGame extends BaseComponent {
       roundResults[roundResults.length - 1].answerCorrectness = false;
     }
     this.paramsScore!.textContent = `${scoreCounter.score}`;
+    console.log(scoreCounter)
     if (this.page) {
       if (groupWordsArrMod.length && wordsOnPageLeft) {
         this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
@@ -461,16 +464,24 @@ export default class SprintGame extends BaseComponent {
     }
     let menuModalHandler = () => {
       menuButton.removeEventListener('click', menuButtonHandler);
-      menuModal.removeEventListener('click', menuModalHandler);
+      menuModal.removeEventListener('click' , menuModalHandler);
+      document.removeEventListener('keyup', keyupHandler);
       this.clearGameParams()
       this.audioSprint.pause();
     }
 
+    let keyupHandler = (ev: KeyboardEvent) => {
+      if (ev.code === 'ArrowRight') {
+        this.checkAnswer(true);
+      } else if (ev.code === 'ArrowLeft') {
+        this.checkAnswer(false);
+      }
+    }
+
     this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
     this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
-
-    if (this.elem.children[1].className === 'page sprint') {
-      document.addEventListener('keyup', this.checkKeyboard.bind(this));
+    if (this.elem.children[1].className === 'page sprint' || 'loading') {
+      document.addEventListener('keyup', keyupHandler);
     }
 
     this.controlSound?.addEventListener('click', this.switchAudio.bind(this));
@@ -480,14 +491,6 @@ export default class SprintGame extends BaseComponent {
   private resume() {
     this.stopTimer();
     this.playAgain();
-  }
-
-  private checkKeyboard(ev: KeyboardEvent) {
-    if (ev.code === 'ArrowRight') {
-      this.checkAnswer(true);
-    } else if (ev.code === 'ArrowLeft') {
-      this.checkAnswer(false);
-    }
   }
 
   private switchAudio() {
@@ -544,6 +547,7 @@ export default class SprintGame extends BaseComponent {
       this.mario!.classList.remove('down');
     }
     this.itemWrapper!.innerHTML = '';
+    this.paramsMultiplyerWrapper!.innerHTML = '';
     this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, '0');
     this.paramsScore!.textContent = `0`;
     this.getRandomWords(groupWordsArrMod, wordsArrNumber);
