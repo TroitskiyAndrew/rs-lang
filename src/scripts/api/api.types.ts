@@ -34,13 +34,16 @@ export interface WordCard {
   word: string,
   wordTranslate: string,
 }
+
 export interface UserWord {
-  difficulty: 'common' | 'difficult',
+  difficulty?: 'common' | 'difficult' | string,
   optional?: {
     new?: boolean,
     learned?: boolean,
     rightRange?: number,
     word?: string,
+    correctAnswersAllTime?: number,
+    answersAllTime?: number,
   };
 }
 export interface PaginatedResults {
@@ -52,8 +55,20 @@ export interface PaginatedResults {
   ];
 }
 export interface Statistics {
-  learnedWords: number,
+  learnedWords?: number,
   optional?: {
-    [key: string]: string | boolean;
+    correctAnswersSprint?: DateNumber,
+    correctAnswersAudio?: DateNumber,
+    answersSprint?: DateNumber,
+    answersAudio?: DateNumber,
+    correctAnswersRangeSprint?: number,
+    correctAnswersRangeAudio?: number,
+    // [key: string]: string | boolean | { [x: string]: number; }[];
   };
+}
+export interface DateNumber {
+  [x: string]: number;
+}
+export interface DateBoolean {
+  [x: string]: boolean;
 }

@@ -1,5 +1,123 @@
 .wordCard {
-  padding: 10px;
-  background-color: $brand-color;
-  height: max-content;
+  @include flex($ai: flex-start);
+  height: 400px;
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__controls {
+    @include flex;
+  }
+
+  &__text-holder {
+    color: white;
+    @include flex($fd: column, $jc: space-between);
+    height: 100%;
+    @media (max-width: 1024px) {
+      order: 1;
+    }
+  }
+
+  &__controls-holder {
+    @include flex($fd: column, $jc: space-between, $ai: flex-start);
+    height: 100%;
+    @media (max-width: 1024px) {
+      align-items: center;
+    }
+  }
+
+  &__text-part {
+    position: relative;
+    color: white;
+    width: 100%;
+    overflow: hidden;
+    *::before {
+      font-size: 1rem;
+      color: white;
+    }
+    .wordCard__word {
+      font-size: 2em;
+    }
+    &._eng {
+      .wordCard__word,
+      .wordCard__transcription {
+        display: inline;
+      }
+    }
+
+    &._ru {
+      max-height: 75px;
+    }
+    .bricks {
+      @include position;
+      width: 100%;
+      height: 100%;
+      background-image: url("/src/assets/img/png/wall.png");
+    }
+  }
+
+  &__img {
+    width: 300px;
+    border-radius: 10px;
+  }
+}
+
+._visible-translate {
+  .wordCard__text-part._ru {
+    max-height: none !important;
+    .bricks {
+      height: 0 !important;
+    }
+  }
+}
+
+.wordCard:not(._authorized) {
+  .button-block.difficult,
+  .button-block.studied {
+    display: none;
+  }
+}
+
+.button-block {
+  position: relative;
+  border-radius: 5px;
+  border: solid 1px black;
+  height: 75px;
+  width: 75px;
+  background-color: rgb(182, 67, 46);
+  &._active {
+    background-color: #e9b818;
+  }
+
+  &__circle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: black;
+    &.left-top {
+      left: 8%;
+      top: 8%;
+    }
+    &.left-bottom {
+      left: 8%;
+      bottom: 8%;
+    }
+    &.right-top {
+      right: 8%;
+      top: 8%;
+    }
+    &.right-bottom {
+      right: 8%;
+      bottom: 8%;
+    }
+  }
+
+  &__button {
+    @include position;
+    &::before {
+      font-size: 40px;
+    }
+  }
 }

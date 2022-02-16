@@ -1,13 +1,12 @@
 import BaseComponent from '../../base';
-import { createDiv, createSpan, createButton, createInput } from '../../../utils';
+import { createDiv, createSpan } from '../../../utils';
 import { pageChenging } from '../../../rooting';
-import constants from '../../../app.constants';
+// import constants from '../../../app.constants';
 import { instances } from '../../components';
 import FlagPole from '../../flagPole';
+import { getState, updateState } from '../../../state';
 
 export default class GameLauncher extends BaseComponent {
-
-  flagPole: HTMLInputElement | undefined;
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -16,11 +15,19 @@ export default class GameLauncher extends BaseComponent {
 
   public oninit(): Promise<void> {
     pageChenging(createSpan({ text: 'game Launch' }), this.name);
+
+    updateState({ launchGame: this.options });
+
     return Promise.resolve();
   }
 
   public createHTML(): void {
     const page = createDiv({ className: 'launcher-games' });
+    const pageContainer = createDiv({ className: 'launcher-games__container' });
+
+    const pageNavigation = createDiv({
+      className: 'launcher-games__navigation',
+    });
     const backBtn = createDiv({
       className: 'launcher-games__link games__link ',
       dataSet: {
@@ -33,17 +40,26 @@ export default class GameLauncher extends BaseComponent {
     const titleDescription = createDiv({
       className: 'game-description__title',
     });
-    const textDescription = createSpan({
+    const textDescription = createDiv({
       className: 'game-description__text',
     });
+    const textDescription1 = createSpan({});
+    const textDescription2 = createSpan({});
+    const textDescription3 = createSpan({});
+    const textDescription4 = createSpan({});
+    const textDescription5 = createSpan({});
+
+    if (!this.options) {
+      this.options = getState().launchGame;
+    }
 
     if (this.options === 'audio-game') {
       titleDescription.textContent = '«Аудиовызов»';
-      textDescription.innerText = `«Аудиовызов» - это тренировка, которая улучшает восприятие речи на слух.
-      Используйте мышь, чтобы выбрать.
-      Используйте цифровые клавиши от 1 до 4 для выбора ответа
-      Используйте пробел для подсказки или для перехода к следующему слову.
-      Для выбора уровня сложности подымите флаг)`;
+      textDescription1.innerText = '«Аудиовызов» - это тренировка, которая улучшает восприятие речи на слух.';
+      textDescription2.innerText = 'Используйте мышь, чтобы выбрать правильный вариант ответа.';
+      textDescription3.innerText = 'Используйте цифровые клавиши от 1 до 4 для выбора ответа.';
+      textDescription4.innerText = 'Используйте пробел для подсказки и перехода к следующему слову.';
+      textDescription5.innerText = 'Для выбора уровня сложности подымите флаг)';
 
       const gameAudio = createDiv({
         className: 'launcher-games__link games__link start-game',
@@ -51,14 +67,17 @@ export default class GameLauncher extends BaseComponent {
           direction: 'audioGame',
         },
       });
-      gameAudio.append(createSpan({ text: 'Начать игру Аудиовызов' }));
-      page.append(gameAudio);
+      gameAudio.append(createSpan({ text: 'Начать игру' }));
+      gameAudio.dataset.options = JSON.stringify({
+        'group': '0',
+      });
+      pageNavigation.append(gameAudio);
     } else if (this.options === 'sprint-game') {
       titleDescription.textContent = '«Спринт»';
-      textDescription.innerText = `«Спринт» - Тренирует навык быстрого перевода с английского языка на русский. Вам нужно выбрать соответствует ли перевод предложенному слову.
-      Используйте мышь, чтобы выбрать.
-      Используйте цифровые клавиши 1 или 2 для выбора ответа.
-      Для выбора уровня сложности подымите флаг)`;
+      textDescription1.innerText = '«Спринт» - Тренирует навык быстрого перевода с английского языка на русский. Вам нужно выбрать соответствует ли перевод предложенному слову.';
+      textDescription2.innerText = 'Используйте мышь, чтобы выбрать правильный вариант ответа.';
+      textDescription3.innerText = 'Используйте цифровые клавиши 1 или 2 для выбора ответа.';
+      textDescription4.innerText = 'Для выбора уровня сложности подымите флаг)';
 
       const gameSprint = createDiv({
         className: 'launcher-games__link games__link start-game',
@@ -66,20 +85,32 @@ export default class GameLauncher extends BaseComponent {
           direction: 'sprintGame',
         },
       });
-      gameSprint.append(createSpan({ text: 'Начать игру Спринт' }));
-      page.append(gameSprint);
+      gameSprint.append(createSpan({ text: 'Начать игру' }));
+      gameSprint.dataset.options = JSON.stringify({
+        'group': '0',
+      });
+      pageNavigation.append(gameSprint);
     }
 
-    backBtn.append(createSpan({ text: 'back' }));
-    page.append(backBtn);
-    description.append(titleDescription);
-    description.append(textDescription);
-    page.append(description);
+    backBtn.append(createSpan({ text: 'Назад' }));
+    pageNavigation.append(backBtn);
 
-    page.append(createDiv({
-      className: '',
+    description.append(titleDescription);
+    textDescription.append(textDescription1);
+    textDescription.append(textDescription2);
+    textDescription.append(textDescription3);
+    textDescription.append(textDescription4);
+    textDescription.append(textDescription5);
+    description.append(textDescription);
+    description.append(pageNavigation);
+    pageContainer.append(description);
+
+    pageContainer.append(createDiv({
+      className: 'launcher-games__flagPole',
       dataSet: { widget: 'flagPole' },
     }));
+
+    page.append(pageContainer);
     this.fragment.append(page);
   }
 

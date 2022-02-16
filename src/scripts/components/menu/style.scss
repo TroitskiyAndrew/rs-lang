@@ -1,7 +1,7 @@
 .menu__modal {
   @include position;
   position: fixed;
-  z-index: 5;
+  z-index: 10;
   display: none;
   padding: 20px;
   background-color: $brand-color;
@@ -17,6 +17,7 @@
 
 .menu__overlay {
   position: absolute;
+  z-index: 9;
   display: none;
   width: 100%;
   height: 100%;
