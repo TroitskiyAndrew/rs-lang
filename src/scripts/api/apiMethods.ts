@@ -1,4 +1,4 @@
-import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, APISStatus } from './api.types';
+import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, APISStatus, Settings } from './api.types';
 import { updateState, getState } from '../state';
 import constants from '../app.constants';
 
@@ -136,24 +136,25 @@ class ApiResourceService {
     const rawResponse = await fetch(`${users}/${userId}/tokens`, {
       method: 'GET',
       headers: {
+        'Authorization': `Bearer ${getState().refreshToken}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
     });
 
-    console.log('user State before', getState());
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['403']) {
+      // exit from current user, show login? refresh page
+      localStorage.clear();
+      location.reload();
+    }
 
+    if (rawResponse.status === APISStatus.ok) {
       const authorization: Authorization = await rawResponse.json();
       const { refreshToken, token } = authorization;
-
       updateState({
         token: token,
         refreshToken: refreshToken,
       });
-
-      console.log('user State after', getState());
-
       return authorization;
     } else {
       return rawResponse.status;
@@ -170,6 +171,11 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
+
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.getAllUserWords(userId);
+    }
 
     if (rawResponse.status === APISStatus.ok) {
       const userWords: UserWord[] = await rawResponse.json();
@@ -190,6 +196,12 @@ class ApiResourceService {
       body: JSON.stringify(wordBody),
     });
 
+
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.createUserWord(userId, wordId, wordBody);
+    }
+
     if (rawResponse.status === APISStatus.ok) {
       const createdWord: UserWord = await rawResponse.json();
       return createdWord;
@@ -207,6 +219,11 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
+
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.getUserWord(userId, wordId);
+    }
 
     if (rawResponse.status === APISStatus.ok) {
       const userWord: UserWord = await rawResponse.json();
@@ -227,6 +244,11 @@ class ApiResourceService {
       body: JSON.stringify(wordBody),
     });
 
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.updateUserWord(userId, wordId, wordBody);
+    }
+
     if (rawResponse.status === APISStatus.ok) {
       const updatedUserWord: UserWord = await rawResponse.json();
       return updatedUserWord;
@@ -236,13 +258,18 @@ class ApiResourceService {
   }
 
   async deleteUserWord(userId: string, wordId: string): Promise<void> {
-    await fetch(`${users}/${userId}/words/${wordId}`, {
+    const rawResponse = await fetch(`${users}/${userId}/words/${wordId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${getState().token}`,
         'Accept': 'application/json',
       },
     });
+
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.deleteUserWord(userId, wordId);
+    }
   }
 
   // !Users/AggregatedWords
@@ -259,6 +286,11 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
+
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.getAllUserAggregatedWords(userId);
+    }
 
     if (rawResponse.status === APISStatus.ok) {
       const userWords: PaginatedResults = await rawResponse.json();
@@ -277,6 +309,11 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
+
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.getAggregatedWord(userId, wordId);
+    }
 
     if (rawResponse.status === APISStatus.ok) {
       const userWord: UserWord = await rawResponse.json();
@@ -297,6 +334,11 @@ class ApiResourceService {
       },
     });
 
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.getUserStatistics(userId);
+    }
+
     if (rawResponse.status === APISStatus.ok) {
       const userStatistics: Statistics = await rawResponse.json();
       return userStatistics;
@@ -316,6 +358,11 @@ class ApiResourceService {
       body: JSON.stringify(statisticsBody),
     });
 
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.updateUserStatistics(userId, statisticsBody);
+    }
+
     if (rawResponse.status === APISStatus.ok) {
       const updatedUserStatistics: Statistics = await rawResponse.json();
       return updatedUserStatistics;
@@ -323,71 +370,54 @@ class ApiResourceService {
       return rawResponse.status;
     }
   }
+
+  // !Users/Settings
+  async getUserSettings(userId: string): Promise<Settings | number> {
+    const rawResponse = await fetch(`${users}/${userId}/settings`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${getState().token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.getUserSettings(userId);
+    }
+
+    if (rawResponse.status === APISStatus.ok) {
+      const userSettings: Settings = await rawResponse.json();
+      return userSettings;
+    } else {
+      return rawResponse.status;
+    }
+  }
+
+  async updateUserSettings(userId: string, settingsBody: Settings): Promise<Settings | number> {
+    const rawResponse = await fetch(`${users}/${userId}/settings`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${getState().token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(settingsBody),
+    });
+
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      await this.getNewUserTokens(getState().userId);
+      this.updateUserSettings(userId, settingsBody);
+    }
+
+    if (rawResponse.status === APISStatus.ok) {
+      const updatedUserSettings: Settings = await rawResponse.json();
+      return updatedUserSettings;
+    } else {
+      return rawResponse.status;
+    }
+  }
 }
 
 export const apiService = new ApiResourceService();
-
-
-/*
-import BaseComponent from '../../base';
-import { pageChenging } from '../../../rooting';
-import { createSpan, createDiv, createInput, createButton, getRandom } from '../../../utils';
-import { apiService, baseUrl } from '../../../api/apiMethods';
-// import { updateState, getState } from '../../../state';
-import constants from '../../../app.constants';
-import { WordCard } from '../../../api/api.types';
-import { getState } from '../../../state';
-
-interface IState {
-  questionWords: WordCard[];
-  translateWords: string[];
-}
-export default class AudioGame extends BaseComponent {
-  test: HTMLElement | undefined;
-
-  wordsFromAPI: Partial<IState> = {};
-
-  page: number | undefined;
-
-  group: number | undefined;
-
-
-  constructor(elem: HTMLElement) {
-    super(elem);
-    this.name = 'audioGame';
-  }
-
-  public oninit(): Promise<void> {
-    pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
-
-    return Promise.resolve();
-  }
-
-  public createHTML(): void {
-    this.test = createButton({
-      text: 'test1 span',
-    });
-    const test2 = createButton({
-      text: 'test 2',
-      className: 'first-answer',
-    });
-    this.test.onclick = async () => {
-      const words = await apiService.getAllUserWords(getState().userId);
-      console.log('refresh tokens', words);
-    };
-    test2.onclick = async () => {
-      const tokens = await apiService.getNewUserTokens(getState().userId);
-      console.log('refresh tokens', tokens);
-    };
-
-    this.fragment.append(this.test);
-    this.fragment.append(test2);
-  }
-
-  public listenEvents(): void {
-    // (this.test as HTMLElement).addEventListener('click', this.showQuestion.bind(this, undefined));
-  }
-}
-
-
-*/
