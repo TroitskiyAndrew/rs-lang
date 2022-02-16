@@ -2,18 +2,22 @@ import BaseComponent from '../../base';
 import { createButton, createDiv, createSpan, getRandom } from '../../../utils';
 import { pageChenging, updateContent } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
+import { WordCard } from '../../../api/api.types';
 import { IGameOptions, IWordParams, IScoreCounter } from './sprintGameTypes';
 import { IStatisticAnswer } from '../audioGame/index'
 import { updateState, getState } from '../../../state';
+// import WordsCard from '../../pageDictionary/wordCard';
 
 const GROUP_WORDS_NUMBER = 600;
+const PAGE_WORDS_NUMBER = 20;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
 const MAX_SCORE_MULTIPLYER = 8;
-const TIME_FOR_GAME_MILISECONDS = 20000;
+const TIME_FOR_GAME_MILISECONDS = 30000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 
 let options: IGameOptions;
 let groupWordsArr: IStatisticAnswer[] =[];
+let groupWordsArrMod: IStatisticAnswer[] =[];
 let roundResults: IWordParams[] = [];
 let scoreCounter: IScoreCounter = {
   score: 0,
@@ -25,7 +29,9 @@ let timerId: NodeJS.Timer;
 let menuButton: HTMLButtonElement
 let menuModal: HTMLUListElement
 let audioIsPlaying = false;
-let coincounter: number = 0;
+let coinCounter: number = 0;
+let wordsArrNumber: number;
+let wordsOnPageLeft: number;
 
 export default class SprintGame extends BaseComponent {
 
@@ -197,11 +203,6 @@ export default class SprintGame extends BaseComponent {
     pipe.className = 'pipe-img'
     pipe.src = '/../../../../assets/img/sprintGame/png/Warp_Pipe_SMW.png';
 
-    // for (let i = 0; i < 5; i++) {
-    //   let newCoin = this.getCoin('small').cloneNode();
-    //   itemWrapper.append(newCoin)
-    // }    
-    
     pipeWrapper.append(blocksWrapper);
     pipeWrapper.append(pipe);
     pipeWrapper.append(itemWrapper);
@@ -257,6 +258,7 @@ export default class SprintGame extends BaseComponent {
   }
 
   private renderWords(wordsWrapper: HTMLDivElement) {
+
     const engWord = createDiv({ className: 'eng-word' });
     const translatedWord = createDiv({ className: 'translated-word' });
 
@@ -267,19 +269,17 @@ export default class SprintGame extends BaseComponent {
   }
 
   private getGroupAndPage() {
+    console.log(this.options)
     if (this.options) {
       options = JSON.parse (this.options);
-      // localStorage.setItem ('options', this.options);
       updateState({optionsSprint: this.options})
     } 
     if (options) {
       this.group = options.group;
       if (options.page) this.page = options.page;
     } else {
-      //localStorage.getItem ('options') ? options = JSON.parse (localStorage.getItem ('options') as string) : options = {group: '0'};
       this.group = JSON.parse (getState().optionsSprint).group;
-      // this.group = options.group;
-      if (JSON.parse (getState().optionsSprint).page) this.page = JSON.parse (getState().optionsSprint).page;
+      //if (JSON.parse (getState().optionsSprint).page) this.page = JSON.parse (getState().optionsSprint).page;
     }
   }
 
@@ -288,13 +288,12 @@ export default class SprintGame extends BaseComponent {
       const getSecondsLeft = () => {
         const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
         if (Math.round(delta / 1000) === 0) {
-          console.log(0)
+          // console.log(0)
           this.paramsTime!.innerHTML = `time<br> 0`;
           this.stopTimer()
-          // this.giveScoreToModalStatistic()
           this.showModalStatistics()
         } else {
-          console.log(Math.round(delta / 1000))
+          // console.log(Math.round(delta / 1000))
           this.paramsTime!.innerHTML = `time<br> ${Math.round(delta / 1000)}`;
         }
       }
@@ -305,37 +304,64 @@ export default class SprintGame extends BaseComponent {
   }
 
   private stopTimer() {
-    console.log(`timerId`+timerId)
     clearInterval (timerId)
   }
 
-  private async getWordsArray() {
-    // if (options && options.page === undefined) {
+  private getWordsArray() {
     if (this.page === '') {
-      await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
-        words.forEach((el) => {
-          const elMod: IWordParams =  {
-            id: `${el.id}`,
-            group: el.group,
-            image: `${el.image}`,
-            page: el.page,
-            word: `${el.word}`, 
-            wordTranslate: `${el.wordTranslate}`, 
-            audio: `${el.audio}`,
-            answerCorrectness: false,
-          };
-           groupWordsArr.push(elMod);
-        })
-      });
-      console.log(groupWordsArr)
+      this.getWordsArrayFromGroup()
+    } else {
+      this.getWordsArrayFromPages()
     }
-    this.getRandomWords(groupWordsArr);
   }
 
-  private getRandomWords(groupWordsArr: IWordParams[]) {
+  private async getWordsArrayFromGroup() {
+    await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
+      words.forEach((el) => this.addElToArray(el))
+    });
+    wordsArrNumber = GROUP_WORDS_NUMBER;
+    // wordsOnPageLeft = wordsArrNumber;
+    this.getRandomWords(groupWordsArr, wordsArrNumber);
+  }
+
+  private async getWordsArrayFromPages() {
+    let currentPageToArray: string = this.page;
+    let addPageToArr = async () => {
+      await apiService.getChunkOfWords(Number(currentPageToArray), Number(this.group)).then(words => {
+        words.forEach((el) => this.addElToArray(el))
+      });
+      currentPageToArray = String(Number(currentPageToArray) - 1);
+      if (Number(currentPageToArray) >= 0) {
+        addPageToArr()
+      } else {
+        groupWordsArrMod = groupWordsArr.slice();
+        this.getRandomWords(groupWordsArr, PAGE_WORDS_NUMBER);
+      }
+    };
+    addPageToArr();
+    wordsArrNumber = PAGE_WORDS_NUMBER;
+    wordsOnPageLeft = PAGE_WORDS_NUMBER;
+  }
+
+  private addElToArray(el: WordCard) {
+    const elMod: IWordParams =  {
+      id: `${el.id}`,
+      group: el.group,
+      image: `${el.image}`,
+      page: el.page,
+      word: `${el.word}`, 
+      wordTranslate: `${el.wordTranslate}`, 
+      audio: `${el.audio}`,
+      answerCorrectness: false,
+    };
+    groupWordsArr.push(elMod);
+  }
+
+  private getRandomWords(groupWordsArr: IWordParams[], wordsNumber: number) {
+
     const word = this.elem.querySelector('.eng-word') as HTMLDivElement;
     const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
-    const randomWordNumber = getRandom(0, GROUP_WORDS_NUMBER);
+    const randomWordNumber = getRandom(0, wordsNumber);
 
     word!.textContent = groupWordsArr[randomWordNumber].word;
     if (Math.random() < 0.5) {
@@ -347,13 +373,16 @@ export default class SprintGame extends BaseComponent {
     }
 
     function getWrongTranslate() {
-      const randomWordAnotherNumber = getRandom(0, GROUP_WORDS_NUMBER);
+      const randomWordAnotherNumber = getRandom(0, wordsNumber);
       if (randomWordNumber === randomWordAnotherNumber) {
         getWrongTranslate();
       }
       return randomWordAnotherNumber;
     }
-    //this.startTimer();
+
+    groupWordsArrMod.splice(randomWordNumber, 1);
+    wordsOnPageLeft -= 1;
+    this.startTimer();
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
@@ -368,6 +397,48 @@ export default class SprintGame extends BaseComponent {
       translateCorrectness: translateCorrectness,
       answerCorrectness: false,
     };
+  }
+  
+  private checkAnswer(answer: boolean) {
+    this.elem.querySelector('.params-wrapper__score')
+    if (answer === roundResults[roundResults.length - 1].translateCorrectness) {
+      roundResults[roundResults.length - 1].answerCorrectness = true;
+      scoreCounter.score += scoreCounter.multiplyer * MIN_SCORE_FOR_CORRECT_ANSWER;
+      scoreCounter.multiplyerIntermediateCounter += 1;
+      
+      if (scoreCounter.multiplyerIntermediateCounter === MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER 
+        && scoreCounter.multiplyer !== MAX_SCORE_MULTIPLYER) {
+        scoreCounter.multiplyer = scoreCounter.multiplyer * 2;
+        scoreCounter.multiplyerIntermediateCounter = 0;
+        this.playAudioSprint(this.audioMushroom, '../../../../assets/sounds/smw_1-up.wav', audioIsPlaying);
+        this.addItem(scoreCounter.multiplyer);
+      } else {
+        this.addCoin();
+        this.playAudioSprint(this.audioCoin, '../../../../assets/sounds/smw_coin.wav', audioIsPlaying);
+      }
+      
+    } else {
+      if (scoreCounter.multiplyer > 1) {
+        scoreCounter.multiplyer /= 2;
+        scoreCounter.multiplyerIntermediateCounter = 0;
+        this.deleteItem(scoreCounter.multiplyer);
+      }
+      roundResults[roundResults.length - 1].answerCorrectness = false;
+    }
+    this.paramsScore!.textContent = `${scoreCounter.score}`;
+    if (this.page) {
+      if (groupWordsArrMod.length && wordsOnPageLeft) {
+        this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
+      } else if (!groupWordsArrMod.length) {
+        this.stopTimer();
+        this.showModalStatistics();
+      } else {
+        wordsOnPageLeft = wordsArrNumber;
+        this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
+      }
+    } else {
+      this.getRandomWords(groupWordsArr, wordsArrNumber);
+    }
   }
 
   public listenEvents(): void {
@@ -394,10 +465,6 @@ export default class SprintGame extends BaseComponent {
     this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
     this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
     this.controlSelect?.addEventListener('click', this.switchAudio.bind(this));
-  }
-
-  private leaveGame() {
-    
   }
 
   private switchAudio() {
@@ -443,7 +510,9 @@ export default class SprintGame extends BaseComponent {
     };
     roundResults = [];
     this.gamepadWrapper!.style.display = "flex";
-    this.getRandomWords(groupWordsArr);
+    groupWordsArrMod = groupWordsArr.slice();
+    wordsOnPageLeft = wordsArrNumber;
+    this.getRandomWords(groupWordsArrMod, wordsArrNumber);
     this.startAudioOnce = true;
     this.audioModal.pause();
     this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
@@ -453,44 +522,11 @@ export default class SprintGame extends BaseComponent {
 
   }
 
-  private checkAnswer(answer: boolean) {
-    this.elem.querySelector('.params-wrapper__score')
-    if (answer === roundResults[roundResults.length - 1].translateCorrectness) {
-      roundResults[roundResults.length - 1].answerCorrectness = true;
-      scoreCounter.score += scoreCounter.multiplyer * MIN_SCORE_FOR_CORRECT_ANSWER;
-      scoreCounter.multiplyerIntermediateCounter += 1;
-      
-      if (scoreCounter.multiplyerIntermediateCounter === MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER 
-        && scoreCounter.multiplyer !== MAX_SCORE_MULTIPLYER) {
-        scoreCounter.multiplyer = scoreCounter.multiplyer * 2;
-        scoreCounter.multiplyerIntermediateCounter = 0;
-        this.playAudioSprint(this.audioMushroom, '../../../../assets/sounds/smw_1-up.wav', audioIsPlaying);
-        this.addItem(scoreCounter.multiplyer);
-      } else {
-        this.addCoin();
-        this.playAudioSprint(this.audioCoin, '../../../../assets/sounds/smw_coin.wav', audioIsPlaying);
-      }
-      
-    } else {
-      if (scoreCounter.multiplyer > 1) {
-        scoreCounter.multiplyer /= 2;
-        scoreCounter.multiplyerIntermediateCounter = 0;
-        this.deleteItem(scoreCounter.multiplyer);
-      }
-      roundResults[roundResults.length - 1].answerCorrectness = false;
-      
-    }
-    this.paramsScore!.textContent = `${scoreCounter.score}`;
-    console.log(roundResults)
-    console.log(scoreCounter)
-    this.getRandomWords(groupWordsArr);
-  }
-
   private addCoin() {
     let newCoin = this.getCoin('small').cloneNode() as HTMLImageElement;
     this.itemWrapper!.append(newCoin);
-    coincounter += 1;
-    this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, String(coincounter)) 
+    coinCounter += 1;
+    this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, String(coinCounter)) 
   }
 
   private addItem(itemNumber: number) {
@@ -622,8 +658,7 @@ export default class SprintGame extends BaseComponent {
       delete el.translateCorrectness;
       return el
     })
-    console.log(roundResults)
-    roundResults = roundResults.slice(0, roundResults.length - 1);
+    if (!this.page) roundResults = roundResults.slice(0, roundResults.length - 1);
     this.audioSprint.pause();
     return roundResults;
   }
@@ -635,49 +670,3 @@ export default class SprintGame extends BaseComponent {
 
 //TODO:
 // 1) LOADER
-
-
-
-
-  // const multiplyerBorderImg = document.createElement('img');
-  // multiplyerBorderImg.className = 'params-wrapper__multiplyer-border';
-  // multiplyerBorderImg.src = '/../../../../assets/img/sprintGame/png/ItemStock-cut.png';
-
-  // public listenEvents(): void {
-  //   this.groupsWrapper!.addEventListener('click', this.actionHandler.bind(this));
-  // }
-
-  // public setActions(): void {
-  //   this.actions.showSprintGame = this.showSprintGame;
-  // }
-
-  // public showSprintGame(): void {
-  //   console.log(this.groupsWrapperButton?.className.slice(-1))
-  //   //this.groupsWrapper!.style.display = 'none';
-  // }
-
-  // private definePageAndGroup(): void {
-  //   const options = this.options ? JSON.parse(this.options) : {};
-  //   this.page = getRandom(constants.minWordsPage, constants.maxWordsPage);
-
-  //   if (options.page) {
-  //     this.page = options.page;
-  //   }
-  //   this.group = getRandom(constants.minWordsGroup, constants.maxWordsGroup);
-  //   if (options.group) {
-  //     this.group = +options.group;
-  //   }
-
-  //   console.log('options', options);
-  //   console.log('this.page', this.page);
-  //   console.log('this.group', this.group);
-  // }
-
-
-    // const multiplyerItem = new Image;
-  // multiplyerItem.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
-  // multiplyerItem.className = 'params-wrapper__multiplyer-item'
-  // multiplyerItem.onload = () => {
-  //   paramsMultiplyerWrapper.append(multiplyerItem);
-  // }
-  // // TEST
