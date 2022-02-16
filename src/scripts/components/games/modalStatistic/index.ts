@@ -197,8 +197,12 @@ export default class ModalStatistic extends BaseComponent {
     const userID = getState().userId;
     const currentDate = new Date();
     const date = currentDate.toISOString().split('T')[0];
+    // const date = '2022-02-14';
+
     const userStatisticApi = await apiService.getUserStatistics(userID);
     const allUserWords = await apiService.getAllUserWords(userID);
+    console.log('userWord FROM', allUserWords);
+
     if (typeof (allUserWords) === 'number') return;
     const learnedWords = allUserWords.filter(word => word.optional?.learned).length;
 
@@ -298,7 +302,6 @@ export default class ModalStatistic extends BaseComponent {
     await Promise.all(this.resultArray.map(async (wordObj) => {
       // получаем каждое слово
       const userWordResponse = await apiService.getUserWord(userID, wordObj.id);
-
       if (typeof (userWordResponse) !== 'number') {
         // если оно есть в базе, то обновляем слово
         const userWord = userWordResponse;
