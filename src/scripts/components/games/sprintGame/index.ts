@@ -48,6 +48,7 @@ export default class SprintGame extends BaseComponent {
   itemWrapper: HTMLDivElement | undefined;
   paramsMultiplyerWrapper: HTMLDivElement | undefined;
   paramsCoins: HTMLDivElement | undefined;
+  buttonsWrapper: HTMLDivElement | undefined;
 
   controlSelect: HTMLButtonElement | undefined;
   buttonB: HTMLButtonElement | undefined;
@@ -212,6 +213,7 @@ export default class SprintGame extends BaseComponent {
   private renderGamepad(gamepadWrapper: HTMLDivElement) {
     const buttonsWrapper = createDiv({ className: 'buttons-wrapper' });
     const controlsWrapper = createDiv({ className: 'controls-wrapper' });
+    this.buttonsWrapper = buttonsWrapper;
 
     const buttonBWrapper = createDiv({ className: 'buttons-wrapper__button-wrapper' });
     const buttonBBack = createDiv({ className: 'buttons-wrapper__back' });
@@ -464,7 +466,20 @@ export default class SprintGame extends BaseComponent {
 
     this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
     this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
+
+    if (this.elem.children[1].className === 'page sprint') {
+      document.addEventListener('keyup', this.checkKeyboard.bind(this));
+    }
+
     this.controlSelect?.addEventListener('click', this.switchAudio.bind(this));
+  }
+
+  private checkKeyboard(ev: KeyboardEvent) {
+    if (ev.code === 'ArrowRight') {
+      this.checkAnswer(true);
+    } else if (ev.code === 'ArrowLeft') {
+      this.checkAnswer(false);
+    }
   }
 
   private switchAudio() {
