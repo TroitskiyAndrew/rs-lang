@@ -7,10 +7,12 @@ import AudioGame, { IStatisticAnswer } from '../audioGame';
 import SprintGame from '../sprintGame';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 import { getState, updateState } from '../../../state';
-import { UserWord } from '../../../api/api.types';
+import { Statistics, UserWord, DateValue } from '../../../api/api.types';
 
 export default class ModalStatistic extends BaseComponent {
   resultArray: IStatisticAnswer[] = [];
+
+  rightAnswers: IStatisticAnswer[] = [];
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -25,7 +27,7 @@ export default class ModalStatistic extends BaseComponent {
     const parenWidget = instances[this.elem.dataset.parentId as string] as AudioGame | SprintGame;
     this.resultArray = parenWidget.giveDataToModalStatistic();
 
-    const rightAnswers = this.resultArray.filter(word => {
+    this.rightAnswers = this.resultArray.filter(word => {
       return word.answerCorrectness;
     });
     const wrongAnswers = this.resultArray.filter(word => {
@@ -36,7 +38,7 @@ export default class ModalStatistic extends BaseComponent {
     const totalPercents = constants.hundred;
     let percentOfRightAnswers: number;
     if (this.resultArray.length) {
-      percentOfRightAnswers = Math.floor(rightAnswers.length * totalPercents / this.resultArray.length);
+      percentOfRightAnswers = Math.floor(this.rightAnswers.length * totalPercents / this.resultArray.length);
     } else {
       percentOfRightAnswers = 0;
     }
@@ -87,7 +89,7 @@ export default class ModalStatistic extends BaseComponent {
     });
     const correctWordsTitle = createSpan({
       className: 'game-modal__words-title',
-      text: `Знаю - ${rightAnswers.length}`,
+      text: `Знаю - ${this.rightAnswers.length}`,
     });
 
     const wrongWordsWrapper = createDiv({
@@ -97,8 +99,8 @@ export default class ModalStatistic extends BaseComponent {
       className: 'game-modal__words-title',
       text: `Ошибок - ${wrongAnswers.length}`,
     });
-    for (let i = 0; i < rightAnswers.length; i++) {
-      const wordRow = this.drawWord(rightAnswers[i]);
+    for (let i = 0; i < this.rightAnswers.length; i++) {
+      const wordRow = this.drawWord(this.rightAnswers[i]);
       correctWordsWrapper.append(wordRow);
     }
     for (let i = 0; i < wrongAnswers.length; i++) {
@@ -153,14 +155,138 @@ export default class ModalStatistic extends BaseComponent {
 
     // todo if user log in
     if (getState().userId) {
-      this.updateOrCreateUserWords();
+      this.updateUserWordsAndStatistic(parenWidget);
     }
 
     this.fragment.append(modalWindow);
   }
 
-  async updateOrCreateUserWords(): Promise<void> {
+  async updateUserWordsAndStatistic(game: AudioGame | SprintGame) {
+    await this.updateOrCreateUserWords(game);
+
+    await this.updateOrCreateStatistic(game);
+  }
+
+  updateObjDate(dateObj: DateValue | undefined, date: string, dateValue: number): DateValue {
+    if (!dateObj) dateObj = {};
+
+    if (date in dateObj) {
+      // такая дата есть в массиве с АПИ, обновляем
+      dateObj[date] = dateValue + dateObj[date];
+    } else {
+      dateObj[date] = dateValue;
+    }
+    return dateObj;
+  }
+
+  updateGameRightRange(rightRangeAudio: number | undefined): number {
+    // если значения нет, то возвращаем самую длинную серию с текущей игры
+    if (!rightRangeAudio) return this.longestRightRange();
+    //  если серия есть, то проверяем ответил юзер на все вопросы верно, если да, то прибавляем все вопросы к существующей цифре
+    if (this.rightAnswers.length === this.resultArray.length) {
+      return rightRangeAudio = this.rightAnswers.length + rightRangeAudio;
+    } else {
+      // если не на все вопросы, то сравниваем со значением из АПИ
+      return rightRangeAudio > this.longestRightRange() ? rightRangeAudio : this.longestRightRange();
+    }
+  }
+
+  async updateOrCreateStatistic(game: AudioGame | SprintGame) {
     const userID = getState().userId;
+    const currentDate = new Date();
+    const date = currentDate.toISOString().split('T')[0];
+    console.log(date);
+    // 2022 - 02 - 15; (string)
+    const userStatisticApi = await apiService.getUserStatistics(userID);
+
+    const allUserWords = await apiService.getAllUserWords(userID);
+    if (typeof (allUserWords) === 'number') return;
+    const learnedWords = allUserWords.filter(word => word.optional?.learned).length;
+    console.log('userWords', allUserWords);
+
+    console.log('userStatisticApi', userStatisticApi);
+
+    const correctAnswersPerDayAudio: DateValue = {};
+    const correctAnswersPerDaySprint: DateValue = {};
+    const answersPerDayAudio: DateValue = {};
+    const answersPerDaySprint: DateValue = {};
+    let rightRangeSprint = 0;
+    let rightRangeAudio = 0;
+
+    if (game instanceof AudioGame) {
+      correctAnswersPerDayAudio[date] = this.rightAnswers.length;
+      answersPerDayAudio[date] = this.resultArray.length;
+      rightRangeAudio = this.longestRightRange();
+    } else if (game instanceof SprintGame) {
+      correctAnswersPerDaySprint[date] = this.rightAnswers.length;
+      answersPerDaySprint[date] = this.resultArray.length;
+      rightRangeSprint = this.longestRightRange();
+    }
+
+    const statistics: Partial<Statistics> = {
+      learnedWords: learnedWords,
+      optional: {
+        correctAnswersSprint: correctAnswersPerDaySprint,
+        correctAnswersAudio: correctAnswersPerDayAudio,
+        answersSprint: answersPerDaySprint,
+        answersAudio: answersPerDayAudio,
+        correctAnswersRangeSprint: rightRangeSprint,
+        correctAnswersRangeAudio: rightRangeAudio,
+      },
+    };
+
+    if (typeof (userStatisticApi) !== 'number') {
+      // update Statistic
+      if (!userStatisticApi.optional || !statistics.optional) return;
+      if (game instanceof AudioGame) {
+        // correctAnswersAudio per Day
+        const currentDateCorrectAnswersAudio = userStatisticApi.optional.correctAnswersAudio;
+        statistics.optional.correctAnswersAudio = this.updateObjDate(currentDateCorrectAnswersAudio, date, this.rightAnswers.length);
+        // answersAudio per Day
+        const currentDateAnswersAudio = userStatisticApi.optional.answersAudio;
+        statistics.optional.answersAudio = this.updateObjDate(currentDateAnswersAudio, date, this.resultArray.length);
+        // самая длинная серия правильных ответов
+        const rightRangeAllTimeAudio = userStatisticApi.optional.correctAnswersRangeAudio;
+        statistics.optional.correctAnswersRangeAudio = this.updateGameRightRange(rightRangeAllTimeAudio);
+      } else if (game instanceof SprintGame) {
+        // correctAnswersSprint per Day
+        const currentDateInCorrectAnswersSprint = userStatisticApi.optional.correctAnswersSprint;
+        statistics.optional.correctAnswersSprint = this.updateObjDate(currentDateInCorrectAnswersSprint, date, this.rightAnswers.length);
+        // answersSprint per Day
+        const currentDateAnswersSprint = userStatisticApi.optional.answersSprint;
+        statistics.optional.answersSprint = this.updateObjDate(currentDateAnswersSprint, date, this.resultArray.length);
+        // самая длинная серия правильных ответов
+        const rightRangeAllTimeSprint = userStatisticApi.optional.correctAnswersRangeSprint;
+        statistics.optional.correctAnswersRangeSprint = this.updateGameRightRange(rightRangeAllTimeSprint);
+      }
+
+      console.log('update Statistic', statistics);
+      await apiService.updateUserStatistics(userID, statistics);
+    } else {
+      // create Statistic
+      console.log('create Statistic', statistics);
+      await apiService.updateUserStatistics(userID, statistics);
+    }
+
+    const userStatisticAFTER = await apiService.getUserStatistics(userID);
+    console.log('userStatisticAFTER', userStatisticAFTER);
+
+  }
+
+
+  async updateOrCreateUserWords(game: AudioGame | SprintGame): Promise<void> {
+    // todo instances
+    // if (parenWidget instanceof AudioGame) {
+    //   console.log('AUDIO GAME');
+    // } else if (parenWidget instanceof SprintGame) {}
+
+
+    const userID = getState().userId;
+    const currentDate = new Date();
+    const date = currentDate.toISOString().split('T')[0];
+    console.log(date);
+    // 2022 - 02 - 15; (string)
+
 
     await Promise.all(this.resultArray.map(async (wordObj) => {
       // получаем каждое слово
@@ -177,11 +303,13 @@ export default class ModalStatistic extends BaseComponent {
           },
         };
 
-        if (!wordBody.optional) return;
+        if (!wordBody.optional || !userWord.optional) return;
         if (!wordObj.answerCorrectness) {
           wordBody.optional.rightRange = 0;
           wordBody.optional.learned = false;
-        } else if (userWord.optional && wordObj.answerCorrectness) {
+
+
+        } else if (wordObj.answerCorrectness) {
           let rightWordRange = userWord.optional.rightRange as number;
           wordBody.optional.rightRange = ++rightWordRange;
 
@@ -193,27 +321,57 @@ export default class ModalStatistic extends BaseComponent {
           } else {
             wordBody.optional.learned = false;
           }
+
+          let answersCorrectAllTime = userWord.optional.correctAnswersAllTime;
+          if (answersCorrectAllTime) {
+            wordBody.optional.correctAnswersAllTime = ++answersCorrectAllTime;
+          } else {
+            wordBody.optional.correctAnswersAllTime = 1;
+          }
         }
+
+        let answersAmountAllTime = userWord.optional.answersAllTime;
+        if (answersAmountAllTime) {
+          wordBody.optional.answersAllTime = ++answersAmountAllTime;
+        } else {
+          wordBody.optional.answersAllTime = 1;
+        }
+
+        console.log('wordBody', wordBody);
+        /*
+        id: "620beda78c949d0016735d50"
+        wordId: "5e9f5ee35eb9e72bc21af4b1"
+        difficulty: "common"
+        optional:
+            new: true
+            learned: false
+            rightRange: 0
+            word: "weather"
+            correctAnswersAllTime: 0
+            answersAllTime: 1
+        */
+
         await apiService.updateUserWord(userID, wordObj.id, wordBody);
 
       } else {
-        const wordBody = {
+        const defaultWordBody = {
           difficulty: 'common',
           optional: {
             new: true,
             learned: false,
             rightRange: wordObj.answerCorrectness ? 1 : 0,
             word: wordObj.word,
+            correctAnswersAllTime: wordObj.answerCorrectness ? 1 : 0,
+            answersAllTime: 1,
           },
         };
-        await apiService.createUserWord(userID, wordObj.id, wordBody);
+        await apiService.createUserWord(userID, wordObj.id, defaultWordBody);
       }
 
     }));
 
-    const allUserWords = await apiService.getAllUserWords(userID);
-    console.log('userWords', allUserWords);
   }
+
 
   drawWord(card: IStatisticAnswer) {
     /*

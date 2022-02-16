@@ -42,6 +42,8 @@ export interface UserWord {
     learned?: boolean,
     rightRange?: number,
     word?: string,
+    correctAnswersAllTime?: number,
+    answersAllTime?: number,
   };
 }
 export interface PaginatedResults {
@@ -53,8 +55,18 @@ export interface PaginatedResults {
   ];
 }
 export interface Statistics {
-  learnedWords: number,
+  learnedWords?: number,
   optional?: {
-    [key: string]: string | boolean;
+    correctAnswersSprint: DateValue,
+    correctAnswersAudio: DateValue,
+    answersSprint: DateValue,
+    answersAudio: DateValue,
+    correctAnswersRangeSprint: number,
+    correctAnswersRangeAudio: number,
+    // [key: string]: string | boolean | { [x: string]: number; }[];
   };
+}
+
+export interface DateValue {
+  [x: string]: number;
 }
