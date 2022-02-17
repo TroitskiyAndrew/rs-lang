@@ -6,7 +6,7 @@ import { instances } from '../../components';
 import AudioGame, { IStatisticAnswer } from '../audioGame';
 import SprintGame from '../sprintGame';
 import { apiService, baseUrl } from '../../../api/apiMethods';
-import { getState, updateState } from '../../../state';
+import { getState } from '../../../state';
 import { Statistics, UserWord, DateNumber } from '../../../api/api.types';
 
 export default class ModalStatistic extends BaseComponent {
@@ -162,20 +162,15 @@ export default class ModalStatistic extends BaseComponent {
   }
 
   async updateUserWordsAndStatistic(game: AudioGame | SprintGame) {
-    await this.updateOrCreateUserWords(game);
+    await this.updateOrCreateUserWords();
 
     await this.updateOrCreateStatistic(game);
-
-    // todo checking refresh token
-    // const userID = getState().userId;
-    // await apiService.getNewUserTokens(userID)
   }
 
   updateObjDate(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
     if (!dateObj) {
       dateObj = {};
     }
-
     if (date in dateObj) {
       // такая дата есть в массиве с АПИ, обновляем
       dateObj[date] = dateValue + dateObj[date];
@@ -185,23 +180,51 @@ export default class ModalStatistic extends BaseComponent {
     return dateObj;
   }
 
-  updateGameRightRange(rightRangeAudio: number | undefined): number {
+  updateObjDateLearnedNew(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
+    if (!dateObj) {
+      dateObj = {};
+    }
+    dateObj[date] = dateValue;
+    return dateObj;
+  }
+
+  updateGameRightRange(rightRangeAPI: number | undefined, rangeMultiply = false): {
+    rightRange: number;
+    rangeMultiply: boolean;
+  } {
+    let rightRange: number;
     // если значения нет, то возвращаем самую длинную серию с текущей игры
-    if (!rightRangeAudio) return this.longestRightRange();
+    if (!rightRangeAPI) {
+      rightRange = this.longestRightRange();
+      return { rightRange, rangeMultiply };
+    }
     //  если серия есть, то проверяем ответил юзер на все вопросы верно, если да, то прибавляем все вопросы к существующей цифре
     if (this.rightAnswers.length === this.resultArray.length) {
-      return rightRangeAudio = this.rightAnswers.length + rightRangeAudio;
+
+      if (rangeMultiply) {
+        rightRange = this.rightAnswers.length + rightRangeAPI;
+        rangeMultiply = true;
+      } else {
+        rightRange = rightRangeAPI > this.rightAnswers.length ? rightRangeAPI : this.rightAnswers.length;
+        rangeMultiply = true;
+      }
     } else {
       // если не на все вопросы, то сравниваем со значением из АПИ
-      return rightRangeAudio > this.longestRightRange() ? rightRangeAudio : this.longestRightRange();
+      if (rangeMultiply && rightRangeAPI % this.resultArray.length === 0 && this.rightAnswers.length > 0) {
+        rightRange = this.longestRightRange() + rightRangeAPI;
+        rangeMultiply = false;
+      } else {
+        rightRange = rightRangeAPI > this.longestRightRange() ? rightRangeAPI : this.longestRightRange();
+        rangeMultiply = false;
+      }
     }
+    return { rightRange, rangeMultiply };
   }
 
   async updateOrCreateStatistic(game: AudioGame | SprintGame) {
     const userID = getState().userId;
     const currentDate = new Date();
     const date = currentDate.toISOString().split('T')[0];
-    // const date = '2022-02-14';
 
     const userStatisticApi = await apiService.getUserStatistics(userID);
     const allUserWords = await apiService.getAllUserWords(userID);
@@ -209,15 +232,24 @@ export default class ModalStatistic extends BaseComponent {
 
     if (typeof (allUserWords) === 'number') return;
     const learnedWords = allUserWords.filter(word => word.optional?.learned).length;
+    const learnedWordsPerDay = allUserWords.filter(word => word.optional?.learnedAtDay === date).length;
+    const newWordsPerDay = allUserWords.filter(word => word.optional?.newAtDay === date).length;
 
     if (typeof (userStatisticApi) !== 'number') {
-      const statistics: Partial<Statistics> = {
+      const statistics: Statistics = {
         learnedWords: learnedWords,
         optional: {},
       };
 
       // update Statistic
       if (!userStatisticApi.optional || !statistics.optional) return;
+
+      const learnedWordsDateObj = userStatisticApi.optional.learnedWordsPerDate;
+      statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
+
+      const newWordsDateObj = userStatisticApi.optional.newWordsPerDate;
+      statistics.optional.newWordsPerDate = this.updateObjDateLearnedNew(newWordsDateObj, date, newWordsPerDay);
+
       if (game instanceof AudioGame) {
         // correctAnswersAudio per Day
         const currentDateCorrectAnswersAudio = userStatisticApi.optional.correctAnswersAudio;
@@ -231,17 +263,20 @@ export default class ModalStatistic extends BaseComponent {
         statistics.optional.answersSprint = userStatisticApi.optional.answersSprint || {};
         // самая длинная серия правильных ответов
         const rightRangeAllTimeAudio = userStatisticApi.optional.correctAnswersRangeAudio;
-        statistics.optional.correctAnswersRangeAudio = this.updateGameRightRange(rightRangeAllTimeAudio);
+        // todo delete range audio above
+        // const rightRangeAllTimeAudio = 0;
+        const rangeMultiplyAudio = userStatisticApi.optional.rangeMultiplyAudio;
+        const { rightRange, rangeMultiply } = this.updateGameRightRange(rightRangeAllTimeAudio, rangeMultiplyAudio);
+        statistics.optional.correctAnswersRangeAudio = rightRange;
+        statistics.optional.rangeMultiplyAudio = rangeMultiply;
 
         statistics.optional.correctAnswersRangeSprint = userStatisticApi.optional.correctAnswersRangeSprint || 0;
-
-        console.log('update Statistic Audio!', statistics);
       } else if (game instanceof SprintGame) {
         // correctAnswersSprint per Day
         const currentDateInCorrectAnswersSprint = userStatisticApi.optional.correctAnswersSprint;
         statistics.optional.correctAnswersSprint = this.updateObjDate(currentDateInCorrectAnswersSprint, date, this.rightAnswers.length);
 
-        statistics.optional.answersAudio = userStatisticApi.optional.answersAudio || {};
+        statistics.optional.correctAnswersAudio = userStatisticApi.optional.correctAnswersAudio || {};
         // answersSprint per Day
         const currentDateAnswersSprint = userStatisticApi.optional.answersSprint;
         statistics.optional.answersSprint = this.updateObjDate(currentDateAnswersSprint, date, this.resultArray.length);
@@ -249,11 +284,12 @@ export default class ModalStatistic extends BaseComponent {
         statistics.optional.answersAudio = userStatisticApi.optional.answersAudio || {};
         // самая длинная серия правильных ответов
         const rightRangeAllTimeSprint = userStatisticApi.optional.correctAnswersRangeSprint;
-        statistics.optional.correctAnswersRangeSprint = this.updateGameRightRange(rightRangeAllTimeSprint);
+        const rangeMultiplySprint = userStatisticApi.optional.rangeMultiplySprint;
+        const { rightRange, rangeMultiply } = this.updateGameRightRange(rightRangeAllTimeSprint, rangeMultiplySprint);
+        statistics.optional.correctAnswersRangeSprint = rightRange;
+        statistics.optional.rangeMultiplySprint = rangeMultiply;
 
         statistics.optional.correctAnswersRangeAudio = userStatisticApi.optional.correctAnswersRangeAudio || 0;
-
-        console.log('update Statistic Sprint!', statistics);
       }
 
       await apiService.updateUserStatistics(userID, statistics);
@@ -275,7 +311,8 @@ export default class ModalStatistic extends BaseComponent {
         answersPerDaySprint[date] = this.resultArray.length;
         rightRangeSprint = this.longestRightRange();
       }
-      const statistics: Partial<Statistics> = {
+
+      const statistics: Statistics = {
         learnedWords: learnedWords,
         optional: {
           correctAnswersSprint: correctAnswersPerDaySprint,
@@ -284,53 +321,43 @@ export default class ModalStatistic extends BaseComponent {
           answersAudio: answersPerDayAudio,
           correctAnswersRangeSprint: rightRangeSprint,
           correctAnswersRangeAudio: rightRangeAudio,
+          rangeMultiplyAudio: false,
+          rangeMultiplySprint: false,
         },
       };
+      if (!statistics.optional) return;
+
+      const learnedWordsDateObj = {};
+      statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
+
+      const newWordsDateObj = {};
+      statistics.optional.newWordsPerDate = this.updateObjDateLearnedNew(newWordsDateObj, date, newWordsPerDay);
+
       console.log('create Statistic', statistics);
       await apiService.updateUserStatistics(userID, statistics);
     }
 
     const userStatisticAFTER = await apiService.getUserStatistics(userID);
     console.log('userStatisticAFTER', userStatisticAFTER);
-
   }
 
-
-  async updateOrCreateUserWords(game: AudioGame | SprintGame): Promise<void> {
+  async updateOrCreateUserWords(): Promise<void> {
     const userID = getState().userId;
     const currentDate = new Date();
     const date = currentDate.toISOString().split('T')[0];
-    console.log(date);
-    // 2022 - 02 - 15; (string)
+    // const date = '2022-02-14';
 
     await Promise.all(this.resultArray.map(async (wordObj) => {
       // получаем каждое слово
       const userWordResponse = await apiService.getUserWord(userID, wordObj.id);
       if (typeof (userWordResponse) !== 'number') {
-        // если оно есть в базе, то обновляем слово
+        // обновляем слово
         const userWord = userWordResponse;
-
-        // todo new words/ learned words per date
-        // const answersPerDayAudio: DateValue = {};
-        // const answersPerDaySprint: DateValue = {};
-        // let rightRangeSprint = 0;
-        // let rightRangeAudio = 0;
-
-        // if (game instanceof AudioGame) {
-        //   correctAnswersPerDayAudio[date] = this.rightAnswers.length;
-        //   answersPerDayAudio[date] = this.resultArray.length;
-        //   rightRangeAudio = this.longestRightRange();
-        // } else if (game instanceof SprintGame) {
-        //   correctAnswersPerDaySprint[date] = this.rightAnswers.length;
-        //   answersPerDaySprint[date] = this.resultArray.length;
-        //   rightRangeSprint = this.longestRightRange();
-        // }
-        // todo end
-
-        const wordBody: Partial<UserWord> = {
+        const wordBody: UserWord = {
           optional: {
             new: true,
             word: wordObj.word,
+            newAtDay: userWord.optional?.newAtDay ? userWord.optional?.newAtDay : date,
           },
         };
 
@@ -338,19 +365,21 @@ export default class ModalStatistic extends BaseComponent {
         if (!wordObj.answerCorrectness) {
           wordBody.optional.rightRange = 0;
           wordBody.optional.learned = false;
-
-
+          wordBody.optional.learnedAtDay = false;
         } else if (wordObj.answerCorrectness) {
           let rightWordRange = userWord.optional.rightRange as number;
           wordBody.optional.rightRange = ++rightWordRange;
 
           if (userWord.difficulty === 'common' && wordBody.optional.rightRange >= constants.wordCommonRightRange) {
             wordBody.optional.learned = true;
+            wordBody.optional.learnedAtDay = userWord.optional?.learnedAtDay ? userWord.optional?.learnedAtDay : date;
           } else if (userWord.difficulty === 'difficult' && wordBody.optional.rightRange >= constants.wordDifficultRightRange) {
             wordBody.difficulty = 'common';
             wordBody.optional.learned = true;
+            wordBody.optional.learnedAtDay = userWord.optional?.learnedAtDay ? userWord.optional?.learnedAtDay : date;
           } else {
             wordBody.optional.learned = false;
+            wordBody.optional.learnedAtDay = false;
           }
 
           let answersCorrectAllTime = userWord.optional.correctAnswersAllTime;
@@ -367,20 +396,7 @@ export default class ModalStatistic extends BaseComponent {
         } else {
           wordBody.optional.answersAllTime = 1;
         }
-
         console.log('wordBody', wordBody);
-        /*
-        id: "620beda78c949d0016735d50"
-        wordId: "5e9f5ee35eb9e72bc21af4b1"
-        difficulty: "common"
-        optional:
-            new: true
-            learned: false
-            rightRange: 0
-            word: "weather"
-            correctAnswersAllTime: 0
-            answersAllTime: 1
-        */
 
         await apiService.updateUserWord(userID, wordObj.id, wordBody);
 
@@ -395,6 +411,8 @@ export default class ModalStatistic extends BaseComponent {
             word: wordObj.word,
             correctAnswersAllTime: wordObj.answerCorrectness ? 1 : 0,
             answersAllTime: 1,
+            newAtDay: date,
+            learnedAtDay: false,
           },
         };
         await apiService.createUserWord(userID, wordObj.id, defaultWordBody);
