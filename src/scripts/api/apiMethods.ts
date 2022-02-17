@@ -50,7 +50,7 @@ class ApiResourceService {
       },
       body: JSON.stringify(user),
     });
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       return rawResponse.json();
     } else {
       return rawResponse.status;
@@ -67,7 +67,7 @@ class ApiResourceService {
       body: JSON.stringify(user),
     });
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const authorization: Authorization = await rawResponse.json();
       const { refreshToken, token, userId, name } = authorization;
       updateState({
@@ -90,7 +90,7 @@ class ApiResourceService {
         'Accept': 'application/json',
       },
     });
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const user: UserId = await rawResponse.json();
       return user;
     } else {
@@ -108,7 +108,7 @@ class ApiResourceService {
       },
       body: JSON.stringify(user),
     });
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const updatedUser: User = await rawResponse.json();
       return updatedUser;
     } else {
@@ -144,11 +144,14 @@ class ApiResourceService {
 
     if (rawResponse.status === APISStatus['403']) {
       // exit from current user, show login? refresh page
-      localStorage.clear();
-      location.reload();
+      console.log('REFRESH TOKEN EXPIRED 403 error');
+      // localStorage.clear();
+      // location.reload();
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
+      console.log('changing token , status ok "getNewUserTokens"');
+
       const authorization: Authorization = await rawResponse.json();
       const { refreshToken, token } = authorization;
       updateState({
@@ -177,7 +180,7 @@ class ApiResourceService {
       this.getAllUserWords(userId);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const userWords: UserWord[] = await rawResponse.json();
       return userWords;
     } else {
@@ -202,7 +205,7 @@ class ApiResourceService {
       this.createUserWord(userId, wordId, wordBody);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const createdWord: UserWord = await rawResponse.json();
       return createdWord;
     } else {
@@ -225,7 +228,7 @@ class ApiResourceService {
       this.getUserWord(userId, wordId);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const userWord: UserWord = await rawResponse.json();
       return userWord;
     } else {
@@ -249,7 +252,7 @@ class ApiResourceService {
       this.updateUserWord(userId, wordId, wordBody);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const updatedUserWord: UserWord = await rawResponse.json();
       return updatedUserWord;
     } else {
@@ -292,7 +295,7 @@ class ApiResourceService {
       this.getAllUserAggregatedWords(userId);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const userWords: PaginatedResults = await rawResponse.json();
       return userWords;
     } else {
@@ -315,7 +318,7 @@ class ApiResourceService {
       this.getAggregatedWord(userId, wordId);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const userWord: UserWord = await rawResponse.json();
       return userWord;
     } else {
@@ -339,7 +342,7 @@ class ApiResourceService {
       this.getUserStatistics(userId);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const userStatistics: Statistics = await rawResponse.json();
       return userStatistics;
     } else {
@@ -363,7 +366,7 @@ class ApiResourceService {
       this.updateUserStatistics(userId, statisticsBody);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const updatedUserStatistics: Statistics = await rawResponse.json();
       return updatedUserStatistics;
     } else {
@@ -387,7 +390,7 @@ class ApiResourceService {
       this.getUserSettings(userId);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const userSettings: Settings = await rawResponse.json();
       return userSettings;
     } else {
@@ -411,7 +414,7 @@ class ApiResourceService {
       this.updateUserSettings(userId, settingsBody);
     }
 
-    if (rawResponse.status === APISStatus.ok) {
+    if (rawResponse.status === APISStatus['200']) {
       const updatedUserSettings: Settings = await rawResponse.json();
       return updatedUserSettings;
     } else {

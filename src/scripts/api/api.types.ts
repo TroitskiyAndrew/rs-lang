@@ -1,5 +1,5 @@
 export const APISStatus = {
-  'ok': 200,
+  '200': 200,
   '401': 401,
   '402': 402,
   '403': 403,
@@ -66,6 +66,8 @@ export interface Statistics {
     answersAudio?: DateNumber,
     correctAnswersRangeSprint?: number,
     correctAnswersRangeAudio?: number,
+    rangeMultiplyAudio?: boolean,
+    rangeMultiplySprint?: boolean,
   };
 }
 export interface DateNumber {
