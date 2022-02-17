@@ -329,6 +329,7 @@ export default class SprintGame extends BaseComponent {
     });
     wordsArrNumber = GROUP_WORDS_NUMBER;
     // wordsOnPageLeft = wordsArrNumber;
+    this.removeLoading();
     this.getRandomWords(groupWordsArr, wordsArrNumber);
   }
 
@@ -343,6 +344,7 @@ export default class SprintGame extends BaseComponent {
         addPageToArr()
       } else {
         groupWordsArrMod = groupWordsArr.slice();
+        this.removeLoading();
         this.getRandomWords(groupWordsArr, PAGE_WORDS_NUMBER);
       }
     };
@@ -371,6 +373,7 @@ export default class SprintGame extends BaseComponent {
     const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
     const randomWordNumber = getRandom(0, wordsNumber);
 
+    
     word!.textContent = groupWordsArr[randomWordNumber].word;
     if (Math.random() < 0.5) {
       wordTranslate!.textContent = groupWordsArr[randomWordNumber].wordTranslate;
@@ -482,7 +485,7 @@ export default class SprintGame extends BaseComponent {
 
     this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
     this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
-    if (this.elem.children[1].className === 'page sprint' || 'loading') {
+    if (this.elem.children[2].className === 'page sprint') {
       document.addEventListener('keyup', keyupHandler);
     }
 
