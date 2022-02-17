@@ -6,7 +6,7 @@ import { instances } from '../../components';
 import AudioGame, { IStatisticAnswer } from '../audioGame';
 import SprintGame from '../sprintGame';
 import { apiService, baseUrl } from '../../../api/apiMethods';
-import { getState, updateState } from '../../../state';
+import { getState } from '../../../state';
 import { Statistics, UserWord, DateNumber } from '../../../api/api.types';
 
 export default class ModalStatistic extends BaseComponent {
@@ -171,7 +171,6 @@ export default class ModalStatistic extends BaseComponent {
     if (!dateObj) {
       dateObj = {};
     }
-
     if (date in dateObj) {
       // такая дата есть в массиве с АПИ, обновляем
       dateObj[date] = dateValue + dateObj[date];
@@ -185,9 +184,7 @@ export default class ModalStatistic extends BaseComponent {
     if (!dateObj) {
       dateObj = {};
     }
-
     dateObj[date] = dateValue;
-
     return dateObj;
   }
 
@@ -315,7 +312,6 @@ export default class ModalStatistic extends BaseComponent {
         rightRangeSprint = this.longestRightRange();
       }
 
-
       const statistics: Statistics = {
         learnedWords: learnedWords,
         optional: {
@@ -331,13 +327,11 @@ export default class ModalStatistic extends BaseComponent {
       };
       if (!statistics.optional) return;
 
-
       const learnedWordsDateObj = {};
       statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
 
       const newWordsDateObj = {};
       statistics.optional.newWordsPerDate = this.updateObjDateLearnedNew(newWordsDateObj, date, newWordsPerDay);
-
 
       console.log('create Statistic', statistics);
       await apiService.updateUserStatistics(userID, statistics);
@@ -345,22 +339,19 @@ export default class ModalStatistic extends BaseComponent {
 
     const userStatisticAFTER = await apiService.getUserStatistics(userID);
     console.log('userStatisticAFTER', userStatisticAFTER);
-
   }
-
 
   async updateOrCreateUserWords(): Promise<void> {
     const userID = getState().userId;
     const currentDate = new Date();
     const date = currentDate.toISOString().split('T')[0];
     // const date = '2022-02-14';
-    // console.log(date);
 
     await Promise.all(this.resultArray.map(async (wordObj) => {
       // получаем каждое слово
       const userWordResponse = await apiService.getUserWord(userID, wordObj.id);
       if (typeof (userWordResponse) !== 'number') {
-        // если оно есть в базе, то обновляем слово
+        // обновляем слово
         const userWord = userWordResponse;
         const wordBody: UserWord = {
           optional: {
