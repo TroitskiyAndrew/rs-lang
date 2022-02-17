@@ -70,8 +70,8 @@ export interface Statistics {
     correctAnswersRangeAudio?: number,
     rangeMultiplyAudio?: boolean,
     rangeMultiplySprint?: boolean,
-    newWordsPerDate?: number,
-    learnedWordsPerDate?: number,
+    newWordsPerDate?: DateNumber,
+    learnedWordsPerDate?: DateNumber,
   };
 }
 export interface DateNumber {

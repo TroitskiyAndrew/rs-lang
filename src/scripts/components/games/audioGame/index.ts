@@ -82,8 +82,8 @@ export default class AudioGame extends BaseComponent {
     this.showNextQuestion();
 
     // todo testing aggregateWords
-    const aggregatedWords = await apiService.getAllUserAggregatedWords(getState().userId, 0, 0, 30, '{"userWord.optional.learned":false}');
-    console.log('aggregatedWords 0 0 30 NOT learned', aggregatedWords);
+    // const aggregatedWords = await apiService.getAllUserAggregatedWords(getState().userId, 0, 0, 30, '{"userWord.optional.learned":false}');
+    // console.log('aggregatedWords 0 0 30 NOT learned', aggregatedWords);
 
     return Promise.resolve();
   }
@@ -99,7 +99,7 @@ export default class AudioGame extends BaseComponent {
       this.group = +options.group;
     }
     // todo delete
-    this.page = 1;
+    this.page = 0;
     this.group = 0;
 
     console.log('this.page', this.page);

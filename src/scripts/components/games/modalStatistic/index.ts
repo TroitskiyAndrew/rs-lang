@@ -181,6 +181,16 @@ export default class ModalStatistic extends BaseComponent {
     return dateObj;
   }
 
+  updateObjDateLearnedNew(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
+    if (!dateObj) {
+      dateObj = {};
+    }
+
+    dateObj[date] = dateValue;
+
+    return dateObj;
+  }
+
   updateGameRightRange(rightRangeAPI: number | undefined, rangeMultiply = false): {
     rightRange: number;
     rangeMultiply: boolean;
@@ -225,6 +235,8 @@ export default class ModalStatistic extends BaseComponent {
 
     if (typeof (allUserWords) === 'number') return;
     const learnedWords = allUserWords.filter(word => word.optional?.learned).length;
+    const learnedWordsPerDay = allUserWords.filter(word => word.optional?.learnedAtDay === date).length;
+    const newWordsPerDay = allUserWords.filter(word => word.optional?.newAtDay === date).length;
 
     if (typeof (userStatisticApi) !== 'number') {
       const statistics: Statistics = {
@@ -234,6 +246,13 @@ export default class ModalStatistic extends BaseComponent {
 
       // update Statistic
       if (!userStatisticApi.optional || !statistics.optional) return;
+
+      const learnedWordsDateObj = userStatisticApi.optional.learnedWordsPerDate;
+      statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
+
+      const newWordsDateObj = userStatisticApi.optional.newWordsPerDate;
+      statistics.optional.newWordsPerDate = this.updateObjDateLearnedNew(newWordsDateObj, date, newWordsPerDay);
+
       if (game instanceof AudioGame) {
         // correctAnswersAudio per Day
         const currentDateCorrectAnswersAudio = userStatisticApi.optional.correctAnswersAudio;
@@ -295,6 +314,8 @@ export default class ModalStatistic extends BaseComponent {
         answersPerDaySprint[date] = this.resultArray.length;
         rightRangeSprint = this.longestRightRange();
       }
+
+
       const statistics: Statistics = {
         learnedWords: learnedWords,
         optional: {
@@ -308,6 +329,16 @@ export default class ModalStatistic extends BaseComponent {
           rangeMultiplySprint: false,
         },
       };
+      if (!statistics.optional) return;
+
+
+      const learnedWordsDateObj = {};
+      statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
+
+      const newWordsDateObj = {};
+      statistics.optional.newWordsPerDate = this.updateObjDateLearnedNew(newWordsDateObj, date, newWordsPerDay);
+
+
       console.log('create Statistic', statistics);
       await apiService.updateUserStatistics(userID, statistics);
     }
