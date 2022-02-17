@@ -227,7 +227,7 @@ export default class ModalStatistic extends BaseComponent {
     const learnedWords = allUserWords.filter(word => word.optional?.learned).length;
 
     if (typeof (userStatisticApi) !== 'number') {
-      const statistics: Partial<Statistics> = {
+      const statistics: Statistics = {
         learnedWords: learnedWords,
         optional: {},
       };
@@ -295,7 +295,7 @@ export default class ModalStatistic extends BaseComponent {
         answersPerDaySprint[date] = this.resultArray.length;
         rightRangeSprint = this.longestRightRange();
       }
-      const statistics: Partial<Statistics> = {
+      const statistics: Statistics = {
         learnedWords: learnedWords,
         optional: {
           correctAnswersSprint: correctAnswersPerDaySprint,
@@ -320,8 +320,9 @@ export default class ModalStatistic extends BaseComponent {
 
   async updateOrCreateUserWords(): Promise<void> {
     const userID = getState().userId;
-    // const currentDate = new Date();
-    // const date = currentDate.toISOString().split('T')[0];
+    const currentDate = new Date();
+    const date = currentDate.toISOString().split('T')[0];
+    // const date = '2022-02-14';
     // console.log(date);
 
     await Promise.all(this.resultArray.map(async (wordObj) => {
@@ -334,6 +335,7 @@ export default class ModalStatistic extends BaseComponent {
           optional: {
             new: true,
             word: wordObj.word,
+            newAtDay: userWord.optional?.newAtDay ? userWord.optional?.newAtDay : date,
           },
         };
 
@@ -341,17 +343,21 @@ export default class ModalStatistic extends BaseComponent {
         if (!wordObj.answerCorrectness) {
           wordBody.optional.rightRange = 0;
           wordBody.optional.learned = false;
+          wordBody.optional.learnedAtDay = false;
         } else if (wordObj.answerCorrectness) {
           let rightWordRange = userWord.optional.rightRange as number;
           wordBody.optional.rightRange = ++rightWordRange;
 
           if (userWord.difficulty === 'common' && wordBody.optional.rightRange >= constants.wordCommonRightRange) {
             wordBody.optional.learned = true;
+            wordBody.optional.learnedAtDay = userWord.optional?.learnedAtDay ? userWord.optional?.learnedAtDay : date;
           } else if (userWord.difficulty === 'difficult' && wordBody.optional.rightRange >= constants.wordDifficultRightRange) {
             wordBody.difficulty = 'common';
             wordBody.optional.learned = true;
+            wordBody.optional.learnedAtDay = userWord.optional?.learnedAtDay ? userWord.optional?.learnedAtDay : date;
           } else {
             wordBody.optional.learned = false;
+            wordBody.optional.learnedAtDay = false;
           }
 
           let answersCorrectAllTime = userWord.optional.correctAnswersAllTime;
@@ -383,6 +389,8 @@ export default class ModalStatistic extends BaseComponent {
             word: wordObj.word,
             correctAnswersAllTime: wordObj.answerCorrectness ? 1 : 0,
             answersAllTime: 1,
+            newAtDay: date,
+            learnedAtDay: false,
           },
         };
         await apiService.createUserWord(userID, wordObj.id, defaultWordBody);

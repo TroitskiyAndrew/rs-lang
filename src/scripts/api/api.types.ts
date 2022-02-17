@@ -47,6 +47,8 @@ export interface UserWord {
     word?: string,
     correctAnswersAllTime?: number,
     answersAllTime?: number,
+    newAtDay?: string,
+    learnedAtDay?: string | boolean,
   };
 }
 export interface PaginatedResults {
@@ -59,7 +61,7 @@ export interface PaginatedResults {
 }
 export interface Statistics {
   learnedWords?: number,
-  optional?: {
+  optional: {
     correctAnswersSprint?: DateNumber,
     correctAnswersAudio?: DateNumber,
     answersSprint?: DateNumber,
@@ -68,6 +70,8 @@ export interface Statistics {
     correctAnswersRangeAudio?: number,
     rangeMultiplyAudio?: boolean,
     rangeMultiplySprint?: boolean,
+    newWordsPerDate?: number,
+    learnedWordsPerDate?: number,
   };
 }
 export interface DateNumber {

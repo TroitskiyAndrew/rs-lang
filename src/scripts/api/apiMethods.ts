@@ -276,12 +276,12 @@ class ApiResourceService {
   }
 
   // !Users/AggregatedWords
-  async getAllUserAggregatedWords(userId: string): Promise<PaginatedResults | number> {
-    const group = getState().aggregatedWords.group ? `&group=${getState().aggregatedWords.group}` : '';
-    const page = getState().aggregatedWords.page ? `&page=${getState().aggregatedWords.page}` : '';
-    const wordsPerPage = getState().aggregatedWords.wordsPerPage ? `&wordsPerPage=${getState().aggregatedWords.wordsPerPage}` : '';
-    const filters = getState().aggregatedWords.filter ? `&filter=${getState().aggregatedWords.filter}` : '';
-    const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?${group}${page}${wordsPerPage}${filters}`, {
+  async getAllUserAggregatedWords(userId: string, group: number, page: number, wordsPerPage: number, filters: string): Promise<PaginatedResults | number> {
+    // const group = getState().aggregatedWords.group ? `&group=${getState().aggregatedWords.group}` : '';
+    // const page = getState().aggregatedWords.page ? `&page=${getState().aggregatedWords.page}` : '';
+    // const wordsPerPage = getState().aggregatedWords.wordsPerPage ? `&wordsPerPage=${getState().aggregatedWords.wordsPerPage}` : '';
+    // const filters = getState().aggregatedWords.filter ? `&filter=${getState().aggregatedWords.filter}` : '';
+    const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?wordsPerPage=${wordsPerPage}&filter={"$and": [{"group": ${group}}, {"page": ${page}}, ${filters}]}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getState().token}`,
@@ -289,10 +289,18 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
+    /*     const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?group=${group}&page=${page}&wordsPerPage=${wordsPerPage}${filters}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${getState().token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }); */
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       await this.getNewUserTokens(getState().userId);
-      this.getAllUserAggregatedWords(userId);
+      this.getAllUserAggregatedWords(userId, group, page, wordsPerPage, filters);
     }
 
     if (rawResponse.status === APISStatus['200']) {
