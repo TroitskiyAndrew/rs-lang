@@ -1,3 +1,9 @@
+export const APISStatus = {
+  'ok': 200,
+  '401': 401,
+  '402': 402,
+  '403': 403,
+};
 export interface User {
   name?: string,
   email: string,
@@ -31,25 +37,18 @@ export interface WordCard {
   word: string,
   wordTranslate: string,
 }
+
 export interface UserWord {
-  difficulty: string,
+  difficulty?: 'common' | 'difficult' | string,
   optional?: {
-    [key: string]: string | boolean;
+    new?: boolean,
+    learned?: boolean,
+    rightRange?: number,
+    word?: string,
+    correctAnswersAllTime?: number,
+    answersAllTime?: number,
   };
 }
-// export interface State {
-//   page: number,
-//   group: number,
-//   aggregatedWords: {
-//     page: number,
-//     group: number,
-//     wordsPerPage: number,
-//     filter: string,
-//   },
-//   userId: string,
-//   token: string,
-//   refreshToken: string,
-// }
 export interface PaginatedResults {
   paginatedResults: WordCard[],
   totalCount: [
@@ -59,14 +58,26 @@ export interface PaginatedResults {
   ];
 }
 export interface Statistics {
-  learnedWords: number,
+  learnedWords?: number,
   optional?: {
-    [key: string]: string | boolean;
+    correctAnswersSprint?: DateNumber,
+    correctAnswersAudio?: DateNumber,
+    answersSprint?: DateNumber,
+    answersAudio?: DateNumber,
+    correctAnswersRangeSprint?: number,
+    correctAnswersRangeAudio?: number,
   };
 }
+export interface DateNumber {
+  [x: string]: number;
+}
+export interface DateBoolean {
+  [x: string]: boolean;
+}
 
-/* export enum EEngineStatus {
-  started = 'started',
-  stopped = 'stopped',
-  drive = 'drive',
-} */
+export interface Settings {
+  wordsPerDay?: number,
+  optional?: {
+    [key: string]: string | boolean | number;
+  };
+}
