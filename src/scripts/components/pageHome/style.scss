@@ -1,8 +1,8 @@
 .home {
   position: relative;
-  span {
-    @include position;
-  }
+  // span {
+  //   @include position;
+  // }
 }
 
 .page.home {
@@ -10,6 +10,29 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
   background-color: #28282B;
+}
+
+.loading {
+  z-index: 5;
+}
+
+.main-view-container {
+  display: inherit;
+  flex-direction: inherit;
+  align-items: inherit;
+  justify-content: center;
+  height: calc(100vh - 78px);
+  width: 62%;
+}
+
+.main-view-container__title {
+  text-transform: uppercase;
+  font-size: 1.6rem;
+}
+
+.description-sub-wrapper {
+  font-size: 1.6rem;
+  text-align: center;
 }
