@@ -5,6 +5,9 @@ import { pageChenging } from '../../rooting';
 const TEAM_MEMBERS_NUMBER = 3;
 
 export default class PageHome extends BaseComponent {
+  descrirtionWrapper: HTMLDivElement | undefined;
+  descriptionWrapperParagraph: HTMLParagraphElement | undefined;
+
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'pageHome';
@@ -22,7 +25,12 @@ export default class PageHome extends BaseComponent {
     this.renderTeam(page);
     this.renderFooter(page);
     this.fragment.append(page);
+    
   }
+
+  // private async getDescrirtionWrapperHeight () {
+  //   this.descrirtionWrapper!.style.height =  `calc(${this.descriptionWrapperParagraph!.offsetHeight}px + 80px)`
+  // }
 
   private renderMainView(page: HTMLDivElement) {
     const mainViewContainer = createDiv({ className: 'main-view-container' });
@@ -30,8 +38,13 @@ export default class PageHome extends BaseComponent {
     const descrirtionWrapper = createDiv({ className: 'main-view-container__description-wrapper' });
     const descrirtionSubWrapper = createDiv({ className: 'description-sub-wrapper' });
     const star = document.createElement('img');
+    const descriptionWrapperParagraph = document.createElement('p');
+    this.descrirtionWrapper = descrirtionWrapper;
+    this.descriptionWrapperParagraph = descriptionWrapperParagraph;
 
     star.className = 'star-img';
+    descriptionWrapperParagraph.className = 'description-sub-wrapper_p';
+
     star.src = '/../../../assets/img/homePage/SMW_Star.gif';
 
     homeTitleWrapper.innerHTML = 
@@ -52,14 +65,16 @@ export default class PageHome extends BaseComponent {
         class="main-view-container__title_red">g</span><span
         class="main-view-container__title_green">.</span>
       </h1>`
-    descrirtionSubWrapper.innerHTML = 
-      `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
-        вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
-        а также добудете морские сокровища за хорошее знание языка!`;
 
+    descriptionWrapperParagraph.innerHTML = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
+    вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
+    а также добудете морские сокровища за хорошее знание языка!`
+    descrirtionSubWrapper.append(descriptionWrapperParagraph);
+    descrirtionWrapper.append(star)
     descrirtionWrapper.append(descrirtionSubWrapper);
     mainViewContainer.append(homeTitleWrapper);
     mainViewContainer.append(descrirtionWrapper);
+
     page.append(mainViewContainer);
 
   }
@@ -79,7 +94,7 @@ export default class PageHome extends BaseComponent {
 
     memberGithubLink.className = 'github-link';
 
-    teamTitle.innerHTML = `<h2>Наша команда.</h2>`
+    teamTitle.innerHTML = `<h2 class="team-container__title">Наша команда.</h2>`
     
     memberGithubLink.innerHTML = this.getGithubSvg('#ffdb73');
     memberGithub.append(memberGithubLink);
@@ -116,7 +131,7 @@ export default class PageHome extends BaseComponent {
           el.children[4].textContent = 'Вклад в разработку';
           break;
         case 1:
-          el.children[0].append(this.getAvatar(`/../../../assets/img/homePage/ava-mushrum-red.jpg`, 'Dmitro'));
+          el.children[0].append(this.getAvatar(`/../../../assets/img/homePage/ava-mushrum-red.jpg`, 'dmitro'));
           githubLink = el.children[1].children[0] as HTMLAnchorElement;
           githubLink.href = 'https://github.com/dmytrozozuliak';
           el.children[2].textContent = 'Дмитрий';
@@ -124,12 +139,14 @@ export default class PageHome extends BaseComponent {
           el.children[4].textContent = 'Вклад в разработку';
           break;
         case 2:
-          el.children[0].append(this.getAvatar(`/../../../assets/img/homePage/essonti.png`, 'Sergei'));
+          el.children[0].append(this.getAvatar(`/../../../assets/img/homePage/essonti.png`, 'sergei'));
           githubLink = el.children[1].children[0] as HTMLAnchorElement;
           githubLink.href = 'https://github.com/Essonti';
           el.children[2].textContent = 'Сергей Трофимченко';
           el.children[3].textContent = 'Frontend Engineer';
-          el.children[4].textContent = 'Вклад в разработку';
+          el.children[4].textContent = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
+          вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
+          а также добудете морские сокровища за хорошее знание языка`;
           break;
       }
     })
@@ -168,6 +185,13 @@ export default class PageHome extends BaseComponent {
     `
     return githubSvg;
     // #ff0000 - красный цвет при наведении
+  }
+
+  public listenEvents(): void {
+    let getDescriptionWrapperSizes = () => {
+      this.descrirtionWrapper!.style.height = `calc(${this.descriptionWrapperParagraph!.offsetHeight}px + 80px)`;
+    }
+    window.addEventListener('resize', getDescriptionWrapperSizes);
   }
 
 }
