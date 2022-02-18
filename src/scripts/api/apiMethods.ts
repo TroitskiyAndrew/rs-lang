@@ -260,7 +260,7 @@ class ApiResourceService {
   }
 
   // !Users/AggregatedWords
-  async getAllUserAggregatedWords(userId: string, filters: string, wordsPerPage?: number, group?: number, page?: number): Promise<PaginatedResults | number> {
+  async getAllUserAggregatedWords(userId: string, filters: string, wordsPerPage?: number, group?: number, page?: number): Promise<WordCard[] | number> {
     let pageQuery = '';
     if (page !== undefined) {
       pageQuery = `{"page": ${page}},`;
@@ -285,10 +285,12 @@ class ApiResourceService {
       },
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.getAllUserAggregatedWords, userId, group, page, wordsPerPage, filters);
+    await this.refreshTokenOrExit(rawResponse, this.getAllUserAggregatedWords, userId, filters, wordsPerPage, group, page);
 
     if (rawResponse.status === APISStatus['200']) {
-      const userWords: PaginatedResults = await rawResponse.json();
+      const userWordsPagination: PaginatedResults[] = await rawResponse.json();
+      const userWords = userWordsPagination[0].paginatedResults;
+
       return userWords;
     } else {
       return rawResponse.status;
