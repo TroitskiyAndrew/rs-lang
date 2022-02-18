@@ -327,7 +327,8 @@ export default class ModalStatistic extends BaseComponent {
         // }
         // todo end
 
-        const wordBody: Partial<UserWord> = {
+        const wordBody: UserWord = {
+          difficulty: userWord.difficulty,
           optional: {
             new: true,
             word: wordObj.word,

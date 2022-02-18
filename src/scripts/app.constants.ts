@@ -8,6 +8,7 @@ type Constnts = {
   hundred: number;
   wordCommonRightRange: number;
   wordDifficultRightRange: number;
+  junmpAnimationTimeDictionary: number;
 };
 
 const constants: Constnts = {
@@ -20,6 +21,7 @@ const constants: Constnts = {
   hundred: 100,
   wordCommonRightRange: 3,
   wordDifficultRightRange: 5,
+  junmpAnimationTimeDictionary: 1000,
 };
 
 export default constants;

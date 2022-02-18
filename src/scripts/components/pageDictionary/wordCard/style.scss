@@ -17,6 +17,9 @@
     @media (max-width: 1024px) {
       order: 1;
     }
+    @media (max-width: 1024px) {
+      font-size: 16px;
+    }
   }
 
   &__controls-holder {
@@ -74,7 +77,7 @@
 
 .wordCard:not(._authorized) {
   .button-block.difficult,
-  .button-block.studied {
+  .button-block.learned {
     display: none;
   }
 }

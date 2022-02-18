@@ -40,14 +40,14 @@ export interface WordCard {
 
 export interface UserWord {
   difficulty?: 'common' | 'difficult' | string,
-  optional?: {
+  optional: {
     new?: boolean,
     learned?: boolean,
     rightRange?: number,
     word?: string,
     correctAnswersAllTime?: number,
     answersAllTime?: number,
-  };
+  },
 }
 export interface PaginatedResults {
   paginatedResults: WordCard[],
