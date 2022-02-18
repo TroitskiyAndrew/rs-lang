@@ -260,12 +260,23 @@ class ApiResourceService {
   }
 
   // !Users/AggregatedWords
-  async getAllUserAggregatedWords(userId: string, group: number, page: number, wordsPerPage: number, filters: string): Promise<PaginatedResults | number> {
-    // const group = getState().aggregatedWords.group ? `&group=${getState().aggregatedWords.group}` : '';
-    // const page = getState().aggregatedWords.page ? `&page=${getState().aggregatedWords.page}` : '';
-    // const wordsPerPage = getState().aggregatedWords.wordsPerPage ? `&wordsPerPage=${getState().aggregatedWords.wordsPerPage}` : '';
-    // const filters = getState().aggregatedWords.filter ? `&filter=${getState().aggregatedWords.filter}` : '';
-    const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?wordsPerPage=${wordsPerPage}&filter={"$and": [{"group": ${group}}, {"page": ${page}}, ${filters}]}`, {
+  async getAllUserAggregatedWords(userId: string, filters: string, wordsPerPage?: number, group?: number, page?: number): Promise<PaginatedResults | number> {
+    let pageQuery = '';
+    if (page !== undefined) {
+      pageQuery = `{"page": ${page}},`;
+    }
+    let groupQuery = '';
+    if (group !== undefined) {
+      groupQuery = `{"group": ${group}},`;
+    }
+    let perPageQuery = '';
+    if (wordsPerPage !== undefined) {
+      perPageQuery = `wordsPerPage=${wordsPerPage}&`;
+    }
+
+    console.log('queryString', `${users}/${userId}/aggregatedWords?${perPageQuery}filter={"$and": [${groupQuery} ${pageQuery} ${filters}]}`);
+
+    const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?${perPageQuery}&filter={"$and": [${groupQuery} ${pageQuery} ${filters}]}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getState().token}`,
@@ -273,14 +284,6 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    /*     const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?group=${group}&page=${page}&wordsPerPage=${wordsPerPage}${filters}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${getState().token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }); */
 
     await this.refreshTokenOrExit(rawResponse, this.getAllUserAggregatedWords, userId, group, page, wordsPerPage, filters);
 

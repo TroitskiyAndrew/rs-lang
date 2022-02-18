@@ -188,39 +188,6 @@ export default class ModalStatistic extends BaseComponent {
     return dateObj;
   }
 
-  /*   updateGameRightRange(rightRangeAPI: number | undefined, rangeMultiply = false): {
-      rightRange: number;
-      rangeMultiply: boolean;
-    } {
-      let rightRange: number;
-      // если значения нет, то возвращаем самую длинную серию с текущей игры
-      if (!rightRangeAPI) {
-        rightRange = this.longestRightRange();
-        return { rightRange, rangeMultiply };
-      }
-      //  если серия есть, то проверяем ответил юзер на все вопросы верно, если да, то прибавляем все вопросы к существующей цифре
-      if (this.rightAnswers.length === this.resultArray.length) {
-
-        if (rangeMultiply) {
-          rightRange = this.rightAnswers.length + rightRangeAPI;
-          rangeMultiply = true;
-        } else {
-          rightRange = rightRangeAPI > this.rightAnswers.length ? rightRangeAPI : this.rightAnswers.length;
-          rangeMultiply = true;
-        }
-      } else {
-        // если не на все вопросы, то сравниваем со значением из АПИ
-        if (rangeMultiply && rightRangeAPI % this.resultArray.length === 0 && this.rightAnswers.length > 0) {
-          rightRange = this.longestRightRange() + rightRangeAPI;
-          rangeMultiply = false;
-        } else {
-          rightRange = rightRangeAPI > this.longestRightRange() ? rightRangeAPI : this.longestRightRange();
-          rangeMultiply = false;
-        }
-      }
-      return { rightRange, rangeMultiply };
-    } */
-
   updateGameRightRange(rightRangeAPI: number | undefined): number {
     let rightRange: number;
     // если значения нет, то возвращаем самую длинную серию с текущей игры
