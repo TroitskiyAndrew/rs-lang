@@ -25,12 +25,7 @@ export default class PageHome extends BaseComponent {
     this.renderTeam(page);
     this.renderFooter(page);
     this.fragment.append(page);
-    
   }
-
-  // private async getDescrirtionWrapperHeight () {
-  //   this.descrirtionWrapper!.style.height =  `calc(${this.descriptionWrapperParagraph!.offsetHeight}px + 80px)`
-  // }
 
   private renderMainView(page: HTMLDivElement) {
     const mainViewContainer = createDiv({ className: 'main-view-container' });
@@ -69,14 +64,14 @@ export default class PageHome extends BaseComponent {
     descriptionWrapperParagraph.innerHTML = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
     вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
     а также добудете морские сокровища за хорошее знание языка!`
+    
     descrirtionSubWrapper.append(descriptionWrapperParagraph);
-    descrirtionWrapper.append(star)
+    descrirtionSubWrapper.append(star)
     descrirtionWrapper.append(descrirtionSubWrapper);
     mainViewContainer.append(homeTitleWrapper);
     mainViewContainer.append(descrirtionWrapper);
 
     page.append(mainViewContainer);
-
   }
 
   private renderTeam(page: HTMLDivElement) {
@@ -188,13 +183,54 @@ export default class PageHome extends BaseComponent {
   }
 
   public listenEvents(): void {
-    let getDescriptionWrapperSizes = () => {
-      this.descrirtionWrapper!.style.height = `calc(${this.descriptionWrapperParagraph!.offsetHeight}px + 80px)`;
-    }
-    window.addEventListener('resize', getDescriptionWrapperSizes);
+
   }
+
+
 
 }
 
+// private async getDescrirtionWrapperWidth(): Promise<HTMLDivElement> {
+//   const descrirtionWrapper = await document.querySelector('.description-sub-wrapper') as HTMLDivElement;
+//   return descrirtionWrapper; 
+// }
 
-    // page.append(createSpan({ text: 'Содержание главной страницы' }));
+// let getDescriptionWrapperSizes = () => {
+//   this.descrirtionWrapper!.style.height = `calc(${this.descriptionWrapperParagraph!.offsetHeight}px + 80px)`;
+// }
+// window.addEventListener('resize', getDescriptionWrapperSizes);
+// window.addEventListener('resize', this.getStarAnimation.bind(this));
+
+
+// page.append(createSpan({ text: 'Содержание главной страницы' }));
+
+//   private async getStarAnimation() {
+  
+//     let dynamicStyles: HTMLStyleElement | null = null;
+
+//     function addAnimation(body: string) {
+//       if (!dynamicStyles) {
+//         dynamicStyles = document.createElement('style');
+//         // dynamicStyles.type = 'text/css';
+//         document.head.appendChild(dynamicStyles);
+//       }
+      
+//       dynamicStyles.sheet!.insertRule(body/*, dynamicStyles.length*/);
+//     }
+
+
+// console.log(this.getDescrirtionWrapperWidth())
+//     this.getDescrirtionWrapperWidth().then(val => console.log(val))
+    
+//     // this.getDescrirtionWrapperWidth().then(val => console.log(val))
+    
+//       addAnimation(`
+//         @keyframes move-star {
+//           0%   {left:0px; top:0px;}
+//           25%  {left:${1}px; top:0px;}
+//           50%  {left:200px; top:200px;}
+//           75%  {left:0px; top:200px;}
+//           100% {left:0px; top:0px;}
+//         }
+//       `);
+//     }

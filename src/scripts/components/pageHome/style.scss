@@ -13,7 +13,7 @@
   justify-content: start;
   background-color: #28282B;
   font-family: 'Super Mario 286(RUS BY LYAJKA)';
-  -webkit-text-stroke: 1.5px black;
+  
 }
 
 .loading {
@@ -31,6 +31,7 @@
   justify-content: center;
   min-height: calc(100vh - 78px);
   width: 100%;
+  -webkit-text-stroke: 1.5px black;
 }
 
 .main-view-container__title {
@@ -43,25 +44,21 @@
 }
 
 .main-view-container__description-wrapper {
-  border: 1px solid red;
   position: relative;
   width: 62%;
   height: 60%;
 }
 
 .description-sub-wrapper {
-  position: absolute;
-  left: 40px;
-  top: 40px;
-  right: 40px;
-  bottom: 40px;
-  font-size: 1.6rem;
-  text-align: center;
-  
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: auto;
 }
 
 .description-sub-wrapper_p {
-  margin: 0;
+  margin: 40px;
+  text-align: center;
 }
 
 .star-img {
@@ -88,15 +85,16 @@
 
 .star-img {
   position: absolute;
-  animation-duration: 4s;
+  animation-duration: 8s;
   animation-name: move-star;
+  animation-iteration-count: infinite;
 }
 
 @keyframes move-star {
   0%   {left:0px; top:0px;}
-  25%  {left:200px; top:0px;}
-  50%  {left:200px; top:200px;}
-  75%  {left:0px; top:200px;}
+  25%  {left:calc(100% - 40px); top:0px;}
+  50%  {left:calc(100% - 40px); top:calc(100% - 40px);}
+  75%  {left:0px; top:calc(100% - 40px);}
   100% {left:0px; top:0px;}
 }
 
@@ -106,6 +104,7 @@
 
 .team-container {
   max-width: 62%;
+  -webkit-text-stroke: 1.5px black;
 }
 
 .team-container__title {
@@ -143,6 +142,7 @@ img[class*="member-wrapper__avatar"] {
   border: 1px solid #ffdb73;
   border-radius: 5px;
   width: calc((100% - 40px) / 3);
+  min-width: 140px;
   text-align: center;
 }
 
@@ -165,5 +165,5 @@ img[class*="member-wrapper__avatar"] {
 
 .home-footer__school-link:hover {
   background-color: #ffdb73;  
-  -webkit-text-stroke: initial;
+  -webkit-text-stroke: 0px black;
 }
