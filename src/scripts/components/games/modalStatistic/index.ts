@@ -188,38 +188,52 @@ export default class ModalStatistic extends BaseComponent {
     return dateObj;
   }
 
-  updateGameRightRange(rightRangeAPI: number | undefined, rangeMultiply = false): {
-    rightRange: number;
-    rangeMultiply: boolean;
-  } {
+  /*   updateGameRightRange(rightRangeAPI: number | undefined, rangeMultiply = false): {
+      rightRange: number;
+      rangeMultiply: boolean;
+    } {
+      let rightRange: number;
+      // если значения нет, то возвращаем самую длинную серию с текущей игры
+      if (!rightRangeAPI) {
+        rightRange = this.longestRightRange();
+        return { rightRange, rangeMultiply };
+      }
+      //  если серия есть, то проверяем ответил юзер на все вопросы верно, если да, то прибавляем все вопросы к существующей цифре
+      if (this.rightAnswers.length === this.resultArray.length) {
+
+        if (rangeMultiply) {
+          rightRange = this.rightAnswers.length + rightRangeAPI;
+          rangeMultiply = true;
+        } else {
+          rightRange = rightRangeAPI > this.rightAnswers.length ? rightRangeAPI : this.rightAnswers.length;
+          rangeMultiply = true;
+        }
+      } else {
+        // если не на все вопросы, то сравниваем со значением из АПИ
+        if (rangeMultiply && rightRangeAPI % this.resultArray.length === 0 && this.rightAnswers.length > 0) {
+          rightRange = this.longestRightRange() + rightRangeAPI;
+          rangeMultiply = false;
+        } else {
+          rightRange = rightRangeAPI > this.longestRightRange() ? rightRangeAPI : this.longestRightRange();
+          rangeMultiply = false;
+        }
+      }
+      return { rightRange, rangeMultiply };
+    } */
+
+  updateGameRightRange(rightRangeAPI: number | undefined): number {
     let rightRange: number;
     // если значения нет, то возвращаем самую длинную серию с текущей игры
     if (!rightRangeAPI) {
       rightRange = this.longestRightRange();
-      return { rightRange, rangeMultiply };
-    }
-    //  если серия есть, то проверяем ответил юзер на все вопросы верно, если да, то прибавляем все вопросы к существующей цифре
-    if (this.rightAnswers.length === this.resultArray.length) {
-
-      if (rangeMultiply) {
-        rightRange = this.rightAnswers.length + rightRangeAPI;
-        rangeMultiply = true;
-      } else {
-        rightRange = rightRangeAPI > this.rightAnswers.length ? rightRangeAPI : this.rightAnswers.length;
-        rangeMultiply = true;
-      }
+      return rightRange;
     } else {
-      // если не на все вопросы, то сравниваем со значением из АПИ
-      if (rangeMultiply && rightRangeAPI % this.resultArray.length === 0 && this.rightAnswers.length > 0) {
-        rightRange = this.longestRightRange() + rightRangeAPI;
-        rangeMultiply = false;
-      } else {
-        rightRange = rightRangeAPI > this.longestRightRange() ? rightRangeAPI : this.longestRightRange();
-        rangeMultiply = false;
-      }
+      rightRange = rightRangeAPI > this.longestRightRange() ? rightRangeAPI : this.longestRightRange();
     }
-    return { rightRange, rangeMultiply };
+
+    return rightRange;
   }
+
 
   async updateOrCreateStatistic(game: AudioGame | SprintGame) {
     const userID = getState().userId;
@@ -265,10 +279,8 @@ export default class ModalStatistic extends BaseComponent {
         const rightRangeAllTimeAudio = userStatisticApi.optional.correctAnswersRangeAudio;
         // todo delete range audio above
         // const rightRangeAllTimeAudio = 0;
-        const rangeMultiplyAudio = userStatisticApi.optional.rangeMultiplyAudio;
-        const { rightRange, rangeMultiply } = this.updateGameRightRange(rightRangeAllTimeAudio, rangeMultiplyAudio);
+        const rightRange = this.updateGameRightRange(rightRangeAllTimeAudio);
         statistics.optional.correctAnswersRangeAudio = rightRange;
-        statistics.optional.rangeMultiplyAudio = rangeMultiply;
 
         statistics.optional.correctAnswersRangeSprint = userStatisticApi.optional.correctAnswersRangeSprint || 0;
       } else if (game instanceof SprintGame) {
@@ -284,10 +296,8 @@ export default class ModalStatistic extends BaseComponent {
         statistics.optional.answersAudio = userStatisticApi.optional.answersAudio || {};
         // самая длинная серия правильных ответов
         const rightRangeAllTimeSprint = userStatisticApi.optional.correctAnswersRangeSprint;
-        const rangeMultiplySprint = userStatisticApi.optional.rangeMultiplySprint;
-        const { rightRange, rangeMultiply } = this.updateGameRightRange(rightRangeAllTimeSprint, rangeMultiplySprint);
+        const rightRange = this.updateGameRightRange(rightRangeAllTimeSprint);
         statistics.optional.correctAnswersRangeSprint = rightRange;
-        statistics.optional.rangeMultiplySprint = rangeMultiply;
 
         statistics.optional.correctAnswersRangeAudio = userStatisticApi.optional.correctAnswersRangeAudio || 0;
       }
@@ -321,8 +331,6 @@ export default class ModalStatistic extends BaseComponent {
           answersAudio: answersPerDayAudio,
           correctAnswersRangeSprint: rightRangeSprint,
           correctAnswersRangeAudio: rightRangeAudio,
-          rangeMultiplyAudio: false,
-          rangeMultiplySprint: false,
         },
       };
       if (!statistics.optional) return;
@@ -424,17 +432,6 @@ export default class ModalStatistic extends BaseComponent {
 
 
   drawWord(card: IStatisticAnswer) {
-    /*
-    interface IStatisticAnswer {
-    id: string,
-    audio: string,
-    group: number,
-    image: string,
-    page: number,
-    word: string,
-    wordTranslate: string,
-    answerCorrectness: boolean;
-  } */
     const wordRow = createDiv({
       className: 'game-modal__word-row modal-row',
     });
