@@ -145,8 +145,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['403']) {
       // exit from current user, show login? refresh page
       console.log('REFRESH TOKEN EXPIRED 403 error');
-      // localStorage.clear();
-      // location.reload();
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -175,7 +173,15 @@ class ApiResourceService {
       },
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.getAllUserWords, userId);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getAllUserWords(userId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const userWords: UserWord[] = await rawResponse.json();
@@ -196,7 +202,15 @@ class ApiResourceService {
       body: JSON.stringify(wordBody),
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.createUserWord, userId, wordId, wordBody);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.createUserWord(userId, wordId, wordBody);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const createdWord: UserWord = await rawResponse.json();
@@ -216,7 +230,15 @@ class ApiResourceService {
       },
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.getUserWord, userId, wordId);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getUserWord(userId, wordId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const userWord: UserWord = await rawResponse.json();
@@ -237,7 +259,15 @@ class ApiResourceService {
       body: JSON.stringify(wordBody),
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.updateUserWord, userId, wordId, wordBody);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.updateUserWord(userId, wordId, wordBody);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const updatedUserWord: UserWord = await rawResponse.json();
@@ -256,7 +286,15 @@ class ApiResourceService {
       },
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.deleteUserWord, userId, wordId);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.deleteUserWord(userId, wordId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
   }
 
   // !Users/AggregatedWords
@@ -271,10 +309,8 @@ class ApiResourceService {
     }
     let perPageQuery = '';
     if (wordsPerPage !== undefined) {
-      perPageQuery = `wordsPerPage=${wordsPerPage}&`;
+      perPageQuery = `wordsPerPage=${wordsPerPage}`;
     }
-
-    console.log('queryString', `${users}/${userId}/aggregatedWords?${perPageQuery}filter={"$and": [${groupQuery} ${pageQuery} ${filters}]}`);
 
     const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?${perPageQuery}&filter={"$and": [${groupQuery} ${pageQuery} ${filters}]}`, {
       method: 'GET',
@@ -285,12 +321,19 @@ class ApiResourceService {
       },
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.getAllUserAggregatedWords, userId, filters, wordsPerPage, group, page);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getAllUserAggregatedWords(userId, filters, wordsPerPage, group, page);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const userWordsPagination: PaginatedResults[] = await rawResponse.json();
       const userWords = userWordsPagination[0].paginatedResults;
-
       return userWords;
     } else {
       return rawResponse.status;
@@ -307,7 +350,15 @@ class ApiResourceService {
       },
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.getAggregatedWord, userId, wordId);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getAggregatedWord(userId, wordId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const userWord: UserWord = await rawResponse.json();
@@ -328,7 +379,15 @@ class ApiResourceService {
       },
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.getUserStatistics, userId);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getUserStatistics(userId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const userStatistics: Statistics = await rawResponse.json();
@@ -349,7 +408,15 @@ class ApiResourceService {
       body: JSON.stringify(statisticsBody),
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.updateUserStatistics, userId, statisticsBody);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.updateUserStatistics(userId, statisticsBody);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const updatedUserStatistics: Statistics = await rawResponse.json();
@@ -370,7 +437,15 @@ class ApiResourceService {
       },
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.getUserSettings, userId);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getUserSettings(userId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const userSettings: Settings = await rawResponse.json();
@@ -391,7 +466,15 @@ class ApiResourceService {
       body: JSON.stringify(settingsBody),
     });
 
-    await this.refreshTokenOrExit(rawResponse, this.updateUserSettings, userId, settingsBody);
+    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.updateUserSettings(userId, settingsBody);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
+    }
 
     if (rawResponse.status === APISStatus['200']) {
       const updatedUserSettings: Settings = await rawResponse.json();
@@ -401,21 +484,9 @@ class ApiResourceService {
     }
   }
 
-  async refreshTokenOrExit(response: Response, callbackFn: CallableFunction, ...args: unknown[]) {
-    if (response.status === APISStatus['401'] || response.status === APISStatus['402']) {
-      console.log('response.status', response.status);
-      console.log(' updating new token in refreshTokenOrExit');
-      const tokenResponse = await this.getNewUserTokens(getState().userId);
-
-      if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!');
-
-        await callbackFn(...args);
-      } else {
-        localStorage.clear();
-        console.log('token didn\'t update! Exit User from REGISTRATION and clear local');
-      }
-    }
+  async whenRefreshTokenExpired() {
+    localStorage.clear();
+    console.log('token didn\'t update! Exit User from REGISTRATION and clear local!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
   }
 
 }
