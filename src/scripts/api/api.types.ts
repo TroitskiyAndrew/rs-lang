@@ -36,6 +36,7 @@ export interface WordCard {
   transcription: string,
   word: string,
   wordTranslate: string,
+  userWord?: UserWord,
 }
 
 export interface UserWord {

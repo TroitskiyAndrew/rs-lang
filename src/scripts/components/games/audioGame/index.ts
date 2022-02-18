@@ -82,8 +82,9 @@ export default class AudioGame extends BaseComponent {
     this.showNextQuestion();
 
     // todo testing aggregateWords
-    const aggregatedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', 1000, 2);
-    console.log('aggregatedWords 0 0 30 NOT learned', aggregatedWords);
+    const wordsPerPage = 1000;
+    const aggregatedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', wordsPerPage, 0, undefined);
+    console.log('aggregatedWords 0 group allWords NOT learned', aggregatedWords);
     const statistics = await apiService.getUserStatistics(getState().userId);
     console.log('UserStatistics', statistics);
 
