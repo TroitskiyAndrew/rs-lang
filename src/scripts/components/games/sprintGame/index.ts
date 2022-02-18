@@ -277,14 +277,14 @@ export default class SprintGame extends BaseComponent {
   }
 
   private getGroupAndPage() {
-    console.log(this.options)
+    // console.log(this.options)
     if (this.options) {
       options = JSON.parse (this.options);
       updateState({optionsSprint: this.options})
     } 
     if (options) {
       this.group = options.group;
-      if (options.page) this.page = options.page;
+      if (options.page !== undefined) this.page = options.page;
     } else {
       this.group = JSON.parse (getState().optionsSprint).group;
       //if (JSON.parse (getState().optionsSprint).page) this.page = JSON.parse (getState().optionsSprint).page;
@@ -368,7 +368,7 @@ export default class SprintGame extends BaseComponent {
   }
 
   private getRandomWords(groupWordsArr: IWordParams[], wordsNumber: number) {
-
+    // console.log(groupWordsArr)
     const word = this.elem.querySelector('.eng-word') as HTMLDivElement;
     const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
     const randomWordNumber = getRandom(0, wordsNumber);
@@ -438,7 +438,7 @@ export default class SprintGame extends BaseComponent {
     }
     this.paramsScore!.textContent = `${scoreCounter.score}`;
     // console.log(scoreCounter)
-    if (this.page) {
+    if (this.page !== undefined) {
       if (groupWordsArrMod.length && wordsOnPageLeft) {
         this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
       } else if (!groupWordsArrMod.length) {
@@ -703,7 +703,7 @@ export default class SprintGame extends BaseComponent {
       delete el.translateCorrectness;
       return el
     })
-    if (!this.page) roundResults = roundResults.slice(0, roundResults.length - 1);
+    if (this.page === undefined) roundResults = roundResults.slice(0, roundResults.length - 1);
     this.audioSprint.pause();
     return roundResults;
   }
