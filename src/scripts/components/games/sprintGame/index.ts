@@ -438,7 +438,7 @@ export default class SprintGame extends BaseComponent {
     }
     this.paramsScore!.textContent = `${scoreCounter.score}`;
     // console.log(scoreCounter)
-    if (this.page !== undefined) {
+    if (this.page !== '') {
       if (groupWordsArrMod.length && wordsOnPageLeft) {
         this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
       } else if (!groupWordsArrMod.length) {
