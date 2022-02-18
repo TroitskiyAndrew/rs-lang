@@ -1,6 +1,169 @@
 .home {
   position: relative;
-  span {
-    @include position;
-  }
+  // span {
+  //   @include position;
+  // }
+}
+
+.page.home {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  background-color: #28282B;
+  font-family: 'Super Mario 286(RUS BY LYAJKA)';
+  
+}
+
+.loading {
+  z-index: 5;
+}
+
+// 1. Main view
+// ===================================================================
+
+.main-view-container {
+
+  display: inherit;
+  flex-direction: inherit;
+  align-items: inherit;
+  justify-content: center;
+  min-height: calc(100vh - 78px);
+  width: 100%;
+  -webkit-text-stroke: 1.5px black;
+}
+
+.main-view-container__title {
+  font-family: 'Super Mario Brothers Font';
+  text-transform: uppercase;
+  font-size: 2.6rem;
+  -webkit-text-stroke: 4px black;
+  text-shadow: 10px 10px 0 black;
+  // text-stroke: 4px navy;
+}
+
+.main-view-container__description-wrapper {
+  position: relative;
+  width: 62%;
+  height: 60%;
+}
+
+.description-sub-wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: auto;
+}
+
+.description-sub-wrapper_p {
+  margin: 40px;
+  text-align: center;
+}
+
+.star-img {
+  width: 36px;
+  height: 36px;
+  margin: 2px;
+}
+
+.main-view-container__title_red {
+  color: #f83838;
+}
+
+.main-view-container__title_blue {
+  color: #00d8f8;
+}
+
+.main-view-container__title_yellow {
+  color: #f8c828;
+}
+
+.main-view-container__title_green {
+  color: #00c800;
+}
+
+.star-img {
+  position: absolute;
+  animation-duration: 8s;
+  animation-name: move-star;
+  animation-iteration-count: infinite;
+}
+
+@keyframes move-star {
+  0%   {left:0px; top:0px;}
+  25%  {left:calc(100% - 40px); top:0px;}
+  50%  {left:calc(100% - 40px); top:calc(100% - 40px);}
+  75%  {left:0px; top:calc(100% - 40px);}
+  100% {left:0px; top:0px;}
+}
+
+
+// 2. Team
+// ===================================================================
+
+.team-container {
+  max-width: 62%;
+  -webkit-text-stroke: 1.5px black;
+}
+
+.team-container__title {
+  text-align: center;
+}
+
+.team-container__members-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.member-wrapper__avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+img[class*="member-wrapper__avatar"] {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.member-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: baseline;
+  gap: 15px;
+  padding: 8px;
+  border: 1px solid #ffdb73;
+  border-radius: 5px;
+  width: calc((100% - 40px) / 3);
+  min-width: 140px;
+  text-align: center;
+}
+
+.github-svg {
+  width: 26px;
+  height: 26px;
+}
+
+// 2. Footer
+// ===================================================================
+
+.home-footer {
+  padding: 8px;
+}
+
+.home-footer__school-link {
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.home-footer__school-link:hover {
+  background-color: #ffdb73;  
+  -webkit-text-stroke: 0px black;
 }
