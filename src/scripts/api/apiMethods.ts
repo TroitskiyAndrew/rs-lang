@@ -175,10 +175,7 @@ class ApiResourceService {
       },
     });
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getAllUserWords(userId);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.getAllUserWords, userId);
 
     if (rawResponse.status === APISStatus['200']) {
       const userWords: UserWord[] = await rawResponse.json();
@@ -199,11 +196,7 @@ class ApiResourceService {
       body: JSON.stringify(wordBody),
     });
 
-
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.createUserWord(userId, wordId, wordBody);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.createUserWord, userId, wordId, wordBody);
 
     if (rawResponse.status === APISStatus['200']) {
       const createdWord: UserWord = await rawResponse.json();
@@ -223,10 +216,7 @@ class ApiResourceService {
       },
     });
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getUserWord(userId, wordId);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.getUserWord, userId, wordId);
 
     if (rawResponse.status === APISStatus['200']) {
       const userWord: UserWord = await rawResponse.json();
@@ -247,10 +237,7 @@ class ApiResourceService {
       body: JSON.stringify(wordBody),
     });
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.updateUserWord(userId, wordId, wordBody);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.updateUserWord, userId, wordId, wordBody);
 
     if (rawResponse.status === APISStatus['200']) {
       const updatedUserWord: UserWord = await rawResponse.json();
@@ -269,19 +256,27 @@ class ApiResourceService {
       },
     });
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.deleteUserWord(userId, wordId);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.deleteUserWord, userId, wordId);
   }
 
   // !Users/AggregatedWords
-  async getAllUserAggregatedWords(userId: string, group: number, page: number, wordsPerPage: number, filters: string): Promise<PaginatedResults | number> {
-    // const group = getState().aggregatedWords.group ? `&group=${getState().aggregatedWords.group}` : '';
-    // const page = getState().aggregatedWords.page ? `&page=${getState().aggregatedWords.page}` : '';
-    // const wordsPerPage = getState().aggregatedWords.wordsPerPage ? `&wordsPerPage=${getState().aggregatedWords.wordsPerPage}` : '';
-    // const filters = getState().aggregatedWords.filter ? `&filter=${getState().aggregatedWords.filter}` : '';
-    const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?wordsPerPage=${wordsPerPage}&filter={"$and": [{"group": ${group}}, {"page": ${page}}, ${filters}]}`, {
+  async getAllUserAggregatedWords(userId: string, filters: string, wordsPerPage?: number, group?: number, page?: number): Promise<PaginatedResults | number> {
+    let pageQuery = '';
+    if (page !== undefined) {
+      pageQuery = `{"page": ${page}},`;
+    }
+    let groupQuery = '';
+    if (group !== undefined) {
+      groupQuery = `{"group": ${group}},`;
+    }
+    let perPageQuery = '';
+    if (wordsPerPage !== undefined) {
+      perPageQuery = `wordsPerPage=${wordsPerPage}&`;
+    }
+
+    console.log('queryString', `${users}/${userId}/aggregatedWords?${perPageQuery}filter={"$and": [${groupQuery} ${pageQuery} ${filters}]}`);
+
+    const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?${perPageQuery}&filter={"$and": [${groupQuery} ${pageQuery} ${filters}]}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getState().token}`,
@@ -289,19 +284,8 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    /*     const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?group=${group}&page=${page}&wordsPerPage=${wordsPerPage}${filters}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${getState().token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }); */
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getAllUserAggregatedWords(userId, group, page, wordsPerPage, filters);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.getAllUserAggregatedWords, userId, group, page, wordsPerPage, filters);
 
     if (rawResponse.status === APISStatus['200']) {
       const userWords: PaginatedResults = await rawResponse.json();
@@ -321,10 +305,7 @@ class ApiResourceService {
       },
     });
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getAggregatedWord(userId, wordId);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.getAggregatedWord, userId, wordId);
 
     if (rawResponse.status === APISStatus['200']) {
       const userWord: UserWord = await rawResponse.json();
@@ -345,10 +326,7 @@ class ApiResourceService {
       },
     });
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getUserStatistics(userId);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.getUserStatistics, userId);
 
     if (rawResponse.status === APISStatus['200']) {
       const userStatistics: Statistics = await rawResponse.json();
@@ -369,10 +347,7 @@ class ApiResourceService {
       body: JSON.stringify(statisticsBody),
     });
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.updateUserStatistics(userId, statisticsBody);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.updateUserStatistics, userId, statisticsBody);
 
     if (rawResponse.status === APISStatus['200']) {
       const updatedUserStatistics: Statistics = await rawResponse.json();
@@ -393,10 +368,7 @@ class ApiResourceService {
       },
     });
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getUserSettings(userId);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.getUserSettings, userId);
 
     if (rawResponse.status === APISStatus['200']) {
       const userSettings: Settings = await rawResponse.json();
@@ -417,10 +389,7 @@ class ApiResourceService {
       body: JSON.stringify(settingsBody),
     });
 
-    if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.updateUserSettings(userId, settingsBody);
-    }
+    await this.refreshTokenOrExit(rawResponse, this.updateUserSettings, userId, settingsBody);
 
     if (rawResponse.status === APISStatus['200']) {
       const updatedUserSettings: Settings = await rawResponse.json();
@@ -429,6 +398,24 @@ class ApiResourceService {
       return rawResponse.status;
     }
   }
+
+  async refreshTokenOrExit(response: Response, callbackFn: CallableFunction, ...args: unknown[]) {
+    if (response.status === APISStatus['401'] || response.status === APISStatus['402']) {
+      console.log('response.status', response.status);
+      console.log(' updating new token in refreshTokenOrExit');
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!');
+
+        await callbackFn(...args);
+      } else {
+        localStorage.clear();
+        console.log('token didn\'t update! Exit User from REGISTRATION and clear local');
+      }
+    }
+  }
+
 }
 
 export const apiService = new ApiResourceService();
