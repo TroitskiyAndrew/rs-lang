@@ -1,10 +1,10 @@
 export const APISStatus = {
-  'ok': 200,
+  '200': 200,
   '401': 401,
   '402': 402,
   '403': 403,
 };
-export interface User {
+export interface IUser {
   name?: string,
   email: string,
   password: string;
@@ -36,6 +36,7 @@ export interface WordCard {
   transcription: string,
   word: string,
   wordTranslate: string,
+  userWord?: UserWord,
 }
 
 export interface UserWord {
@@ -47,6 +48,8 @@ export interface UserWord {
     word?: string,
     correctAnswersAllTime?: number,
     answersAllTime?: number,
+    newAtDay?: string,
+    learnedAtDay?: string | boolean,
   },
 }
 export interface PaginatedResults {
@@ -59,13 +62,17 @@ export interface PaginatedResults {
 }
 export interface Statistics {
   learnedWords?: number,
-  optional?: {
+  optional: {
     correctAnswersSprint?: DateNumber,
     correctAnswersAudio?: DateNumber,
     answersSprint?: DateNumber,
     answersAudio?: DateNumber,
     correctAnswersRangeSprint?: number,
     correctAnswersRangeAudio?: number,
+    rangeMultiplyAudio?: boolean,
+    rangeMultiplySprint?: boolean,
+    newWordsPerDate?: DateNumber,
+    learnedWordsPerDate?: DateNumber,
   };
 }
 export interface DateNumber {

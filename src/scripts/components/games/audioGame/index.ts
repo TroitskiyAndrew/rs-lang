@@ -5,6 +5,7 @@ import { apiService, baseUrl } from '../../../api/apiMethods';
 // import { updateState, getState } from '../../../state';
 import constants from '../../../app.constants';
 import { WordCard } from '../../../api/api.types';
+import { getState } from '../../../state';
 
 
 interface IState {
@@ -79,6 +80,15 @@ export default class AudioGame extends BaseComponent {
       totalQuestionSpan.textContent = '/20';
     }
     this.showNextQuestion();
+
+    // todo testing aggregateWords
+    if (getState().userId) {
+      // const wordsPerPage = 1000;
+      // const aggregatedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', wordsPerPage, 0, undefined);
+      // console.log('aggregatedWords 0 group allWords NOT learned', aggregatedWords);
+      const statistics = await apiService.getUserStatistics(getState().userId);
+      console.log('UserStatistics', statistics);
+    }
 
     return Promise.resolve();
   }

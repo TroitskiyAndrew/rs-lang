@@ -1,3 +1,18 @@
 // -----------------------------------------------------------------------------
 // This file contains all @font-face declarations, if any.
 // -----------------------------------------------------------------------------
+
+@font-face {
+  font-family: 'Super Mario World Text Box';
+  src: URL('/src/assets/fonts/SuperMarioWorldTextBoxRegular-Y86j.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Super Mario Brothers Font';
+  src: URL('/src/assets/fonts/SuperMarioBrothers-4nmp.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Super Mario 286(RUS BY LYAJKA)';
+  src: URL('/src/assets/fonts/supermario286rusbylyajka.otf') format('truetype');
+}
