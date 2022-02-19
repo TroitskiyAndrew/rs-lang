@@ -6,6 +6,7 @@ type Constnts = {
   learnedGroup: number;
   minWordsPage: number;
   maxWordsPage: number;
+  maxWordsOnPage: number;
   answersInAudioGame: number;
   hundred: number;
   wordCommonRightRange: number;
@@ -21,6 +22,7 @@ const constants: Constnts = {
   learnedGroup: 7,
   minWordsPage: 0,
   maxWordsPage: 29,
+  maxWordsOnPage: 1000,
   answersInAudioGame: 4,
   hundred: 100,
   wordCommonRightRange: 3,

@@ -42,6 +42,8 @@ export default class PageDictionary extends BaseComponent {
 
   updating = false;
 
+  userId = '';
+
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'pageDictionary';
@@ -108,6 +110,7 @@ export default class PageDictionary extends BaseComponent {
     this.learnedWordsCount = 0;
     this.removeWords();
     const state = getState();
+    this.userId = state.userId;
     this.currGroup = state.dictionaryGroup;
     this.currPage = state.dictionaryPage;
     this.pageCode = `g${this.currGroup}p${this.currPage}`;
@@ -121,13 +124,17 @@ export default class PageDictionary extends BaseComponent {
 
     this.updateButtons();
 
-    const wordsList = apiService.getChunkOfWords(this.currPage, this.currGroup);
-    return wordsList.then((list: WordCard[]): void => {
+    const wordsList = this.currGroup <= constants.maxWordsGroup ? apiService.getChunkOfWords(this.currPage, this.currGroup) :
+      apiService.getAllUserAggregatedWords(this.userId, this.currGroup === constants.difficultGroup ? '{"userWord.difficulty":"difficult"}' : '{"userWord.optional.learned":true}', constants.maxWordsOnPage);
+    return wordsList.then((list: WordCard[] | number): void => {
+      if (typeof list === 'number') {
+        return;
+      }
       const words = new DocumentFragment;
 
       this.wordsOnPage = list.length;
       for (const word of list) {
-        const newWord = createDiv({ className: 'dictionary__word', dataSet: { widget: 'wordsCard', wordId: word.id } });
+        const newWord = createDiv({ className: 'dictionary__word', dataSet: { widget: 'wordsCard', wordId: word.id || word._id as string } });
         newWord.style.transitionDuration = stepTime;
         updateContent(newWord, newWord.getAttribute('data-widget') as string);
         this.wordElems.push(newWord);
@@ -135,7 +142,7 @@ export default class PageDictionary extends BaseComponent {
       }
       this.setGoInput();
       this.setPaginator();
-      this.backGround.style.width = `${(this.wordElems.length || Number('20')) * constants.hundred}%`;
+      this.backGround.style.width = `${(this.wordElems.length) * constants.hundred}%`;
       this.wordsHolder?.append(words);
       this.go(0);
 

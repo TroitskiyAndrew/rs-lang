@@ -53,9 +53,6 @@ export default class WordsCard extends BaseComponent {
   }
 
   public async oninit(): Promise<void> {
-    if (this.userId) {
-      this.elem.classList.add('_authorized');
-    }
     const word = await apiService.getWord(this.wordId);
     const match = word.image.match(/\d*_\d*/);
 
@@ -72,20 +69,23 @@ export default class WordsCard extends BaseComponent {
     this.img.src = `${baseUrl}/files/${this.file}.jpg`;
 
 
-    const userWord = await apiService.getUserWord(this.userId, this.wordId);
+    if (this.userId) {
+      this.elem.classList.add('_authorized');
+      const userWord = await apiService.getUserWord(this.userId, this.wordId);
 
-    if (typeof userWord !== 'number') {
-      this.wordBody.difficulty = userWord.difficulty;
-      this.wordBody.optional = userWord.optional;
-      this.changeStatus();
+      if (typeof userWord !== 'number') {
+        this.wordBody.difficulty = userWord.difficulty;
+        this.wordBody.optional = userWord.optional;
+        this.changeStatus();
 
-    } else {
-      this.wordBody.optional.word = word.word;
-      apiService.createUserWord(this.userId, this.wordId, this.wordBody).then();
-    }
+      } else {
+        this.wordBody.optional.word = word.word;
+        apiService.createUserWord(this.userId, this.wordId, this.wordBody).then();
+      }
 
-    if (this.wordBody.optional.learned) {
-      this.wordStatusChange(true);
+      if (this.wordBody.optional.learned) {
+        this.wordStatusChange(true);
+      }
     }
     return Promise.resolve();
   }
@@ -185,6 +185,9 @@ export default class WordsCard extends BaseComponent {
 
   private togglelearned(): void {
     this.wordBody.optional.learned = !this.wordBody.optional.learned;
+    if (this.wordBody.optional.learned) {
+      this.wordBody.difficulty = 'common';
+    }
     apiService.updateUserWord(this.userId, this.wordId, this.wordBody);
     this.changeStatus();
     this.wordStatusChange(this.wordBody.optional.learned);
