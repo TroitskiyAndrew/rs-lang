@@ -1,11 +1,9 @@
 export const APISStatus = {
-  'ok': 200,
+  '200': 200,
+  '401': 401,
+  '402': 402,
+  '403': 403,
 };
-// export enum APISStatus {
-//   ok = 200,
-//   stopped = 'stopped',
-//   drive = 'drive',
-// }
 export interface User {
   name?: string,
   email: string,
@@ -38,13 +36,20 @@ export interface WordCard {
   transcription: string,
   word: string,
   wordTranslate: string,
+  userWord?: UserWord,
 }
+
 export interface UserWord {
-  difficulty: 'common' | 'difficult',
+  difficulty?: 'common' | 'difficult' | string,
   optional?: {
-    new: boolean,
-    learned: boolean,
-    rightRange: number,
+    new?: boolean,
+    learned?: boolean,
+    rightRange?: number,
+    word?: string,
+    correctAnswersAllTime?: number,
+    answersAllTime?: number,
+    newAtDay?: string,
+    learnedAtDay?: string | boolean,
   };
 }
 export interface PaginatedResults {
@@ -56,14 +61,30 @@ export interface PaginatedResults {
   ];
 }
 export interface Statistics {
-  learnedWords: number,
-  optional?: {
-    [key: string]: string | boolean;
+  learnedWords?: number,
+  optional: {
+    correctAnswersSprint?: DateNumber,
+    correctAnswersAudio?: DateNumber,
+    answersSprint?: DateNumber,
+    answersAudio?: DateNumber,
+    correctAnswersRangeSprint?: number,
+    correctAnswersRangeAudio?: number,
+    rangeMultiplyAudio?: boolean,
+    rangeMultiplySprint?: boolean,
+    newWordsPerDate?: DateNumber,
+    learnedWordsPerDate?: DateNumber,
   };
 }
+export interface DateNumber {
+  [x: string]: number;
+}
+export interface DateBoolean {
+  [x: string]: boolean;
+}
 
-/* export enum EEngineStatus {
-  started = 'started',
-  stopped = 'stopped',
-  drive = 'drive',
-} */
+export interface Settings {
+  wordsPerDay?: number,
+  optional?: {
+    [key: string]: string | boolean | number;
+  };
+}

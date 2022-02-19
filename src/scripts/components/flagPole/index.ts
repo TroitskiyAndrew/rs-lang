@@ -44,10 +44,11 @@ export default class FlagPole extends BaseComponent {
   }
 
   public listenEvents(): void {
-    (this.flagPole as HTMLInputElement).addEventListener('input', this.groupChangeFromFlag.bind(this));
+    (this.flagPole as HTMLInputElement).addEventListener('input', this.moveFlag.bind(this));
+    (this.flagPole as HTMLInputElement).addEventListener('change', this.valueSelected.bind(this));
   }
 
-  groupChangeFromFlag() {
+  moveFlag() {
     const number = this.elem.querySelector('.flagPole-zone__number') as HTMLDivElement;
     const flagPole = this.flagPole as HTMLInputElement;
     const basicBottomPosition = 40;
@@ -66,6 +67,9 @@ export default class FlagPole extends BaseComponent {
       }
     }
 
+  }
+
+  valueSelected() {
     this.sendEvent('change-flag');
   }
 
