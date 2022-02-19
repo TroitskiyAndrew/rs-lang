@@ -393,7 +393,7 @@ export default class SprintGame extends BaseComponent {
 
     groupWordsArrMod.splice(randomWordNumber, 1);
     wordsOnPageLeft -= 1;
-    this.startTimer();
+    // this.startTimer();
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
