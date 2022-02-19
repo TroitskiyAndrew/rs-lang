@@ -12,7 +12,7 @@ const GROUP_WORDS_NUMBER = 600;
 const PAGE_WORDS_NUMBER = 20;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
 const MAX_SCORE_MULTIPLYER = 8;
-const TIME_FOR_GAME_MILISECONDS = 60000;
+const TIME_FOR_GAME_MILISECONDS = 10000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 
 let options: IGameOptions;
@@ -32,6 +32,7 @@ let audioIsPlaying = false;
 let coinCounter: number = 0;
 let wordsArrNumber: number;
 let wordsOnPageLeft: number;
+let cutRoundResults = false;
 
 export default class SprintGame extends BaseComponent {
 
@@ -298,6 +299,7 @@ export default class SprintGame extends BaseComponent {
         if (Math.round(delta / 1000) === 0) {
           // console.log(0)
           this.paramsTime!.innerHTML = `time<br> 0`;
+          cutRoundResults = true;
           this.stopTimer()
           this.showModalStatistics()
         } else {
@@ -529,6 +531,7 @@ export default class SprintGame extends BaseComponent {
       multiplyerIntermediateCounter: 0,
     };
     roundResults = [];
+    cutRoundResults = false;
     this.stopTimer();
   }
 
@@ -540,6 +543,7 @@ export default class SprintGame extends BaseComponent {
       multiplyerIntermediateCounter: 0,
     };
     roundResults = [];
+    cutRoundResults = false;
     this.gamepadWrapper!.style.visibility = 'visible';
     this.wordsWrapper!.style.visibility = 'visible';
     groupWordsArrMod = groupWordsArr.slice();
@@ -703,7 +707,7 @@ export default class SprintGame extends BaseComponent {
       delete el.translateCorrectness;
       return el
     })
-    if (this.page === undefined) roundResults = roundResults.slice(0, roundResults.length - 1);
+    if (cutRoundResults) roundResults = roundResults.slice(0, roundResults.length - 1);
     this.audioSprint.pause();
     return roundResults;
   }
