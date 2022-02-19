@@ -125,7 +125,7 @@ export default class PageDictionary extends BaseComponent {
     this.updateButtons();
 
     const wordsList = this.currGroup <= constants.maxWordsGroup ? apiService.getChunkOfWords(this.currPage, this.currGroup) :
-      apiService.getAllUserAggregatedWords(this.userId, this.currGroup === constants.difficultGroup ? '{"userWord.difficulty":"difficult"}' : '{"userWord.optional.learned":true}', constants.maxWordsOnPage);
+      apiService.getAllUserAggregatedWords(this.userId, this.currGroup === constants.difficultGroup ? '{"userWord.difficulty":"difficult"}' : '{"userWord.optional.learned":true}');
     return wordsList.then((list: WordCard[] | number): void => {
       if (typeof list === 'number') {
         return;
