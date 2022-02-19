@@ -2,6 +2,7 @@ import BaseComponent from '../base';
 import { createSpan, createDiv, createInput, createButton } from '../../utils';
 import { apiService } from '../../api/apiMethods';
 import { updateState, getState } from '../../state';
+import { updateContent } from '../../rooting';
 // import '../../api/testingApiMethods';
 
 export default class User extends BaseComponent {
@@ -28,7 +29,7 @@ export default class User extends BaseComponent {
 
   constructor(elem: HTMLElement) {
     super(elem);
-    this.name = 'user';
+    this.name = 'userRegister';
   }
 
   public createHTML(): void {
@@ -257,24 +258,23 @@ export default class User extends BaseComponent {
     if (this.verifyUser()) {
       const email = this.verifyUser()?.email as string;
       const password = this.verifyUser()?.password as string;
-      try {
-        await apiService.loginUser({ email, password });
+      const loginStatus = await apiService.loginUser({ email, password });
 
+      if (typeof (loginStatus) !== 'number') {
         updateState({
           userEmail: email,
           userPassword: password,
         });
         this.closeModalWindow();
         this.disableLogo();
-
-      } catch (error) {
+      } else {
         const existWarning = this.elem.querySelector('.form-exist__warning') as HTMLElement;
         existWarning.textContent = 'Incorrect e-mail or password!';
         existWarning.classList.add('active');
-        // console.log('Incorrect e-mail or password!');
+        console.log('Incorrect e-mail or password!');
         return;
-
       }
+
     }
   }
 
@@ -284,34 +284,35 @@ export default class User extends BaseComponent {
   }
 
   disableLogo(): void {
-    if (this.logoUser) {
-      this.logoUser.innerHTML = '';
-      const userName = createSpan({
-        className: 'modal-user__userName',
-        text: getState().userName,
-      });
-      this.logoUser.style.pointerEvents = 'none';
-      this.logoUser.append(userName);
+    if (!this.logoUser) return;
+    this.logoUser.innerHTML = '';
+    const userName = createSpan({
+      className: 'modal-user__userName',
+      text: getState().userName,
+    });
+    this.logoUser.style.pointerEvents = 'none';
+    this.logoUser.append(userName);
 
-      const logOutBtn = createButton({
-        className: 'modal-user__logoutBtn icon-button',
-      });
+    const logOutBtn = createButton({
+      className: 'modal-user__logoutBtn icon-button',
+    });
 
-      this.elem.prepend(logOutBtn);
-      logOutBtn.onclick = () => {
-        localStorage.clear();
-        location.reload();
-      };
+    this.elem.prepend(logOutBtn);
+    logOutBtn.onclick = User.logOutUser;
+  }
 
-    }
+  static logOutUser() {
+    localStorage.clear();
+    updateContent(document.querySelector('.header__user') as HTMLElement, 'user');
+    console.log('Exit User from REGISTRATION and clear local!!');
   }
 
   togglePasswordView(e: Event): void {
-    if (this.inputPassword) {
-      const type = this.inputPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-      this.inputPassword.setAttribute('type', type);
-      (e.target as HTMLElement).classList.toggle('fa-eye-slash');
-    }
+    if (!this.inputPassword) return;
+    const type = this.inputPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+    this.inputPassword.setAttribute('type', type);
+    (e.target as HTMLElement).classList.toggle('fa-eye-slash');
+
   }
 
   toggleRegisterModal(): void {
