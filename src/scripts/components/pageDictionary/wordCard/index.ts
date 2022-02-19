@@ -179,6 +179,9 @@ export default class WordsCard extends BaseComponent {
 
   private toggleDifficult(): void {
     this.wordBody.difficulty = this.wordBody.difficulty === 'common' ? 'difficult' : 'common';
+    if (this.wordBody.difficulty === 'difficult') {
+      this.wordBody.optional.learned = false;
+    }
     apiService.updateUserWord(this.userId, this.wordId, this.wordBody);
     this.changeStatus();
   }
