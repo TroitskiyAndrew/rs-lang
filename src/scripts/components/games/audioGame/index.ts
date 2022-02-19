@@ -67,7 +67,26 @@ export default class AudioGame extends BaseComponent {
 
     // получаю с АПИ данные
     // todo новые слова перезаписать ТУТ!, которые придут не связанные с группой
-    await this.setAllQuestionWordsToState();
+    // Если групп 6 (сложные слова), то запрос агрегейтед на них
+    const hardsWordGroup = 6;
+    if (this.group === hardsWordGroup) {
+      console.log('groupe with hard words');
+      const wordsPerPage = 100;
+      const difficultWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}', wordsPerPage);
+      console.log('difficultWords', difficultWords);
+
+    } else {
+      // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
+      console.log('te4s');
+
+
+      // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
+
+      // если группа от 0 до 5 БЕЗ флага fromDictionary, то все слова со страницы
+      await this.setAllQuestionWordsToState();
+    }
+
+    // создаем массив из слов-перевода, который НЕ включает слова с вопросов
     await this.setAllTranslateWordsToState();
     console.log('this.wordsFromAPI', this.wordsFromAPI);
 
@@ -81,7 +100,7 @@ export default class AudioGame extends BaseComponent {
     }
     this.showNextQuestion();
 
-    // todo testing aggregateWords
+    // todo testing aggregateWords and statistics
     if (getState().userId) {
       // const wordsPerPage = 1000;
       // const aggregatedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', wordsPerPage, 0, undefined);
@@ -100,12 +119,13 @@ export default class AudioGame extends BaseComponent {
       this.page = options.page;
     }
     this.group = getRandom(constants.minWordsGroup, constants.maxWordsGroup);
+
     if (options.group) {
       this.group = +options.group;
     }
     // todo delete
     this.page = 0;
-    this.group = 0;
+    this.group = 6;
 
     console.log('this.page', this.page);
     console.log('this.group', this.group);
@@ -162,9 +182,6 @@ export default class AudioGame extends BaseComponent {
     audioGameContainer.append(audioGameContent);
 
     audioPage.append(audioGameContainer);
-
-    // todo temporary show modal
-    // this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
@@ -361,9 +378,12 @@ export default class AudioGame extends BaseComponent {
 
   async setAllTranslateWordsToState(): Promise<void> {
     if (this.group !== undefined) {
-      const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(this.group))
+      const hardWordsGroup = 6;
+      const maxCommonGroupNumber = 5;
+      const commonGroup = getRandom(0, maxCommonGroupNumber);
+      const group = this.group >= hardWordsGroup ? commonGroup : this.group;
+      const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(group))
         .map(elem => elem.wordTranslate);
-      // todo новые слова перепроверить ТУТ!, которые придут не связанные с группой
       const filterWordsOfCurrentGroup = this.wordsFromAPI.questionWords?.map(card => {
         return card.wordTranslate;
       });
@@ -411,7 +431,6 @@ export default class AudioGame extends BaseComponent {
   }
 
   giveDataToModalStatistic(): IStatisticAnswer[] {
-    // return this.fake();
     return this.answersArray;
   }
 
@@ -421,120 +440,5 @@ export default class AudioGame extends BaseComponent {
     this.answersArray = [];
     (this.nextBtn as HTMLElement).style.pointerEvents = 'auto';
     this.showNextQuestion();
-  }
-
-  private fake() {
-    return [
-      {
-        answerCorrectness: false,
-        audio: 'files/10_0192.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0192.jpg',
-        page: 9,
-        word: 'immediate',
-        wordTranslate: 'немедленно',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0191.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0191.jpg',
-        page: 9,
-        word: 'unknown_2',
-        wordTranslate: 'неизвестно_2',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0191.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0191.jpg',
-        page: 9,
-        word: 'unknown_2',
-        wordTranslate: 'неизвестно_2',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0191.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0191.jpg',
-        page: 9,
-        word: 'unknown_2',
-        wordTranslate: 'неизвестно_2',
-      },
-      {
-        answerCorrectness: false,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: false,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-    ];
   }
 }
