@@ -4,7 +4,7 @@ export const APISStatus = {
   '402': 402,
   '403': 403,
 };
-export interface User {
+export interface IUser {
   name?: string,
   email: string,
   password: string;
@@ -36,11 +36,13 @@ export interface WordCard {
   transcription: string,
   word: string,
   wordTranslate: string,
+  userWord?: UserWord,
+  _id?: string,
 }
 
 export interface UserWord {
   difficulty?: 'common' | 'difficult' | string,
-  optional?: {
+  optional: {
     new?: boolean,
     learned?: boolean,
     rightRange?: number,
@@ -49,7 +51,7 @@ export interface UserWord {
     answersAllTime?: number,
     newAtDay?: string,
     learnedAtDay?: string | boolean,
-  };
+  },
 }
 export interface PaginatedResults {
   paginatedResults: WordCard[],

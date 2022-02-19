@@ -1,6 +1,7 @@
-import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, APISStatus, Settings } from './api.types';
+import { IUser, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, APISStatus, Settings } from './api.types';
 import { updateState, getState } from '../state';
 import constants from '../app.constants';
+import User from '../components/user';
 
 // export const baseUrl = 'http://127.0.0.1:3000';
 export const baseUrl = 'https://rs-learning-words.herokuapp.com';
@@ -41,7 +42,7 @@ class ApiResourceService {
   }
 
   // !User
-  async createUser(user: User): Promise<void | number> {
+  async createUser(user: IUser): Promise<void | number> {
     const rawResponse = await fetch(`${users}`, {
       method: 'POST',
       headers: {
@@ -57,7 +58,7 @@ class ApiResourceService {
     }
   }
 
-  async loginUser(user: User): Promise<Authorization | number> {
+  async loginUser(user: IUser): Promise<Authorization | number> {
     const rawResponse = await fetch(`${signIn}`, {
       method: 'POST',
       headers: {
@@ -98,7 +99,7 @@ class ApiResourceService {
     }
   }
 
-  async updateUser(userId: string, user: User): Promise<User | number> {
+  async updateUser(userId: string, user: IUser): Promise<IUser | number> {
     const rawResponse = await fetch(`${users}/${userId}`, {
       method: 'PUT',
       headers: {
@@ -109,7 +110,7 @@ class ApiResourceService {
       body: JSON.stringify(user),
     });
     if (rawResponse.status === APISStatus['200']) {
-      const updatedUser: User = await rawResponse.json();
+      const updatedUser: IUser = await rawResponse.json();
       return updatedUser;
     } else {
       return rawResponse.status;
@@ -145,8 +146,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['403']) {
       // exit from current user, show login? refresh page
       console.log('REFRESH TOKEN EXPIRED 403 error');
-      // localStorage.clear();
-      // location.reload();
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -176,8 +175,13 @@ class ApiResourceService {
     });
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getAllUserWords(userId);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getAllUserWords(userId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -199,10 +203,14 @@ class ApiResourceService {
       body: JSON.stringify(wordBody),
     });
 
-
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.createUserWord(userId, wordId, wordBody);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.createUserWord(userId, wordId, wordBody);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -224,8 +232,13 @@ class ApiResourceService {
     });
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getUserWord(userId, wordId);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getUserWord(userId, wordId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -248,8 +261,13 @@ class ApiResourceService {
     });
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.updateUserWord(userId, wordId, wordBody);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.updateUserWord(userId, wordId, wordBody);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -270,18 +288,29 @@ class ApiResourceService {
     });
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.deleteUserWord(userId, wordId);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.deleteUserWord(userId, wordId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
   }
 
   // !Users/AggregatedWords
-  async getAllUserAggregatedWords(userId: string, group: number, page: number, wordsPerPage: number, filters: string): Promise<PaginatedResults | number> {
-    // const group = getState().aggregatedWords.group ? `&group=${getState().aggregatedWords.group}` : '';
-    // const page = getState().aggregatedWords.page ? `&page=${getState().aggregatedWords.page}` : '';
-    // const wordsPerPage = getState().aggregatedWords.wordsPerPage ? `&wordsPerPage=${getState().aggregatedWords.wordsPerPage}` : '';
-    // const filters = getState().aggregatedWords.filter ? `&filter=${getState().aggregatedWords.filter}` : '';
-    const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?wordsPerPage=${wordsPerPage}&filter={"$and": [{"group": ${group}}, {"page": ${page}}, ${filters}]}`, {
+  async getAllUserAggregatedWords(userId: string, filters: string, wordsPerPage?: number, group?: number, page?: number): Promise<WordCard[] | number> {
+    let pageQuery = '';
+    if (page !== undefined) {
+      pageQuery = `{"page": ${page}},`;
+    }
+    let groupQuery = '';
+    if (group !== undefined) {
+      groupQuery = `{"group": ${group}},`;
+    }
+    const perPageQuery = `wordsPerPage=${wordsPerPage || constants.maxWordsOnPage}`;
+
+    const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?${perPageQuery}&filter={"$and": [${groupQuery} ${pageQuery} ${filters}]}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getState().token}`,
@@ -289,22 +318,20 @@ class ApiResourceService {
         'Content-Type': 'application/json',
       },
     });
-    /*     const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?group=${group}&page=${page}&wordsPerPage=${wordsPerPage}${filters}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${getState().token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }); */
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getAllUserAggregatedWords(userId, group, page, wordsPerPage, filters);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getAllUserAggregatedWords(userId, filters, wordsPerPage, group, page);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
-      const userWords: PaginatedResults = await rawResponse.json();
+      const userWordsPagination: PaginatedResults[] = await rawResponse.json();
+      const userWords = userWordsPagination[0].paginatedResults;
       return userWords;
     } else {
       return rawResponse.status;
@@ -322,8 +349,13 @@ class ApiResourceService {
     });
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getAggregatedWord(userId, wordId);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getAggregatedWord(userId, wordId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -346,8 +378,13 @@ class ApiResourceService {
     });
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getUserStatistics(userId);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getUserStatistics(userId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -370,8 +407,13 @@ class ApiResourceService {
     });
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.updateUserStatistics(userId, statisticsBody);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.updateUserStatistics(userId, statisticsBody);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -394,8 +436,13 @@ class ApiResourceService {
     });
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.getUserSettings(userId);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.getUserSettings(userId);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -418,8 +465,13 @@ class ApiResourceService {
     });
 
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
-      await this.getNewUserTokens(getState().userId);
-      this.updateUserSettings(userId, settingsBody);
+      const tokenResponse = await this.getNewUserTokens(getState().userId);
+      if (typeof (tokenResponse) !== 'number') {
+        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        await this.updateUserSettings(userId, settingsBody);
+      } else {
+        this.whenRefreshTokenExpired();
+      }
     }
 
     if (rawResponse.status === APISStatus['200']) {
@@ -429,6 +481,13 @@ class ApiResourceService {
       return rawResponse.status;
     }
   }
+
+  async whenRefreshTokenExpired() {
+    localStorage.clear();
+    User.logOutUser();
+    console.log('token didn\'t update! Exit User from REGISTRATION and clear local!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+  }
+
 }
 
 export const apiService = new ApiResourceService();
