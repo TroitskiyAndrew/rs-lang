@@ -1,6 +1,7 @@
-import { User, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, APISStatus, Settings } from './api.types';
+import { IUser, Authorization, WordCard, UserId, UserWord, PaginatedResults, Statistics, APISStatus, Settings } from './api.types';
 import { updateState, getState } from '../state';
 import constants from '../app.constants';
+import User from '../components/user';
 
 // export const baseUrl = 'http://127.0.0.1:3000';
 export const baseUrl = 'https://rs-learning-words.herokuapp.com';
@@ -41,7 +42,7 @@ class ApiResourceService {
   }
 
   // !User
-  async createUser(user: User): Promise<void | number> {
+  async createUser(user: IUser): Promise<void | number> {
     const rawResponse = await fetch(`${users}`, {
       method: 'POST',
       headers: {
@@ -57,7 +58,7 @@ class ApiResourceService {
     }
   }
 
-  async loginUser(user: User): Promise<Authorization | number> {
+  async loginUser(user: IUser): Promise<Authorization | number> {
     const rawResponse = await fetch(`${signIn}`, {
       method: 'POST',
       headers: {
@@ -98,7 +99,7 @@ class ApiResourceService {
     }
   }
 
-  async updateUser(userId: string, user: User): Promise<User | number> {
+  async updateUser(userId: string, user: IUser): Promise<IUser | number> {
     const rawResponse = await fetch(`${users}/${userId}`, {
       method: 'PUT',
       headers: {
@@ -109,7 +110,7 @@ class ApiResourceService {
       body: JSON.stringify(user),
     });
     if (rawResponse.status === APISStatus['200']) {
-      const updatedUser: User = await rawResponse.json();
+      const updatedUser: IUser = await rawResponse.json();
       return updatedUser;
     } else {
       return rawResponse.status;
@@ -486,6 +487,7 @@ class ApiResourceService {
 
   async whenRefreshTokenExpired() {
     localStorage.clear();
+    User.logOutUser();
     console.log('token didn\'t update! Exit User from REGISTRATION and clear local!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
   }
 

@@ -4,7 +4,7 @@ export const APISStatus = {
   '402': 402,
   '403': 403,
 };
-export interface User {
+export interface IUser {
   name?: string,
   email: string,
   password: string;
