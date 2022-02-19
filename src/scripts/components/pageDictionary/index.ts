@@ -112,8 +112,7 @@ export default class PageDictionary extends BaseComponent {
     this.currPage = state.dictionaryPage;
     this.pageCode = `g${this.currGroup}p${this.currPage}`;
     this.updateSelectOption();
-    this.gamesButtonsControl(false);
-    const wordsList = apiService.getChunkOfWords(this.currPage, this.currGroup);
+    this.gamesButtonsControl(this.currGroup == constants.learnedGroup);
     const ms = 1000;
     const stepTime = `${constants.junmpAnimationTimeDictionary / ms}s`;
 
@@ -122,6 +121,7 @@ export default class PageDictionary extends BaseComponent {
 
     this.updateButtons();
 
+    const wordsList = apiService.getChunkOfWords(this.currPage, this.currGroup);
     return wordsList.then((list: WordCard[]): void => {
       const words = new DocumentFragment;
 
@@ -135,7 +135,7 @@ export default class PageDictionary extends BaseComponent {
       }
       this.setGoInput();
       this.setPaginator();
-      this.backGround.style.width = `${this.wordElems.length * constants.hundred}%`;
+      this.backGround.style.width = `${(this.wordElems.length || Number('20')) * constants.hundred}%`;
       this.wordsHolder?.append(words);
       this.go(0);
 
@@ -258,7 +258,7 @@ export default class PageDictionary extends BaseComponent {
   }
 
   private setPaginator(): void {
-    if (String(this.currGroup) === '6') {
+    if (this.currGroup > constants.maxWordsGroup) {
       this.paginator.classList.add('hidden');
     } else {
       this.paginator.classList.remove('hidden');

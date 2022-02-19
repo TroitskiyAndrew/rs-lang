@@ -2,6 +2,8 @@ type Constnts = {
   widgetIdMax: number;
   minWordsGroup: number;
   maxWordsGroup: number;
+  difficultGroup: number;
+  learnedGroup: number;
   minWordsPage: number;
   maxWordsPage: number;
   answersInAudioGame: number;
@@ -15,6 +17,8 @@ const constants: Constnts = {
   widgetIdMax: 1000000,
   minWordsGroup: 0,
   maxWordsGroup: 5,
+  difficultGroup: 6,
+  learnedGroup: 7,
   minWordsPage: 0,
   maxWordsPage: 29,
   answersInAudioGame: 4,
