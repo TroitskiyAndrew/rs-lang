@@ -81,26 +81,24 @@ export default class AudioGame extends BaseComponent {
       // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
       const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, this.group);
       if (typeof (notLearnedWords) === 'number') return;
-      if (!this.page) return;
+      if (this.page === undefined) return;
       const currentPage = this.page;
       const notLearnedWordsFilteredBePage = notLearnedWords.filter(word => word.page <= currentPage);
       console.log('notLearnedWords', notLearnedWordsFilteredBePage);
-      /* for (let i = notLearnedWordsFilteredBePage.length; i < array.length; i++) {
-        const element = array[i];
-
-      } */
-      // this.wordsFromAPI.questionWords = notLearnedWords;
+      const last20Words = notLearnedWordsFilteredBePage.slice(-20);
+      console.log('last20Words', last20Words);
+      this.wordsFromAPI.questionWords = last20Words;
     } else {
       // если группа от 0 до 5 БЕЗ флага fromDictionary, то все слова со страницы
       console.log('from games');
       await this.setAllQuestionWordsToState();
     }
 
-    /*   if () {
-          проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
-          console.log('modal window not 5 words!');
-        }
-        */
+    if (this.wordsFromAPI.questionWords && this.wordsFromAPI.questionWords.length < 5) {
+      // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
+      console.log('modal window not 5 words!');
+    }
+
 
 
     // создаем массив из слов-перевода, который НЕ включает слова с вопросов
