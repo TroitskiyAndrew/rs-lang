@@ -104,9 +104,9 @@ export default class SprintGame extends BaseComponent {
     sprintWrapper.append(wordsWrapper);
     sprintWrapper.append(marioWrapper);
     sprintWrapper.append(pipeWrapper);
-    sprintWrapper.append(gamepadWrapper);
-
+    
     page.append(sprintWrapper);
+    page.append(gamepadWrapper);
     this.fragment.append(page);
   }
 
@@ -393,7 +393,7 @@ export default class SprintGame extends BaseComponent {
 
     groupWordsArrMod.splice(randomWordNumber, 1);
     wordsOnPageLeft -= 1;
-    // this.startTimer();
+    this.startTimer();
   }
 
   private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
