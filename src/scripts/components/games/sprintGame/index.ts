@@ -104,9 +104,9 @@ export default class SprintGame extends BaseComponent {
     sprintWrapper.append(wordsWrapper);
     sprintWrapper.append(marioWrapper);
     sprintWrapper.append(pipeWrapper);
-    sprintWrapper.append(gamepadWrapper);
-
+    
     page.append(sprintWrapper);
+    page.append(gamepadWrapper);
     this.fragment.append(page);
   }
 
