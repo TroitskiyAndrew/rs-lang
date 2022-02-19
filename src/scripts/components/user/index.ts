@@ -267,6 +267,7 @@ export default class User extends BaseComponent {
         });
         this.closeModalWindow();
         this.disableLogo();
+        updateContent(document.querySelector('#page-holder') as HTMLElement, 'pageHome');
       } else {
         const existWarning = this.elem.querySelector('.form-exist__warning') as HTMLElement;
         existWarning.textContent = 'Incorrect e-mail or password!';
@@ -304,6 +305,7 @@ export default class User extends BaseComponent {
   static logOutUser() {
     localStorage.clear();
     updateContent(document.querySelector('.header__user') as HTMLElement, 'user');
+    updateContent(document.querySelector('#page-holder') as HTMLElement, 'pageHome');
     console.log('Exit User from REGISTRATION and clear local!!');
   }
 
@@ -312,7 +314,6 @@ export default class User extends BaseComponent {
     const type = this.inputPassword.getAttribute('type') === 'password' ? 'text' : 'password';
     this.inputPassword.setAttribute('type', type);
     (e.target as HTMLElement).classList.toggle('fa-eye-slash');
-
   }
 
   toggleRegisterModal(): void {
