@@ -328,7 +328,26 @@ export default class ModalStatistic extends BaseComponent {
       if (typeof (userWordResponse) !== 'number') {
         // обновляем слово
         const userWord = userWordResponse;
+
+        // todo new words/ learned words per date
+        // const answersPerDayAudio: DateValue = {};
+        // const answersPerDaySprint: DateValue = {};
+        // let rightRangeSprint = 0;
+        // let rightRangeAudio = 0;
+
+        // if (game instanceof AudioGame) {
+        //   correctAnswersPerDayAudio[date] = this.rightAnswers.length;
+        //   answersPerDayAudio[date] = this.resultArray.length;
+        //   rightRangeAudio = this.longestRightRange();
+        // } else if (game instanceof SprintGame) {
+        //   correctAnswersPerDaySprint[date] = this.rightAnswers.length;
+        //   answersPerDaySprint[date] = this.resultArray.length;
+        //   rightRangeSprint = this.longestRightRange();
+        // }
+        // todo end
+
         const wordBody: UserWord = {
+          difficulty: userWord.difficulty,
           optional: {
             new: true,
             word: wordObj.word,

@@ -37,11 +37,12 @@ export interface WordCard {
   word: string,
   wordTranslate: string,
   userWord?: UserWord,
+  _id?: string,
 }
 
 export interface UserWord {
   difficulty?: 'common' | 'difficult' | string,
-  optional?: {
+  optional: {
     new?: boolean,
     learned?: boolean,
     rightRange?: number,
@@ -50,7 +51,7 @@ export interface UserWord {
     answersAllTime?: number,
     newAtDay?: string,
     learnedAtDay?: string | boolean,
-  };
+  },
 }
 export interface PaginatedResults {
   paginatedResults: WordCard[],
