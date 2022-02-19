@@ -76,8 +76,9 @@ export default class AudioGame extends BaseComponent {
       console.log('difficultWords', difficultWords);
 
     } else {
-
       // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
+      console.log('te4s');
+
 
       // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
 
