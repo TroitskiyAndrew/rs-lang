@@ -6,13 +6,14 @@ import { WordCard } from '../../../api/api.types';
 import { IGameOptions, IWordParams, IScoreCounter } from './sprintGameTypes';
 import { IStatisticAnswer } from '../audioGame/index'
 import { updateState, getState } from '../../../state';
+import constants from '../../../app.constants';
 // import WordsCard from '../../pageDictionary/wordCard';
 
 const GROUP_WORDS_NUMBER = 600;
 const PAGE_WORDS_NUMBER = 20;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
 const MAX_SCORE_MULTIPLYER = 8;
-const TIME_FOR_GAME_MILISECONDS = 10000;
+const TIME_FOR_GAME_MILISECONDS = 30000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 
 let options: IGameOptions;
@@ -328,30 +329,50 @@ export default class SprintGame extends BaseComponent {
     await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
       words.forEach((el) => this.addElToArray(el))
     });
-    wordsArrNumber = GROUP_WORDS_NUMBER;
+    // wordsArrNumber = GROUP_WORDS_NUMBER;
     // wordsOnPageLeft = wordsArrNumber;
     this.removeLoading();
-    this.getRandomWords(groupWordsArr, wordsArrNumber);
+    this.getRandomWords(groupWordsArr, GROUP_WORDS_NUMBER);
   }
-
+// =================================================================================================================================================>>>>>>>>>>>>>>>>>>>>>>>>>>>
   private async getWordsArrayFromPages() {
     let currentPageToArray: string = this.page;
+
+    // const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, Number(this.group), Number(currentPageToArray));
+    // console.log('notLearnedWords', notLearnedWords);
+
     let addPageToArr = async () => {
-      await apiService.getChunkOfWords(Number(currentPageToArray), Number(this.group)).then(words => {
-        words.forEach((el) => this.addElToArray(el))
-      });
+      await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, Number(this.group), Number(currentPageToArray)).then
+        (words => {
+          (words as WordCard[]).forEach((el) => this.addElToArray(el))
+        });
+
+      // await apiService.getChunkOfWords(Number(currentPageToArray), Number(this.group)).then(words => {
+      //   words.forEach((el) => this.addElToArray(el))
+      // });
       currentPageToArray = String(Number(currentPageToArray) - 1);
       if (Number(currentPageToArray) >= 0) {
         addPageToArr()
       } else {
         groupWordsArrMod = groupWordsArr.slice();
+        wordsOnPageLeft = this.getWordsOnPageNumber();
+        this.getRandomWords(groupWordsArr, wordsOnPageLeft);
         this.removeLoading();
-        this.getRandomWords(groupWordsArr, PAGE_WORDS_NUMBER);
       }
     };
     addPageToArr();
-    wordsArrNumber = PAGE_WORDS_NUMBER;
-    wordsOnPageLeft = PAGE_WORDS_NUMBER;
+    // wordsArrNumber = PAGE_WORDS_NUMBER;
+    // wordsOnPageLeft = PAGE_WORDS_NUMBER;
+  }
+
+  private getWordsOnPageNumber() {
+    let prevEl: number | null = null;
+    let wordsOnPageNumber: number = 1;
+    groupWordsArrMod.forEach((el, index) => {
+      if (el.page === prevEl && index > 0) wordsOnPageNumber += 1;
+      prevEl = el.page;
+    })
+    return wordsOnPageNumber;
   }
 
   private addElToArray(el: WordCard) {
@@ -369,12 +390,11 @@ export default class SprintGame extends BaseComponent {
   }
 
   private getRandomWords(groupWordsArr: IWordParams[], wordsNumber: number) {
-    // console.log(groupWordsArr)
+    console.log(groupWordsArr)
     const word = this.elem.querySelector('.eng-word') as HTMLDivElement;
     const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
     const randomWordNumber = getRandom(0, wordsNumber);
 
-    
     word!.textContent = groupWordsArr[randomWordNumber].word;
     if (Math.random() < 0.5) {
       wordTranslate!.textContent = groupWordsArr[randomWordNumber].wordTranslate;
@@ -391,7 +411,7 @@ export default class SprintGame extends BaseComponent {
       }
       return randomWordAnotherNumber;
     }
-
+    // if (groupWordsArrMod[0])
     groupWordsArrMod.splice(randomWordNumber, 1);
     wordsOnPageLeft -= 1;
     this.startTimer();
@@ -446,11 +466,11 @@ export default class SprintGame extends BaseComponent {
         this.stopTimer();
         this.showModalStatistics();
       } else {
-        wordsOnPageLeft = wordsArrNumber;
+        wordsOnPageLeft = this.getWordsOnPageNumber();
         this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
       }
     } else {
-      this.getRandomWords(groupWordsArr, wordsArrNumber);
+      this.getRandomWords(groupWordsArr, GROUP_WORDS_NUMBER);
     }
   }
 
@@ -545,7 +565,7 @@ export default class SprintGame extends BaseComponent {
     this.gamepadWrapper!.style.visibility = 'visible';
     this.wordsWrapper!.style.visibility = 'visible';
     groupWordsArrMod = groupWordsArr.slice();
-    wordsOnPageLeft = wordsArrNumber;
+
     this.mario!.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
     this.mario!.onload = () => {
       this.mario!.style.height = '3.6rem';
@@ -559,7 +579,14 @@ export default class SprintGame extends BaseComponent {
     this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, '0');
     this.paramsScore!.textContent = `0`;
     this.startAudioOnce = true;
-    this.getRandomWords(groupWordsArrMod, wordsArrNumber);
+    if (this.page === '') {
+      this.getRandomWords(groupWordsArrMod, GROUP_WORDS_NUMBER);
+    } else {
+      wordsOnPageLeft = this.getWordsOnPageNumber();
+      this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
+    }
+    // wordsOnPageLeft = wordsArrNumber;
+    // this.getRandomWords(groupWordsArrMod, wordsArrNumber);
     this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
   }
 
