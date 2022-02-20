@@ -2,7 +2,6 @@ import BaseComponent from '../../base';
 import { updateContent } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
-// import { updateState, getState } from '../../../state';
 import constants from '../../../app.constants';
 import { WordCard } from '../../../api/api.types';
 import { getState } from '../../../state';
@@ -250,7 +249,7 @@ export default class AudioGame extends BaseComponent {
     if (!this.enableKeyAnswer) return;
     const answerDiv = document.querySelector(`[data-audio="answer-${pos}"]`) as HTMLElement;
     if (!answerDiv.textContent) return;
-    const answerFromDiv = answerDiv.textContent.split('. ');
+    const answerFromDiv = answerDiv.textContent.split('.');
     const correctAnswer = this.currentQuestionCard.wordTranslate;
     if (!correctAnswer) return;
     if (answerFromDiv[1] === correctAnswer) {
@@ -342,8 +341,8 @@ export default class AudioGame extends BaseComponent {
         className: 'audio-answers__answer',
         dataSet: { audio: `answer-${i + 1}` },
       });
-      answerDiv.textContent = `${i + 1}. ${answers[i]}`;
-      const answerFromDiv = answerDiv.textContent.split('. ');
+      answerDiv.textContent = `${i + 1}.${answers[i]}`;
+      const answerFromDiv = answerDiv.textContent.split('.');
 
       answerDiv.addEventListener('click', () => {
         if (answerFromDiv[1] === correctAnswer) {
@@ -381,7 +380,7 @@ export default class AudioGame extends BaseComponent {
     }
     allDivAnswers.forEach(divAnswer => {
       if (divAnswer.textContent) {
-        const answerFromDiv = divAnswer.textContent.split('. ');
+        const answerFromDiv = divAnswer.textContent.split('.');
         const correctAnswer = this.currentQuestionCard.wordTranslate;
         if (!correctAnswer) return;
         if (answerFromDiv[1] === correctAnswer) {
@@ -457,7 +456,6 @@ export default class AudioGame extends BaseComponent {
       dataSet: {
         widget: 'modalStatistic',
         parentId: this.id,
-        // options: 'some options from AUDIO game',
       },
     });
     this.elem.append(modalStatistic);
