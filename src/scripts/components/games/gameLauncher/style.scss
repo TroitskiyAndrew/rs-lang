@@ -62,7 +62,11 @@
   .launcher-games__flagPole {
     position: absolute;
     bottom: calc(12% + 60px);
-    left: 0;
+    left: 10%;
+
+    @media (max-width: 1200px) {
+      left: 0;
+    }
   }
 
   @media (max-width: 760px) {

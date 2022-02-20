@@ -130,22 +130,15 @@ export default class AudioGame extends BaseComponent {
 
   private definePageAndGroup(): void {
     const options = this.options ? JSON.parse(this.options) : {};
-    console.log('options', options);
-
     this.page = getRandom(constants.minWordsPage, constants.maxWordsPage);
     if (options.page !== undefined) {
       this.page = options.page;
     }
 
-    console.log('this.page after getRandom', this.page);
-
-
     this.group = getRandom(constants.minWordsGroup, constants.maxWordsGroup);
     if (options.group !== undefined) {
       this.group = +options.group;
     }
-    console.log('this.group after getRandom', this.group);
-
 
     if (options.fromDictionary) {
       this.fromDictionary = options.fromDictionary;
@@ -153,7 +146,6 @@ export default class AudioGame extends BaseComponent {
     // todo delete
     // this.page = 0;
     // this.group = 0;
-
     console.log('this.page', this.page);
     console.log('this.group', this.group);
     console.log('this.fromDictionary', this.fromDictionary);
@@ -226,7 +218,6 @@ export default class AudioGame extends BaseComponent {
       }
     };
   }
-
 
   private keyFunctionality(e: KeyboardEvent): void {
     if (this.focusedGame) {
@@ -466,9 +457,7 @@ export default class AudioGame extends BaseComponent {
     return this.answersArray;
   }
 
-  public playAgain() {
-    console.log('this.answersArray play again', this.answersArray);
-
+  public playAgain(): void {
     this.questionNumber = 0;
     this.currentQuestionCard = {};
     this.answersArray = [];

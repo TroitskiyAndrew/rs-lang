@@ -98,8 +98,6 @@ export default class GameLauncher extends BaseComponent {
         'group': '0',
       });
       pageNavigation.append(gameSprint);
-
-
     }
 
     backBtn.append(createSpan({ text: 'Назад' }));
@@ -128,7 +126,7 @@ export default class GameLauncher extends BaseComponent {
     (this.elem.querySelector('.launcher-games') as HTMLDivElement).addEventListener('change-flag', this.groupChangeFromFlag.bind(this));
   }
 
-  private groupChangeFromFlag(event: Event) {
+  private groupChangeFromFlag(event: Event): void {
     const target = event.target as HTMLElement;
     const widgetId = target.dataset.widgetId as string;
     const widget = instances[widgetId] as FlagPole;
