@@ -37,8 +37,6 @@ export default class AudioGame extends BaseComponent {
 
   totalQuestions: number | undefined;
 
-  audio = new Audio();
-
   nextTextBtn = 'следующий вопрос';
 
   showResultTextBtn = 'показать ответ';
@@ -68,8 +66,7 @@ export default class AudioGame extends BaseComponent {
     // pageChenging(createSpan({}), this.name);
 
     // получаю с АПИ данные
-    // todo новые слова перезаписать ТУТ!, которые придут не связанные с группой
-    // Если групп 6 (сложные слова), то запрос агрегейтед на них
+    // Если групп 6 (сложные слова), то запрос
     const hardsWordGroup = 6;
     if (this.group === hardsWordGroup && this.fromDictionary) {
       console.log('groupe with hard words');
@@ -80,6 +77,8 @@ export default class AudioGame extends BaseComponent {
     } else if (this.fromDictionary) {
       // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
       const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, this.group);
+      console.log('notLearnedWords', notLearnedWords);
+
       if (typeof (notLearnedWords) === 'number') return;
       if (this.page === undefined) return;
       const currentPage = this.page;
@@ -95,10 +94,22 @@ export default class AudioGame extends BaseComponent {
     }
 
     if (this.wordsFromAPI.questionWords && this.wordsFromAPI.questionWords.length < constants.minQuestionsGame) {
+      this.wordsFromAPI.questionWords = [];
       // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
       console.log('modal window not 5 words!');
+      const questionField = this.elem.querySelector('.audio-game__answers') as HTMLElement;
+      questionField.textContent = 'Минимум 5 слов требуется для игры.';
+      const nextBtn = this.nextBtn as HTMLElement;
+      nextBtn.textContent = 'Выйти';
+      nextBtn.onclick = () => {
+        if (this.fromDictionary) {
+          updateContent(document.querySelector('#page-holder') as HTMLElement, 'pageDictionary');
+        } else {
+          updateContent(document.querySelector('#page-holder') as HTMLElement, 'gameLauncher');
+        }
+      };
+      return;
     }
-
 
 
     // создаем массив из слов-перевода, который НЕ включает слова с вопросов
@@ -141,8 +152,8 @@ export default class AudioGame extends BaseComponent {
       this.fromDictionary = options.fromDictionary;
     }
     // todo delete
-    this.page = 0;
-    this.group = 0;
+    // this.page = 0;
+    // this.group = 0;
 
     console.log('this.page', this.page);
     console.log('this.group', this.group);
@@ -313,11 +324,10 @@ export default class AudioGame extends BaseComponent {
       className: 'questionField__audio icon-button',
     });
     audioWrapper.append(audioBtn);
-    this.audio.src = `${baseUrl}/${this.currentQuestionCard.audio}`;
-    this.audio.play();
+    this.playAudio(`${baseUrl}/${this.currentQuestionCard.audio}`);
+
     audioBtn.addEventListener('click', () => {
-      this.audio.currentTime = 0;
-      this.audio.play();
+      this.playAudio(`${baseUrl}/${this.currentQuestionCard.audio}`);
     });
   }
 
@@ -364,6 +374,7 @@ export default class AudioGame extends BaseComponent {
     if (answer) {
       answerToStatistic.answerCorrectness = true;
       this.answersArray.push(answerToStatistic);
+      this.playAudio('../../../../assets/sounds/smw_coin.wav');
     } else {
       answerToStatistic.answerCorrectness = false;
       this.answersArray.push(answerToStatistic);
@@ -440,13 +451,13 @@ export default class AudioGame extends BaseComponent {
     return answers;
   }
 
-
   private showModalStatistics(): void {
     const modalStatistic = createDiv({
       className: '',
       dataSet: {
         widget: 'modalStatistic',
         parentId: this.id,
+        // options: 'some options from AUDIO game',
       },
     });
     this.elem.append(modalStatistic);

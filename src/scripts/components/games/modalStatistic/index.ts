@@ -12,6 +12,7 @@ import { Statistics, UserWord, DateNumber } from '../../../api/api.types';
 export default class ModalStatistic extends BaseComponent {
 
   resultArray: IStatisticAnswer[] = [];
+
   rightAnswers: IStatisticAnswer[] = [];
 
   audioModalStatistic: HTMLAudioElement = new Audio();
@@ -73,6 +74,8 @@ export default class ModalStatistic extends BaseComponent {
       text: `Всего слов - ${this.resultArray.length}`,
     });
 
+    let isEnableSound = true;
+
     if (parenWidget instanceof AudioGame) {
       console.log('AUDIO GAME');
     } else if (parenWidget instanceof SprintGame) {
@@ -81,6 +84,7 @@ export default class ModalStatistic extends BaseComponent {
         text: `К-во баллов - ${parenWidget.giveScoreToModalStatistic()}`,
       });
       gameInfoRight.append(totalScore);
+      isEnableSound = JSON.parse(this.elem.dataset.audioIsPlaying as string);
     }
 
     const wordsWrapper = createDiv({
@@ -147,6 +151,10 @@ export default class ModalStatistic extends BaseComponent {
         direction: 'pageGames',
       },
     });
+    toGamesBtn.onclick = () => {
+      this.audioModalStatistic.pause();
+    };
+
 
     navigationModal.append(againBtn);
     navigationModal.append(toGamesBtn);
@@ -160,8 +168,9 @@ export default class ModalStatistic extends BaseComponent {
       this.updateUserWordsAndStatistic(parenWidget);
     }
 
+    this.playAudioModalStatistic(isEnableSound);
+
     this.fragment.append(modalWindow);
-    this.playAudioModalStatistic(JSON.parse(this.elem.dataset.audioIsPlaying as string))
   }
 
   async updateUserWordsAndStatistic(game: AudioGame | SprintGame) {
@@ -519,7 +528,7 @@ export default class ModalStatistic extends BaseComponent {
     parent.removeChild(this.elem);
   }
 
-  private playAudioModalStatistic (status: boolean) {
+  private playAudioModalStatistic(status: boolean) {
     if (status) {
       this.audioModalStatistic.src = '../../../../assets/sounds/22 - Course Clear Fanfare.mp3';
       this.audioModalStatistic.play();
