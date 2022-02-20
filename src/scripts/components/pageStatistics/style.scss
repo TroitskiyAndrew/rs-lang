@@ -1,6 +1,3 @@
 .statistics {
-  position: relative;
-  span {
-    @include position;
-  }
+  @include flex;
 }
