@@ -10,9 +10,11 @@ import { getState } from '../../../state';
 import { Statistics, UserWord, DateNumber } from '../../../api/api.types';
 
 export default class ModalStatistic extends BaseComponent {
-  resultArray: IStatisticAnswer[] = [];
 
+  resultArray: IStatisticAnswer[] = [];
   rightAnswers: IStatisticAnswer[] = [];
+
+  audioModalStatistic: HTMLAudioElement = new Audio();
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -134,6 +136,7 @@ export default class ModalStatistic extends BaseComponent {
     });
     againBtn.onclick = () => {
       this.close(parenWidget.elem);
+      this.audioModalStatistic.pause();
       parenWidget.playAgain();
     };
 
@@ -158,6 +161,7 @@ export default class ModalStatistic extends BaseComponent {
     }
 
     this.fragment.append(modalWindow);
+    this.playAudioModalStatistic(JSON.parse(this.elem.dataset.audioIsPlaying as string))
   }
 
   async updateUserWordsAndStatistic(game: AudioGame | SprintGame) {
@@ -510,9 +514,17 @@ export default class ModalStatistic extends BaseComponent {
 
   }
 
-
   close(parent: HTMLElement) {
     this.dispose();
     parent.removeChild(this.elem);
   }
+
+  private playAudioModalStatistic (status: boolean) {
+    if (status) {
+      this.audioModalStatistic.src = '../../../../assets/sounds/22 - Course Clear Fanfare.mp3';
+      this.audioModalStatistic.play();
+    }
+  }
+
+
 }
