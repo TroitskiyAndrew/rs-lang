@@ -60,7 +60,6 @@ export default class SprintGame extends BaseComponent {
   mario: HTMLImageElement | undefined;
 
   audioSprint: HTMLAudioElement = new Audio();
-  audioModal: HTMLAudioElement = new Audio();
   audioCoin: HTMLAudioElement = new Audio();
   audioMushroom: HTMLAudioElement = new Audio();
 
@@ -519,7 +518,6 @@ export default class SprintGame extends BaseComponent {
       player.src = src;
       player.play();
     }
-
   }
 
   private clearGameParams() {
@@ -560,9 +558,8 @@ export default class SprintGame extends BaseComponent {
     this.paramsMultiplyerWrapper!.innerHTML = '';
     this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, '0');
     this.paramsScore!.textContent = `0`;
-    this.getRandomWords(groupWordsArrMod, wordsArrNumber);
     this.startAudioOnce = true;
-    this.audioModal.pause();
+    this.getRandomWords(groupWordsArrMod, wordsArrNumber);
     this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
   }
 
@@ -693,11 +690,11 @@ export default class SprintGame extends BaseComponent {
       dataSet: {
         widget: 'modalStatistic',
         parentId: this.id,
+        audioIsPlaying: String(audioIsPlaying),
       },
     });
     this.elem.append(modalStatistic);
     updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
-    this.playAudioSprint(this.audioModal, '../../../../assets/sounds/22 - Course Clear Fanfare.mp3', audioIsPlaying);
     this.gamepadWrapper!.style.visibility = 'hidden';
     this.wordsWrapper!.style.visibility = 'hidden';
   }
