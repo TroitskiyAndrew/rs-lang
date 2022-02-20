@@ -13,6 +13,7 @@ type Constnts = {
   wordDifficultRightRange: number;
   junmpAnimationTimeDictionary: number;
   maxNumberOfQuestionsAudio: number;
+  minQuestionsGame: number;
 };
 
 const constants: Constnts = {
@@ -30,6 +31,7 @@ const constants: Constnts = {
   wordDifficultRightRange: 5,
   junmpAnimationTimeDictionary: 1000,
   maxNumberOfQuestionsAudio: 20,
+  minQuestionsGame: 5,
 };
 
 export default constants;
