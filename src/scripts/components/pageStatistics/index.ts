@@ -27,7 +27,8 @@ export default class PageStatistics extends BaseComponent {
       learnedWords: 0,
       optional: {
         learnedWordsPerDate: updateObjDate(undefined, 0),
-        newWordsPerDate: updateObjDate(undefined, 0),
+        newWordsPerDayAudio: updateObjDate(undefined, 0),
+        newWordsPerDaySprint: updateObjDate(undefined, 0),
       },
     };
     this.statistic = typeof apiStatistic !== 'number' ? apiStatistic : defaultStatistic;
@@ -71,6 +72,9 @@ export default class PageStatistics extends BaseComponent {
       rightAnswerColumn.push(Math.floor(((correctSprintAnswers + correctAudioAnswers) / (allSprintAnswers + allAudioAnswers)) * constants.hundred));
     }
 
+    const newWordsAudio = getTodayCount(this.statistic?.optional.newWordsPerDayAudio);
+    const newWordsSprint = getTodayCount(this.statistic?.optional.newWordsPerDaySprint);
+
 
     c3.generate({
       bindto: '.day-statistic',
@@ -79,7 +83,7 @@ export default class PageStatistics extends BaseComponent {
         columns: [
           ['Изучено слов, шт', null, null, getTodayCount(this.statistic?.optional.learnedWordsPerDate)],
           ['x', 'игра Аудио', 'игра Спринт', 'Итоги дня'],
-          ['Новые слова, шт', getTodayCount(this.statistic?.optional.newWordsPerDate), getTodayCount(this.statistic?.optional.newWordsPerDate), getTodayCount(this.statistic?.optional.newWordsPerDate)],
+          ['Новые слова, шт', newWordsAudio, newWordsSprint, newWordsAudio + newWordsSprint],
           rightAnswerColumn,
           ['Серия правильных ответов, max', this.statistic?.optional.correctAnswersRangeAudio || 0, this.statistic?.optional.correctAnswersRangeSprint || 0, null],
         ],
@@ -95,15 +99,16 @@ export default class PageStatistics extends BaseComponent {
 
   private drawAllStatistic(): void {
     const learnedWords = updateObjDate(this.statistic?.optional.learnedWordsPerDate, 0);
-    const newdWords = updateObjDate(this.statistic?.optional.newWordsPerDate, 0);
-    const allDays: string[] = Array.from(new Set([...Object.keys(learnedWords), ...Object.keys(newdWords)].sort((a: string, b: string) => new Date(a).valueOf() - new Date(b).valueOf())));
+    const newdWordsAudio = updateObjDate(this.statistic?.optional.newWordsPerDayAudio, 0);
+    const newdWordsSprint = updateObjDate(this.statistic?.optional.newWordsPerDaySprint, 0);
+    const allDays: string[] = Array.from(new Set([...Object.keys(learnedWords), ...Object.keys(newdWordsAudio), ...Object.keys(newdWordsSprint)].sort((a: string, b: string) => new Date(a).valueOf() - new Date(b).valueOf())));
     c3.generate({
       bindto: '.all-statistic',
       data: {
         x: 'x',
         columns: [
           ['x', ...allDays],
-          ['Новые слова', ...allDays.map((day: string) => newdWords[day] || 0)],
+          ['Новые слова', ...allDays.map((day: string) => (newdWordsAudio[day] || 0) + (newdWordsSprint[day] || 0))],
           ['Выученные слова', ...allDays.map((day: string) => learnedWords[day] || 0)],
         ],
         type: 'line',
