@@ -143,3 +143,15 @@ export function updateObjDate(dateObj: DateNumber | undefined, dateValue: number
   }
   return dateObj;
 }
+
+export function getTodayCount(dateObj: DateNumber | undefined): number {
+  const currentDate = new Date();
+  const date = currentDate.toISOString().split('T')[0];
+  if (!dateObj) {
+    return 0;
+  }
+  if (date in dateObj) {
+    return dateObj[date];
+  }
+  return 0;
+}
