@@ -85,7 +85,7 @@ export default class AudioGame extends BaseComponent {
       const currentPage = this.page;
       const notLearnedWordsFilteredBePage = notLearnedWords.filter(word => word.page <= currentPage);
       console.log('notLearnedWords', notLearnedWordsFilteredBePage);
-      const last20Words = notLearnedWordsFilteredBePage.slice(-20);
+      const last20Words = notLearnedWordsFilteredBePage.slice(-constants.maxNumberOfQuestionsAudio);
       console.log('last20Words', last20Words);
       this.wordsFromAPI.questionWords = last20Words;
     } else {
