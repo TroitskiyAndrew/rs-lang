@@ -94,8 +94,21 @@ export default class AudioGame extends BaseComponent {
     }
 
     if (this.wordsFromAPI.questionWords && this.wordsFromAPI.questionWords.length < constants.minQuestionsGame) {
+      this.wordsFromAPI.questionWords = [];
       // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
       console.log('modal window not 5 words!');
+      const questionField = this.elem.querySelector('.audio-game__answers') as HTMLElement;
+      questionField.textContent = 'Минимум 5 слов требуется для игры.';
+      const nextBtn = this.nextBtn as HTMLElement;
+      nextBtn.textContent = 'Выйти';
+      nextBtn.onclick = () => {
+        if (this.fromDictionary) {
+          updateContent(document.querySelector('#page-holder') as HTMLElement, 'pageDictionary');
+        } else {
+          updateContent(document.querySelector('#page-holder') as HTMLElement, 'gameLauncher');
+        }
+      };
+      return;
     }
 
 
