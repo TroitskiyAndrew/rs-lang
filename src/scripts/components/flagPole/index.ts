@@ -41,7 +41,7 @@ export default class FlagPole extends BaseComponent {
       className: 'flagPole-wrapper',
     });
     const state = getState();
-    this.groupsCount = constants.maxWordsGroup + (state.userId ? 2 : 0);
+    this.groupsCount = constants.maxWordsGroup + ((this.elem.dataset.fromDictionary && state.userId) ? 2 : 0);
 
     this.flagPole.min = constants.minWordsGroup.toString();
     this.flagPole.max = String(this.groupsCount);
