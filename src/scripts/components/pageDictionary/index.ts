@@ -60,7 +60,7 @@ export default class PageDictionary extends BaseComponent {
   public createHTML(): void {
     const stepControl = createDiv({ className: 'dictionary__stepControl stepControl' });
     const contorol = createDiv({ className: 'dictionary__control' });
-    const level = createDiv({ className: 'dictionary__level', dataSet: { widget: 'flagPole' } });
+    const level = createDiv({ className: 'dictionary__level', dataSet: { widget: 'flagPole', fromDictionary: 'true' } });
 
     this.pageSelector.classList.add('paginator__selector');
     this.pageSelector.id = 'pageSelector';

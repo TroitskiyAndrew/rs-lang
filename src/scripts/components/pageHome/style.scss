@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: start;
   background-color: #28282B;
-  font-family: 'Super Mario 286(RUS BY LYAJKA)';
+  font-family: 'F77 Minecraft';
   
 }
 
@@ -31,7 +31,9 @@
   justify-content: center;
   min-height: calc(100vh - 78px);
   width: 100%;
-  -webkit-text-stroke: 1.5px black;
+  font-size: 1.6rem;
+  -webkit-text-stroke: 0.3px black;
+  // letter-spacing: 1px;
 }
 
 .main-view-container__title {
@@ -40,13 +42,15 @@
   font-size: 2.6rem;
   -webkit-text-stroke: 4px black;
   text-shadow: 10px 10px 0 black;
-  // text-stroke: 4px navy;
+  text-align: center;
+  padding: 15px;
 }
 
 .main-view-container__description-wrapper {
   position: relative;
   width: 62%;
-  height: 60%;
+  // height: 60%;
+  height: auto;
 }
 
 .description-sub-wrapper {
@@ -54,11 +58,13 @@
   display: flex;
   width: 100%;
   height: auto;
+  justify-content: center;
 }
 
 .description-sub-wrapper_p {
   margin: 40px;
   text-align: center;
+  
 }
 
 .star-img {
@@ -103,8 +109,9 @@
 // ===================================================================
 
 .team-container {
-  max-width: 62%;
-  -webkit-text-stroke: 1.5px black;
+  max-width: 90%;
+  // -webkit-text-stroke: 0.3px black;
+  letter-spacing: 1px;
 }
 
 .team-container__title {
@@ -115,9 +122,23 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 20px;
   margin-bottom: 20px;
   width: 100%;
+}
+
+.member-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: baseline;
+  gap: 15px;
+  padding: 8px;
+  border: 1px solid #ffdb73;
+  border-radius: 5px;
+  max-width: calc((100% - 40px) / 3);
+  text-align: center;
 }
 
 .member-wrapper__avatar {
@@ -132,26 +153,17 @@ img[class*="member-wrapper__avatar"] {
   border-radius: 50%;
 }
 
-.member-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: baseline;
-  gap: 15px;
-  padding: 8px;
-  border: 1px solid #ffdb73;
-  border-radius: 5px;
-  width: calc((100% - 40px) / 3);
-  min-width: 140px;
-  text-align: center;
-}
-
 .github-svg {
   width: 26px;
   height: 26px;
+  transition: 0.5s;
 }
 
-// 2. Footer
+.github-svg:hover {
+  filter: invert(27%) sepia(93%) saturate(7466%) hue-rotate(357deg) brightness(104%) contrast(121%);
+}
+
+// 3. Footer
 // ===================================================================
 
 .home-footer {
@@ -166,4 +178,31 @@ img[class*="member-wrapper__avatar"] {
 .home-footer__school-link:hover {
   background-color: #ffdb73;  
   -webkit-text-stroke: 0px black;
+}
+
+// 4. Main-view-adaptivity
+// ===================================================================
+
+.main-view-container__description-wrapper {
+  width: 100%;
+}
+
+// 5. Team-adaptivity
+// ===================================================================
+
+@media (max-width: 1200px) {
+
+  .team-container {
+    max-width: 100%;
+  }
+  
+  .team-container__members-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .member-wrapper {
+    max-width: 600px;
+    margin: 10px;
+  }
 }

@@ -1,8 +1,8 @@
 import BaseComponent from '../../base';
-import { createButton, createDiv } from '../../../utils';
+import { createButton, createDiv, updateObjDate } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 import { getState } from '../../../state';
-import { UserWord } from '../../../api/api.types';
+import { Statistics, UserWord } from '../../../api/api.types';
 import constants from '../../../app.constants';
 
 export default class WordsCard extends BaseComponent {
@@ -179,6 +179,9 @@ export default class WordsCard extends BaseComponent {
 
   private toggleDifficult(): void {
     this.wordBody.difficulty = this.wordBody.difficulty === 'common' ? 'difficult' : 'common';
+    if (this.wordBody.difficulty === 'difficult') {
+      this.wordBody.optional.learned = false;
+    }
     apiService.updateUserWord(this.userId, this.wordId, this.wordBody);
     this.changeStatus();
   }
@@ -188,9 +191,30 @@ export default class WordsCard extends BaseComponent {
     if (this.wordBody.optional.learned) {
       this.wordBody.difficulty = 'common';
     }
+    this.updateStatistic(this.wordBody.optional.learned);
     apiService.updateUserWord(this.userId, this.wordId, this.wordBody);
     this.changeStatus();
     this.wordStatusChange(this.wordBody.optional.learned);
+  }
+
+  private async updateStatistic(learned: boolean): Promise<void> {
+    const apiStatistic = await apiService.getUserStatistics(this.userId);
+    const defaultStatistic: Statistics = {
+      learnedWords: 0,
+      optional: {
+        learnedWordsPerDate: updateObjDate(undefined, 0),
+      },
+    };
+    const statistic = typeof apiStatistic !== 'number' ? apiStatistic : defaultStatistic;
+    console.log(statistic);
+    const change = learned ? 1 : -1;
+    statistic.learnedWords = statistic.learnedWords as number + change;
+    statistic.optional.learnedWordsPerDate = updateObjDate(statistic.optional.learnedWordsPerDate, change);
+    if (statistic.id) {
+      delete statistic.id;
+    }
+    console.log(statistic);
+    return apiService.updateUserStatistics(this.userId, statistic).then();
   }
 
   private wordStatusChange(add: boolean): void {
