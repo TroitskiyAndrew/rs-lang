@@ -94,7 +94,7 @@ export default class AudioGame extends BaseComponent {
       await this.setAllQuestionWordsToState();
     }
 
-    if (this.wordsFromAPI.questionWords && this.wordsFromAPI.questionWords.length < 5) {
+    if (this.wordsFromAPI.questionWords && this.wordsFromAPI.questionWords.length < constants.minQuestionsGame) {
       // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
       console.log('modal window not 5 words!');
     }
@@ -141,8 +141,8 @@ export default class AudioGame extends BaseComponent {
       this.fromDictionary = options.fromDictionary;
     }
     // todo delete
-    // this.page = 0;
-    // this.group = 0;
+    this.page = 0;
+    this.group = 0;
 
     console.log('this.page', this.page);
     console.log('this.group', this.group);
@@ -357,7 +357,9 @@ export default class AudioGame extends BaseComponent {
     delete answerToStatistic.textMeaningTranslate;
     delete answerToStatistic.transcription;
     delete answerToStatistic.userWord;
-    answerToStatistic.id = answerToStatistic._id;
+    if (answerToStatistic._id) {
+      answerToStatistic.id = answerToStatistic._id;
+    }
 
     if (answer) {
       answerToStatistic.answerCorrectness = true;
@@ -456,6 +458,8 @@ export default class AudioGame extends BaseComponent {
   }
 
   public playAgain() {
+    console.log('this.answersArray play again', this.answersArray);
+
     this.questionNumber = 0;
     this.currentQuestionCard = {};
     this.answersArray = [];
