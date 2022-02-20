@@ -10,11 +10,23 @@ export default class FlagPole extends BaseComponent {
 
   groupsCount = 0;
 
-  flagPole: HTMLInputElement | undefined;
+  flagPole: HTMLInputElement = createInput({
+    className: 'flagPole',
+    type: 'range',
+  });
 
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'flagPole';
+  }
+
+  public oninit(): Promise<void> {
+    if (this.elem.dataset.fromDictionary) {
+      this.flagPole.value = String(getState().dictionaryGroup);
+      this.moveFlag();
+    }
+
+    return Promise.resolve();
   }
 
   public createHTML(): void {
@@ -27,10 +39,6 @@ export default class FlagPole extends BaseComponent {
 
     const flagPoleWrapper = createDiv({
       className: 'flagPole-wrapper',
-    });
-    this.flagPole = createInput({
-      className: 'flagPole',
-      type: 'range',
     });
     const state = getState();
     this.groupsCount = constants.maxWordsGroup + (state.userId ? 2 : 0);

@@ -55,6 +55,8 @@ export default class AudioGame extends BaseComponent {
 
   answersArray: IStatisticAnswer[] = [];
 
+  fromDictionary: boolean | undefined;
+
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -69,22 +71,35 @@ export default class AudioGame extends BaseComponent {
     // todo новые слова перезаписать ТУТ!, которые придут не связанные с группой
     // Если групп 6 (сложные слова), то запрос агрегейтед на них
     const hardsWordGroup = 6;
-    if (this.group === hardsWordGroup) {
+    if (this.group === hardsWordGroup && this.fromDictionary) {
       console.log('groupe with hard words');
-      const wordsPerPage = 100;
-      const difficultWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}', wordsPerPage);
+      const difficultWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}');
       console.log('difficultWords', difficultWords);
-
-    } else {
-      // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
-      console.log('te4s');
-
-
+      if (typeof (difficultWords) === 'number') return;
+      this.wordsFromAPI.questionWords = difficultWords;
+    } else if (this.fromDictionary) {
       // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
-
+      const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, this.group);
+      if (typeof (notLearnedWords) === 'number') return;
+      if (this.page === undefined) return;
+      const currentPage = this.page;
+      const notLearnedWordsFilteredBePage = notLearnedWords.filter(word => word.page <= currentPage);
+      console.log('notLearnedWords', notLearnedWordsFilteredBePage);
+      const last20Words = notLearnedWordsFilteredBePage.slice(-constants.maxNumberOfQuestionsAudio);
+      console.log('last20Words', last20Words);
+      this.wordsFromAPI.questionWords = last20Words;
+    } else {
       // если группа от 0 до 5 БЕЗ флага fromDictionary, то все слова со страницы
+      console.log('from games');
       await this.setAllQuestionWordsToState();
     }
+
+    if (this.wordsFromAPI.questionWords && this.wordsFromAPI.questionWords.length < constants.minQuestionsGame) {
+      // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
+      console.log('modal window not 5 words!');
+    }
+
+
 
     // создаем массив из слов-перевода, который НЕ включает слова с вопросов
     await this.setAllTranslateWordsToState();
@@ -100,35 +115,38 @@ export default class AudioGame extends BaseComponent {
     }
     this.showNextQuestion();
 
-    // todo testing aggregateWords and statistics
-    if (getState().userId) {
-      // const wordsPerPage = 1000;
-      // const aggregatedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', wordsPerPage, 0, undefined);
-      // console.log('aggregatedWords 0 group allWords NOT learned', aggregatedWords);
-      const statistics = await apiService.getUserStatistics(getState().userId);
-      console.log('UserStatistics', statistics);
-    }
-
     return Promise.resolve();
   }
 
   private definePageAndGroup(): void {
     const options = this.options ? JSON.parse(this.options) : {};
+    console.log('options', options);
+
     this.page = getRandom(constants.minWordsPage, constants.maxWordsPage);
-    if (options.page) {
+    if (options.page !== undefined) {
       this.page = options.page;
     }
-    this.group = getRandom(constants.minWordsGroup, constants.maxWordsGroup);
 
-    if (options.group) {
+    console.log('this.page after getRandom', this.page);
+
+
+    this.group = getRandom(constants.minWordsGroup, constants.maxWordsGroup);
+    if (options.group !== undefined) {
       this.group = +options.group;
+    }
+    console.log('this.group after getRandom', this.group);
+
+
+    if (options.fromDictionary) {
+      this.fromDictionary = options.fromDictionary;
     }
     // todo delete
     this.page = 0;
-    this.group = 6;
+    this.group = 0;
 
     console.log('this.page', this.page);
     console.log('this.group', this.group);
+    console.log('this.fromDictionary', this.fromDictionary);
   }
 
 
@@ -338,6 +356,11 @@ export default class AudioGame extends BaseComponent {
     delete answerToStatistic.textMeaning;
     delete answerToStatistic.textMeaningTranslate;
     delete answerToStatistic.transcription;
+    delete answerToStatistic.userWord;
+    if (answerToStatistic._id) {
+      answerToStatistic.id = answerToStatistic._id;
+    }
+
     if (answer) {
       answerToStatistic.answerCorrectness = true;
       this.answersArray.push(answerToStatistic);
@@ -435,6 +458,8 @@ export default class AudioGame extends BaseComponent {
   }
 
   public playAgain() {
+    console.log('this.answersArray play again', this.answersArray);
+
     this.questionNumber = 0;
     this.currentQuestionCard = {};
     this.answersArray = [];
