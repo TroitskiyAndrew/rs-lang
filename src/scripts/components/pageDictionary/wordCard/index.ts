@@ -33,7 +33,6 @@ export default class WordsCard extends BaseComponent {
   wordBody: UserWord = {
     difficulty: 'common',
     optional: {
-      new: false,
       learned: false,
       rightRange: 0,
       word: '',
