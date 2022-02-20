@@ -1,5 +1,5 @@
 
-import { createDiv, createSpan, createButton } from '../../../utils';
+import { createDiv, createSpan, createButton, updateObjDate } from '../../../utils';
 import constants from '../../../app.constants';
 import BaseComponent from '../../base';
 import { instances } from '../../components';
@@ -148,12 +148,11 @@ export default class ModalStatistic extends BaseComponent {
     navigationModal.append(againBtn);
     navigationModal.append(toGamesBtn);
 
-
     gameContent.append(wordsWrapper);
     modalWindow.append(gameContent);
     modalWindow.append(navigationModal);
 
-    // todo if user log in
+    // if user log in
     if (getState().userId) {
       this.updateUserWordsAndStatistic(parenWidget);
     }
@@ -167,18 +166,18 @@ export default class ModalStatistic extends BaseComponent {
     await this.updateOrCreateStatistic(game);
   }
 
-  updateObjDate(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
-    if (!dateObj) {
-      dateObj = {};
-    }
-    if (date in dateObj) {
-      // такая дата есть в массиве с АПИ, обновляем
-      dateObj[date] = dateValue + dateObj[date];
-    } else {
-      dateObj[date] = dateValue;
-    }
-    return dateObj;
-  }
+  /*   updateObjDate(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
+      if (!dateObj) {
+        dateObj = {};
+      }
+      if (date in dateObj) {
+        // такая дата есть в массиве с АПИ, обновляем
+        dateObj[date] = dateValue + dateObj[date];
+      } else {
+        dateObj[date] = dateValue;
+      }
+      return dateObj;
+    } */
 
   updateObjDateLearnedNew(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
     if (!dateObj) {
@@ -234,12 +233,12 @@ export default class ModalStatistic extends BaseComponent {
       if (game instanceof AudioGame) {
         // correctAnswersAudio per Day
         const currentDateCorrectAnswersAudio = userStatisticApi.optional.correctAnswersAudio;
-        statistics.optional.correctAnswersAudio = this.updateObjDate(currentDateCorrectAnswersAudio, date, this.rightAnswers.length);
+        statistics.optional.correctAnswersAudio = updateObjDate(currentDateCorrectAnswersAudio, this.rightAnswers.length);
 
         statistics.optional.correctAnswersSprint = userStatisticApi.optional.correctAnswersSprint || {};
         // answersAudio per Day
         const currentDateAnswersAudio = userStatisticApi.optional.answersAudio;
-        statistics.optional.answersAudio = this.updateObjDate(currentDateAnswersAudio, date, this.resultArray.length);
+        statistics.optional.answersAudio = updateObjDate(currentDateAnswersAudio, this.resultArray.length);
 
         statistics.optional.answersSprint = userStatisticApi.optional.answersSprint || {};
         // самая длинная серия правильных ответов
@@ -253,12 +252,12 @@ export default class ModalStatistic extends BaseComponent {
       } else if (game instanceof SprintGame) {
         // correctAnswersSprint per Day
         const currentDateInCorrectAnswersSprint = userStatisticApi.optional.correctAnswersSprint;
-        statistics.optional.correctAnswersSprint = this.updateObjDate(currentDateInCorrectAnswersSprint, date, this.rightAnswers.length);
+        statistics.optional.correctAnswersSprint = updateObjDate(currentDateInCorrectAnswersSprint, this.rightAnswers.length);
 
         statistics.optional.correctAnswersAudio = userStatisticApi.optional.correctAnswersAudio || {};
         // answersSprint per Day
         const currentDateAnswersSprint = userStatisticApi.optional.answersSprint;
-        statistics.optional.answersSprint = this.updateObjDate(currentDateAnswersSprint, date, this.resultArray.length);
+        statistics.optional.answersSprint = updateObjDate(currentDateAnswersSprint, this.resultArray.length);
 
         statistics.optional.answersAudio = userStatisticApi.optional.answersAudio || {};
         // самая длинная серия правильных ответов

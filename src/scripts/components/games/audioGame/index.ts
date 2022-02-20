@@ -55,6 +55,8 @@ export default class AudioGame extends BaseComponent {
 
   answersArray: IStatisticAnswer[] = [];
 
+  fromDictionary: boolean | undefined;
+
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -67,7 +69,39 @@ export default class AudioGame extends BaseComponent {
 
     // получаю с АПИ данные
     // todo новые слова перезаписать ТУТ!, которые придут не связанные с группой
-    await this.setAllQuestionWordsToState();
+    // Если групп 6 (сложные слова), то запрос агрегейтед на них
+    const hardsWordGroup = 6;
+    if (this.group === hardsWordGroup && this.fromDictionary) {
+      console.log('groupe with hard words');
+      const difficultWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}');
+      console.log('difficultWords', difficultWords);
+      if (typeof (difficultWords) === 'number') return;
+      this.wordsFromAPI.questionWords = difficultWords;
+    } else if (this.fromDictionary) {
+      // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
+      const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, this.group);
+      if (typeof (notLearnedWords) === 'number') return;
+      if (this.page === undefined) return;
+      const currentPage = this.page;
+      const notLearnedWordsFilteredBePage = notLearnedWords.filter(word => word.page <= currentPage);
+      console.log('notLearnedWords', notLearnedWordsFilteredBePage);
+      const last20Words = notLearnedWordsFilteredBePage.slice(-constants.maxNumberOfQuestionsAudio);
+      console.log('last20Words', last20Words);
+      this.wordsFromAPI.questionWords = last20Words;
+    } else {
+      // если группа от 0 до 5 БЕЗ флага fromDictionary, то все слова со страницы
+      console.log('from games');
+      await this.setAllQuestionWordsToState();
+    }
+
+    if (this.wordsFromAPI.questionWords && this.wordsFromAPI.questionWords.length < constants.minQuestionsGame) {
+      // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
+      console.log('modal window not 5 words!');
+    }
+
+
+
+    // создаем массив из слов-перевода, который НЕ включает слова с вопросов
     await this.setAllTranslateWordsToState();
     console.log('this.wordsFromAPI', this.wordsFromAPI);
 
@@ -81,27 +115,30 @@ export default class AudioGame extends BaseComponent {
     }
     this.showNextQuestion();
 
-    // todo testing aggregateWords
-    if (getState().userId) {
-      // const wordsPerPage = 1000;
-      // const aggregatedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', wordsPerPage, 0, undefined);
-      // console.log('aggregatedWords 0 group allWords NOT learned', aggregatedWords);
-      const statistics = await apiService.getUserStatistics(getState().userId);
-      console.log('UserStatistics', statistics);
-    }
-
     return Promise.resolve();
   }
 
   private definePageAndGroup(): void {
     const options = this.options ? JSON.parse(this.options) : {};
+    console.log('options', options);
+
     this.page = getRandom(constants.minWordsPage, constants.maxWordsPage);
-    if (options.page) {
+    if (options.page !== undefined) {
       this.page = options.page;
     }
+
+    console.log('this.page after getRandom', this.page);
+
+
     this.group = getRandom(constants.minWordsGroup, constants.maxWordsGroup);
-    if (options.group) {
+    if (options.group !== undefined) {
       this.group = +options.group;
+    }
+    console.log('this.group after getRandom', this.group);
+
+
+    if (options.fromDictionary) {
+      this.fromDictionary = options.fromDictionary;
     }
     // todo delete
     this.page = 0;
@@ -109,6 +146,7 @@ export default class AudioGame extends BaseComponent {
 
     console.log('this.page', this.page);
     console.log('this.group', this.group);
+    console.log('this.fromDictionary', this.fromDictionary);
   }
 
 
@@ -162,9 +200,6 @@ export default class AudioGame extends BaseComponent {
     audioGameContainer.append(audioGameContent);
 
     audioPage.append(audioGameContainer);
-
-    // todo temporary show modal
-    // this.showModalStatistics();
 
     this.fragment.append(audioPage);
   }
@@ -321,6 +356,11 @@ export default class AudioGame extends BaseComponent {
     delete answerToStatistic.textMeaning;
     delete answerToStatistic.textMeaningTranslate;
     delete answerToStatistic.transcription;
+    delete answerToStatistic.userWord;
+    if (answerToStatistic._id) {
+      answerToStatistic.id = answerToStatistic._id;
+    }
+
     if (answer) {
       answerToStatistic.answerCorrectness = true;
       this.answersArray.push(answerToStatistic);
@@ -361,9 +401,12 @@ export default class AudioGame extends BaseComponent {
 
   async setAllTranslateWordsToState(): Promise<void> {
     if (this.group !== undefined) {
-      const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(this.group))
+      const hardWordsGroup = 6;
+      const maxCommonGroupNumber = 5;
+      const commonGroup = getRandom(0, maxCommonGroupNumber);
+      const group = this.group >= hardWordsGroup ? commonGroup : this.group;
+      const wordsTranslationGroup = (await apiService.getChunkOfWordsGroup(group))
         .map(elem => elem.wordTranslate);
-      // todo новые слова перепроверить ТУТ!, которые придут не связанные с группой
       const filterWordsOfCurrentGroup = this.wordsFromAPI.questionWords?.map(card => {
         return card.wordTranslate;
       });
@@ -411,130 +454,16 @@ export default class AudioGame extends BaseComponent {
   }
 
   giveDataToModalStatistic(): IStatisticAnswer[] {
-    // return this.fake();
     return this.answersArray;
   }
 
   public playAgain() {
+    console.log('this.answersArray play again', this.answersArray);
+
     this.questionNumber = 0;
     this.currentQuestionCard = {};
     this.answersArray = [];
     (this.nextBtn as HTMLElement).style.pointerEvents = 'auto';
     this.showNextQuestion();
-  }
-
-  private fake() {
-    return [
-      {
-        answerCorrectness: false,
-        audio: 'files/10_0192.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0192.jpg',
-        page: 9,
-        word: 'immediate',
-        wordTranslate: 'немедленно',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0191.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0191.jpg',
-        page: 9,
-        word: 'unknown_2',
-        wordTranslate: 'неизвестно_2',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0191.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0191.jpg',
-        page: 9,
-        word: 'unknown_2',
-        wordTranslate: 'неизвестно_2',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0191.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0191.jpg',
-        page: 9,
-        word: 'unknown_2',
-        wordTranslate: 'неизвестно_2',
-      },
-      {
-        answerCorrectness: false,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: false,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-      {
-        answerCorrectness: true,
-        audio: 'files/10_0190.mp3',
-        group: 0,
-        id: '5e9f5ee35eb9e72bc21af55f',
-        image: 'files/10_0190.jpg',
-        page: 9,
-        word: 'unknown_3',
-        wordTranslate: 'неизвестно_3',
-      },
-    ];
   }
 }

@@ -74,7 +74,8 @@ export interface Statistics {
     rangeMultiplySprint?: boolean,
     newWordsPerDate?: DateNumber,
     learnedWordsPerDate?: DateNumber,
-  };
+  },
+  id?: string,
 }
 export interface DateNumber {
   [x: string]: number;

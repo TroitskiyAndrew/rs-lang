@@ -60,7 +60,7 @@ export default class PageDictionary extends BaseComponent {
   public createHTML(): void {
     const stepControl = createDiv({ className: 'dictionary__stepControl stepControl' });
     const contorol = createDiv({ className: 'dictionary__control' });
-    const level = createDiv({ className: 'dictionary__level', dataSet: { widget: 'flagPole' } });
+    const level = createDiv({ className: 'dictionary__level', dataSet: { widget: 'flagPole', fromDictionary: 'true' } });
 
     this.pageSelector.classList.add('paginator__selector');
     this.pageSelector.id = 'pageSelector';
@@ -125,7 +125,7 @@ export default class PageDictionary extends BaseComponent {
     this.updateButtons();
 
     const wordsList = this.currGroup <= constants.maxWordsGroup ? apiService.getChunkOfWords(this.currPage, this.currGroup) :
-      apiService.getAllUserAggregatedWords(this.userId, this.currGroup === constants.difficultGroup ? '{"userWord.difficulty":"difficult"}' : '{"userWord.optional.learned":true}', constants.maxWordsOnPage);
+      apiService.getAllUserAggregatedWords(this.userId, this.currGroup === constants.difficultGroup ? '{"userWord.difficulty":"difficult"}' : '{"userWord.optional.learned":true}');
     return wordsList.then((list: WordCard[] | number): void => {
       if (typeof list === 'number') {
         return;
