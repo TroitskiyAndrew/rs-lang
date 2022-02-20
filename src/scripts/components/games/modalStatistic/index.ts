@@ -174,7 +174,7 @@ export default class ModalStatistic extends BaseComponent {
   }
 
   async updateUserWordsAndStatistic(game: AudioGame | SprintGame) {
-    await this.updateOrCreateUserWords();
+    await this.updateOrCreateUserWords(game);
 
     await this.updateOrCreateStatistic(game);
   }
@@ -226,7 +226,11 @@ export default class ModalStatistic extends BaseComponent {
     if (typeof (allUserWords) === 'number') return;
     const learnedWords = allUserWords.filter(word => word.optional?.learned).length;
     const learnedWordsPerDay = allUserWords.filter(word => word.optional?.learnedAtDay === date).length;
-    const newWordsPerDay = allUserWords.filter(word => word.optional?.newAtDay === date).length;
+    const newWordsPerDayArray = allUserWords.filter(word => word.optional?.newAtDay === date);
+    // todo
+    const newWordsPerDayAudio = newWordsPerDayArray.filter(word => word.optional?.newFrom === 'audioGame').length;
+    const newWordsPerDaySprint = newWordsPerDayArray.filter(word => word.optional?.newFrom === 'sprintGame').length;
+
 
     if (typeof (userStatisticApi) !== 'number') {
       const statistics: Statistics = {
@@ -240,8 +244,11 @@ export default class ModalStatistic extends BaseComponent {
       const learnedWordsDateObj = userStatisticApi.optional.learnedWordsPerDate;
       statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
 
-      const newWordsDateObj = userStatisticApi.optional.newWordsPerDate;
-      statistics.optional.newWordsPerDate = this.updateObjDateLearnedNew(newWordsDateObj, date, newWordsPerDay);
+      const newWordsPerDayAudioObj = userStatisticApi.optional.newWordsPerDayAudio;
+      statistics.optional.newWordsPerDayAudio = this.updateObjDateLearnedNew(newWordsPerDayAudioObj, date, newWordsPerDayAudio);
+
+      const newWordsPerDaySprintObj = userStatisticApi.optional.newWordsPerDaySprint;
+      statistics.optional.newWordsPerDaySprint = this.updateObjDateLearnedNew(newWordsPerDaySprintObj, date, newWordsPerDaySprint);
 
       if (game instanceof AudioGame) {
         // correctAnswersAudio per Day
@@ -256,8 +263,6 @@ export default class ModalStatistic extends BaseComponent {
         statistics.optional.answersSprint = userStatisticApi.optional.answersSprint || {};
         // самая длинная серия правильных ответов
         const rightRangeAllTimeAudio = userStatisticApi.optional.correctAnswersRangeAudio;
-        // todo delete range audio above
-        // const rightRangeAllTimeAudio = 0;
         const rightRange = this.updateGameRightRange(rightRangeAllTimeAudio);
         statistics.optional.correctAnswersRangeAudio = rightRange;
 
@@ -317,8 +322,11 @@ export default class ModalStatistic extends BaseComponent {
       const learnedWordsDateObj = {};
       statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
 
-      const newWordsDateObj = {};
-      statistics.optional.newWordsPerDate = this.updateObjDateLearnedNew(newWordsDateObj, date, newWordsPerDay);
+      const newWordsPerDayAudioObj = {};
+      statistics.optional.newWordsPerDayAudio = this.updateObjDateLearnedNew(newWordsPerDayAudioObj, date, newWordsPerDayAudio);
+
+      const newWordsPerDaySprintObj = {};
+      statistics.optional.newWordsPerDaySprint = this.updateObjDateLearnedNew(newWordsPerDaySprintObj, date, newWordsPerDaySprint);
 
       console.log('create Statistic', statistics);
       await apiService.updateUserStatistics(userID, statistics);
@@ -328,7 +336,7 @@ export default class ModalStatistic extends BaseComponent {
     console.log('userStatisticAFTER', userStatisticAFTER);
   }
 
-  async updateOrCreateUserWords(): Promise<void> {
+  async updateOrCreateUserWords(game: AudioGame | SprintGame): Promise<void> {
     const userID = getState().userId;
     const currentDate = new Date();
     const date = currentDate.toISOString().split('T')[0];
@@ -337,33 +345,23 @@ export default class ModalStatistic extends BaseComponent {
     await Promise.all(this.resultArray.map(async (wordObj) => {
       // получаем каждое слово
       const userWordResponse = await apiService.getUserWord(userID, wordObj.id);
+      let gameFrom: 'audioGame' | 'sprintGame' = 'audioGame';
+      if (game instanceof AudioGame) {
+        gameFrom = 'audioGame';
+      } else if (game instanceof SprintGame) {
+        gameFrom = 'sprintGame';
+      }
+
       if (typeof (userWordResponse) !== 'number') {
         // обновляем слово
         const userWord = userWordResponse;
-
-        // todo new words/ learned words per date
-        // const answersPerDayAudio: DateValue = {};
-        // const answersPerDaySprint: DateValue = {};
-        // let rightRangeSprint = 0;
-        // let rightRangeAudio = 0;
-
-        // if (game instanceof AudioGame) {
-        //   correctAnswersPerDayAudio[date] = this.rightAnswers.length;
-        //   answersPerDayAudio[date] = this.resultArray.length;
-        //   rightRangeAudio = this.longestRightRange();
-        // } else if (game instanceof SprintGame) {
-        //   correctAnswersPerDaySprint[date] = this.rightAnswers.length;
-        //   answersPerDaySprint[date] = this.resultArray.length;
-        //   rightRangeSprint = this.longestRightRange();
-        // }
-        // todo end
-
         const wordBody: UserWord = {
           difficulty: userWord.difficulty,
           optional: {
             new: true,
             word: wordObj.word,
             newAtDay: userWord.optional?.newAtDay ? userWord.optional?.newAtDay : date,
+            newFrom: userWord.optional?.newFrom ? userWord.optional?.newFrom : gameFrom,
           },
         };
 
@@ -419,6 +417,7 @@ export default class ModalStatistic extends BaseComponent {
             answersAllTime: 1,
             newAtDay: date,
             learnedAtDay: false,
+            newFrom: gameFrom,
           },
         };
         await apiService.createUserWord(userID, wordObj.id, defaultWordBody);
@@ -427,7 +426,6 @@ export default class ModalStatistic extends BaseComponent {
     }));
 
   }
-
 
   drawWord(card: IStatisticAnswer) {
     const wordRow = createDiv({
