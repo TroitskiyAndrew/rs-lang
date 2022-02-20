@@ -13,7 +13,7 @@ export default class FlagPole extends BaseComponent {
   flagPole: HTMLInputElement = createInput({
     className: 'flagPole',
     type: 'range',
-  });;
+  });
 
   constructor(elem: HTMLElement) {
     super(elem);
