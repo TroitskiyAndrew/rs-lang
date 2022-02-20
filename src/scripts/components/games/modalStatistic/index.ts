@@ -179,19 +179,6 @@ export default class ModalStatistic extends BaseComponent {
     await this.updateOrCreateStatistic(game);
   }
 
-  /*   updateObjDate(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
-      if (!dateObj) {
-        dateObj = {};
-      }
-      if (date in dateObj) {
-        // такая дата есть в массиве с АПИ, обновляем
-        dateObj[date] = dateValue + dateObj[date];
-      } else {
-        dateObj[date] = dateValue;
-      }
-      return dateObj;
-    } */
-
   updateObjDateLearnedNew(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
     if (!dateObj) {
       dateObj = {};

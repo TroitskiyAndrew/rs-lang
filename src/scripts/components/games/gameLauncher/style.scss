@@ -40,6 +40,7 @@
     border-radius: 25px;
     margin-left: 200px;
     margin-right: 20px;
+    max-width: 740px;
     padding: 15px;
 
     .game-description__title {
@@ -48,6 +49,7 @@
     }
     .game-description__text {
       margin: 20px;
+      font-size: 1em;
 
       span {
         display: block;
@@ -57,18 +59,45 @@
     }
   }
 
-  .start-game {
-    // position: absolute;
-    // left: 50%;
-    // top: 50%;
-    // transform: translate(-50%, -50%);
-    // background-color: $brand-color;
-    // cursor: pointer;
-  }
-
   .launcher-games__flagPole {
     position: absolute;
     bottom: calc(12% + 60px);
     left: 0;
+  }
+
+  @media (max-width: 760px) {
+    &__description {
+      padding: 15px;
+
+      .game-description__title {
+        font-size: 1.2em;
+      }
+      .game-description__text {
+        margin: 10px;
+      }
+    }
+
+    &__navigation {
+      .launcher-games__link {
+        font-size: 1em;
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    &__description {
+      .game-description__title {
+        font-size: 1.1em;
+      }
+      .game-description__text {
+        font-size: 0.9em;
+      }
+    }
+
+    &__navigation {
+      .launcher-games__link {
+        font-size: 0.9em;
+      }
+    }
   }
 }

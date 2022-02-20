@@ -1,11 +1,10 @@
 import BaseComponent from '../../base';
 import { createDiv, createSpan } from '../../../utils';
 import { pageChenging } from '../../../rooting';
-// import constants from '../../../app.constants';
 import { instances } from '../../components';
 import FlagPole from '../../flagPole';
 import { getState, updateState } from '../../../state';
-
+import { apiService } from '../../../api/apiMethods';
 export default class GameLauncher extends BaseComponent {
 
   constructor(elem: HTMLElement) {
@@ -18,7 +17,16 @@ export default class GameLauncher extends BaseComponent {
 
     updateState({ launchGame: this.options });
 
+    // if user log in
+    if (getState().userId) {
+      this.checkAuthorization();
+    }
+
     return Promise.resolve();
+  }
+
+  private async checkAuthorization() {
+    await apiService.getUserStatistics(getState().userId);
   }
 
   public createHTML(): void {
@@ -90,6 +98,8 @@ export default class GameLauncher extends BaseComponent {
         'group': '0',
       });
       pageNavigation.append(gameSprint);
+
+
     }
 
     backBtn.append(createSpan({ text: 'Назад' }));
