@@ -24,7 +24,7 @@ export default class PageDictionary extends BaseComponent {
 
   wordElems: HTMLElement[];
 
-  goInput: HTMLInputElement = createInput({ className: 'paginator__mover', type: 'range' });
+  goInput: HTMLInputElement = createInput({ className: 'stepControl__mover', type: 'range' });
 
   paginator: HTMLDivElement = createDiv({ className: 'dictionary__paginator paginator' });
 
@@ -64,16 +64,16 @@ export default class PageDictionary extends BaseComponent {
 
     this.pageSelector.classList.add('paginator__selector');
     this.pageSelector.id = 'pageSelector';
-    this.paginator.append(createButton({ className: 'paginator__button icon-button prevPage', action: 'prevPage' }));
+    this.paginator.append(createButton({ className: 'paginator__button icon-button sega-button prevPage', action: 'prevPage' }));
     this.paginator.append(this.pageSelector);
-    this.paginator.append(createButton({ className: 'paginator__button icon-button nextPage', action: 'nextPage' }));
+    this.paginator.append(createButton({ className: 'paginator__button icon-button sega-button nextPage', action: 'nextPage' }));
 
-    this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button', text: 'АудиоСпринт', dataSet: { direction: 'audioGame' } }));
+    this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button', text: 'Аудио', dataSet: { direction: 'audioGame' } }));
     this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button', text: 'Спринт', dataSet: { direction: 'sprintGame' } }));
 
-    stepControl.append(createButton({ className: 'stepControl__step icon-button step-back', action: 'stepBack' }));
+    stepControl.append(createButton({ className: 'stepControl__step icon-button sega-button step-back', action: 'stepBack' }));
     stepControl.append(this.goInput);
-    stepControl.append(createButton({ className: 'stepControl__step icon-button step-forward', action: 'stepForward' }));
+    stepControl.append(createButton({ className: 'stepControl__step icon-button sega-button step-forward', action: 'stepForward' }));
 
     contorol.append(this.paginator);
     contorol.append(level);
