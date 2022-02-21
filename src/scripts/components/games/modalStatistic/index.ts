@@ -74,12 +74,11 @@ export default class ModalStatistic extends BaseComponent {
       text: `Всего слов - ${this.resultArray.length}`,
     });
 
-    let isEnableSound = true;
+    let isEnableSound = false;
 
     if (parenWidget instanceof AudioGame) {
-      console.log('AUDIO GAME');
+      // from audio-game
     } else if (parenWidget instanceof SprintGame) {
-      console.log('Sprint Game');
       const totalScore = createSpan({
         text: `К-во баллов - ${parenWidget.giveScoreToModalStatistic()}`,
       });
@@ -204,7 +203,6 @@ export default class ModalStatistic extends BaseComponent {
     const date = currentDate.toISOString().split('T')[0];
     const userStatisticApi = await apiService.getUserStatistics(userID);
     const allUserWords = await apiService.getAllUserWords(userID);
-    console.log('userWord FROM', allUserWords);
 
     if (typeof (allUserWords) === 'number') return;
     const learnedWords = allUserWords.filter(word => word.optional?.learned).length;
@@ -305,12 +303,8 @@ export default class ModalStatistic extends BaseComponent {
       const newWordsPerDaySprintObj = {};
       statistics.optional.newWordsPerDaySprint = this.updateObjDateLearnedNew(newWordsPerDaySprintObj, date, newWordsPerDaySprint);
 
-      console.log('create Statistic', statistics);
       await apiService.updateUserStatistics(userID, statistics);
     }
-
-    const userStatisticAFTER = await apiService.getUserStatistics(userID);
-    console.log('userStatisticAFTER', userStatisticAFTER);
   }
 
   private async updateOrCreateUserWords(game: AudioGame | SprintGame): Promise<void> {
@@ -351,12 +345,8 @@ export default class ModalStatistic extends BaseComponent {
         };
 
         if (!wordBody.optional || !userWord.optional) return;
-
-        // todo
         const isLearnedBefore = userWord.optional?.learned ? userWord.optional?.learned : false;
         let change = 0;
-        // todo end
-        console.log('isLearnedBefore', isLearnedBefore);
 
         if (!wordObj.answerCorrectness) {
           wordBody.optional.rightRange = 0;
@@ -389,14 +379,11 @@ export default class ModalStatistic extends BaseComponent {
           }
         }
 
-        // todo
         statistic.optional.learnedWordsPerDate = updateObjDate(statistic.optional.learnedWordsPerDate, change);
         if (statistic.id) {
           delete statistic.id;
         }
-        console.log('change!!!!!!!!', change);
         await apiService.updateUserStatistics(userID, statistic);
-        // todo end
 
         let answersAmountAllTime = userWord.optional.answersAllTime;
         if (answersAmountAllTime) {
@@ -404,7 +391,6 @@ export default class ModalStatistic extends BaseComponent {
         } else {
           wordBody.optional.answersAllTime = 1;
         }
-        console.log('wordBody', wordBody);
         await apiService.updateUserWord(userID, wordObj.id, wordBody);
       } else {
         // createUserWord

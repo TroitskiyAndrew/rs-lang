@@ -66,10 +66,10 @@ export default class PageHome extends BaseComponent {
         class="main-view-container__title_green">.</span>
       </h1>`;
 
-    descriptionWrapperParagraph.innerHTML = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
+    descriptionWrapperParagraph.innerHTML = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи
     вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
     а также добудете морские сокровища за хорошее знание языка!`;
-    
+
     descrirtionSubWrapper.append(descriptionWrapperParagraph);
     descrirtionSubWrapper.append(star);
     descrirtionWrapper.append(descrirtionSubWrapper);
@@ -97,10 +97,10 @@ export default class PageHome extends BaseComponent {
     memberGithubLink.className = 'github-link';
 
     teamTitle.innerHTML = '<h2 class="team-container__title">Наша команда.</h2>';
-    
+
     memberGithubLink.innerHTML = this.getGithubSvg('#ffdb73');
     memberGithub.append(memberGithubLink);
-    
+
     memberWrapper.append(memberAvatar);
     memberWrapper.append(memberGithub);
     memberWrapper.append(memberName);
@@ -132,20 +132,20 @@ export default class PageHome extends BaseComponent {
           githubLink = el.children[1].children[0] as HTMLAnchorElement;
           githubLink.href = 'https://github.com/TroitskiyAndrew';
           el.children[person].textContent = 'Андрей Троицкий';
-          el.children[role].innerHTML = 'Team lead<br>Frontend Engineer';
-          el.children[contribution].textContent = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
-          вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
-          а также добудете морские сокровища за хорошее знание языка`;
+          el.children[role].innerHTML = 'Frontend Engineer';
+          el.children[contribution].innerHTML = `Структура приложения, все основные компоненты.
+          Страница словаря с карточками.
+          Страница статистики.`;
           break;
         case 1:
-          el.children[0].append(this.getAvatar('/../../../assets/img/homePage/ava-mushrum-red.jpg', 'dmitro'));
+          el.children[0].append(this.getAvatar('/../../../assets/img/homePage/zozuliak.jpg', 'dmytro'));
           githubLink = el.children[1].children[0] as HTMLAnchorElement;
           githubLink.href = 'https://github.com/dmytrozozuliak';
-          el.children[person].textContent = 'Дмитрий';
+          el.children[person].textContent = 'Дмитрий Зозуляк';
           el.children[role].textContent = 'Frontend Engineer';
-          el.children[contribution].textContent = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
-          вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
-          а также добудете морские сокровища за хорошее знание языка`;
+          el.children[contribution].textContent = `Авторизация пользователя.
+          Методы API.
+          Игра Аудиовызов.`;
           break;
         case 2:
           el.children[0].append(this.getAvatar('/../../../assets/img/homePage/essonti.png', 'sergei'));
@@ -153,14 +153,14 @@ export default class PageHome extends BaseComponent {
           githubLink.href = 'https://github.com/Essonti';
           el.children[person].textContent = 'Сергей Трофимченко';
           el.children[role].textContent = 'Frontend Engineer';
-          el.children[contribution].textContent = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
-          вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
-          а также добудете морские сокровища за хорошее знание языка`;
+          el.children[contribution].textContent = `Дизайн.
+          Игра спринт.
+          Главная страница.`;
           break;
       }
     });
   }
- 
+
 
   private getAvatar(path: string, name: string) {
     const avatarImg = document.createElement('img');
@@ -205,7 +205,7 @@ export default class PageHome extends BaseComponent {
 
 // private async getDescrirtionWrapperWidth(): Promise<HTMLDivElement> {
 //   const descrirtionWrapper = await document.querySelector('.description-sub-wrapper') as HTMLDivElement;
-//   return descrirtionWrapper; 
+//   return descrirtionWrapper;
 // }
 
 // let getDescriptionWrapperSizes = () => {
@@ -218,7 +218,7 @@ export default class PageHome extends BaseComponent {
 // page.append(createSpan({ text: 'Содержание главной страницы' }));
 
 //   private async getStarAnimation() {
-  
+
 //     let dynamicStyles: HTMLStyleElement | null = null;
 
 //     function addAnimation(body: string) {
@@ -227,16 +227,16 @@ export default class PageHome extends BaseComponent {
 //         // dynamicStyles.type = 'text/css';
 //         document.head.appendChild(dynamicStyles);
 //       }
-      
+
 //       dynamicStyles.sheet!.insertRule(body/*, dynamicStyles.length*/);
 //     }
 
 
 // console.log(this.getDescrirtionWrapperWidth())
 //     this.getDescrirtionWrapperWidth().then(val => console.log(val))
-    
+
 //     // this.getDescrirtionWrapperWidth().then(val => console.log(val))
-    
+
 //       addAnimation(`
 //         @keyframes move-star {
 //           0%   {left:0px; top:0px;}

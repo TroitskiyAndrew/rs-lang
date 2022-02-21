@@ -68,38 +68,30 @@ export default class AudioGame extends BaseComponent {
       // Если групп 6 (сложные слова), то запрос
       const hardsWordGroup = 6;
       if (this.group === hardsWordGroup && this.fromDictionary) {
-        console.log('groupe with hard words');
         const difficultWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}');
-        console.log('difficultWords', difficultWords);
         if (typeof (difficultWords) === 'number') return;
         this.wordsFromAPI.questionWords = difficultWords;
       } else if (this.fromDictionary) {
         // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
         const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, this.group);
-        console.log('notLearnedWords', notLearnedWords);
 
         if (typeof (notLearnedWords) === 'number') return;
         if (this.page === undefined) return;
         const currentPage = this.page;
         const notLearnedWordsFilteredBePage = notLearnedWords.filter(word => word.page <= currentPage);
-        console.log('notLearnedWords', notLearnedWordsFilteredBePage);
         const last20Words = notLearnedWordsFilteredBePage.slice(-constants.maxNumberOfQuestionsAudio);
-        console.log('last20Words', last20Words);
         this.wordsFromAPI.questionWords = last20Words;
       } else {
         // если группа от 0 до 5 БЕЗ флага fromDictionary, то все слова со страницы
-        console.log('from games');
         await this.setAllQuestionWordsToState();
       }
     } else {
-      console.log('не авторизован');
       await this.setAllQuestionWordsToState();
     }
 
     if (this.wordsFromAPI.questionWords && this.wordsFromAPI.questionWords.length < constants.minQuestionsGame) {
       this.wordsFromAPI.questionWords = [];
       // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
-      console.log('modal window not 5 words!');
       const questionField = this.elem.querySelector('.audio-game__answers') as HTMLElement;
       questionField.textContent = 'Минимум 5 слов требуется для игры.';
       const nextBtn = this.nextBtn as HTMLElement;
@@ -113,11 +105,8 @@ export default class AudioGame extends BaseComponent {
       };
       return;
     }
-
-
     // создаем массив из слов-перевода, который НЕ включает слова с вопросов
     await this.setAllTranslateWordsToState();
-    console.log('this.wordsFromAPI', this.wordsFromAPI);
 
     if (!this.wordsFromAPI.questionWords) return;
     this.totalQuestions = this.wordsFromAPI.questionWords.length - 1;
@@ -148,12 +137,6 @@ export default class AudioGame extends BaseComponent {
     if (options.fromDictionary) {
       this.fromDictionary = options.fromDictionary;
     }
-    // todo delete
-    // this.page = 0;
-    // this.group = 0;
-    console.log('this.page', this.page);
-    console.log('this.group', this.group);
-    console.log('this.fromDictionary', this.fromDictionary);
   }
 
 
@@ -292,7 +275,7 @@ export default class AudioGame extends BaseComponent {
     if (!this.wordsFromAPI.questionWords) return;
     this.currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
 
-    console.log('currentQuestionCard', this.currentQuestionCard);
+    // console.log('currentQuestionCard', this.currentQuestionCard);
     // картинка
     this.implementPicture();
     // аудио звук
