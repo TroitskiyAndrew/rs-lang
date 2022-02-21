@@ -5,8 +5,13 @@ import { pageChenging } from '../../rooting';
 const TEAM_MEMBERS_NUMBER = 3;
 
 export default class PageHome extends BaseComponent {
+
   descrirtionWrapper: HTMLDivElement | undefined;
+  memberGithub: HTMLDivElement | undefined;
+
   descriptionWrapperParagraph: HTMLParagraphElement | undefined;
+
+  memberGithubLink: HTMLAnchorElement | undefined;
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -86,6 +91,8 @@ export default class PageHome extends BaseComponent {
     const memberPosition = createDiv({ className: 'member-wrapper__position' });
     const memberContribution = createDiv({ className: 'member-wrapper__contribution' });
     const memberGithubLink = document.createElement('a');
+    this.memberGithub = memberGithub;
+    this.memberGithubLink = memberGithubLink;
 
     memberGithubLink.className = 'github-link';
 
@@ -123,7 +130,9 @@ export default class PageHome extends BaseComponent {
           githubLink.href = 'https://github.com/TroitskiyAndrew';
           el.children[2].textContent = 'Андрей Троицкий';
           el.children[3].innerHTML = 'Team lead<br>Frontend Engineer';
-          el.children[4].textContent = 'Вклад в разработку';
+          el.children[4].textContent = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
+          вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
+          а также добудете морские сокровища за хорошее знание языка`;
           break;
         case 1:
           el.children[0].append(this.getAvatar(`/../../../assets/img/homePage/ava-mushrum-red.jpg`, 'dmitro'));
@@ -131,7 +140,9 @@ export default class PageHome extends BaseComponent {
           githubLink.href = 'https://github.com/dmytrozozuliak';
           el.children[2].textContent = 'Дмитрий';
           el.children[3].textContent = 'Frontend Engineer';
-          el.children[4].textContent = 'Вклад в разработку';
+          el.children[4].textContent = `Онлайн сервис для изучения английского языка.<br>Вместе с любимыми героями культовой игры Марио и Луиджи 
+          вы будете изучать слова на бескрайних просторах Грибного королевства, услышите много нового в загадочном подземелье,
+          а также добудете морские сокровища за хорошее знание языка`;
           break;
         case 2:
           el.children[0].append(this.getAvatar(`/../../../assets/img/homePage/essonti.png`, 'sergei'));
@@ -186,9 +197,22 @@ export default class PageHome extends BaseComponent {
 
   }
 
-
-
 }
+
+
+  //   console.log(this.memberGithubLink )
+  //  this.getMemberGithub().then(val => {
+  //    console.log(val)
+  //   val!.addEventListener('mouseover', () => {
+  //     console.log(111)
+  //     this.memberGithubLink!.innerHTML = this.getGithubSvg('#ff0000');
+  //     }
+  //   )})
+
+  // public async getMemberGithub() {
+  //   return await this.memberGithubLink;
+  // }
+
 
 // private async getDescrirtionWrapperWidth(): Promise<HTMLDivElement> {
 //   const descrirtionWrapper = await document.querySelector('.description-sub-wrapper') as HTMLDivElement;

@@ -308,10 +308,7 @@ class ApiResourceService {
     if (group !== undefined) {
       groupQuery = `{"group": ${group}},`;
     }
-    let perPageQuery = '';
-    if (wordsPerPage !== undefined) {
-      perPageQuery = `wordsPerPage=${wordsPerPage}`;
-    }
+    const perPageQuery = `wordsPerPage=${wordsPerPage || constants.maxWordsOnPage}`;
 
     const rawResponse = await fetch(`${users}/${userId}/aggregatedWords?${perPageQuery}&filter={"$and": [${groupQuery} ${pageQuery} ${filters}]}`, {
       method: 'GET',

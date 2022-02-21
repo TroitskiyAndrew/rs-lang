@@ -51,6 +51,7 @@ export interface UserWord {
     answersAllTime?: number,
     newAtDay?: string,
     learnedAtDay?: string | boolean,
+    newFrom?: 'audioGame' | 'sprintGame';
   },
 }
 export interface PaginatedResults {
@@ -72,9 +73,11 @@ export interface Statistics {
     correctAnswersRangeAudio?: number,
     rangeMultiplyAudio?: boolean,
     rangeMultiplySprint?: boolean,
-    newWordsPerDate?: DateNumber,
     learnedWordsPerDate?: DateNumber,
-  };
+    newWordsPerDayAudio?: DateNumber,
+    newWordsPerDaySprint?: DateNumber,
+  },
+  id?: string,
 }
 export interface DateNumber {
   [x: string]: number;

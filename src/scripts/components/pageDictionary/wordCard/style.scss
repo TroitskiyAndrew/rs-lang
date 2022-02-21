@@ -76,6 +76,7 @@
 }
 
 .wordCard:not(._authorized) {
+  .button-block.statistic,
   .button-block.difficult,
   .button-block.learned {
     display: none;
@@ -122,5 +123,9 @@
     &::before {
       font-size: 40px;
     }
+  }
+  &__text {
+    @include position;
+    font-size: 24px;
   }
 }

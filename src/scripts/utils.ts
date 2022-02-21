@@ -1,3 +1,4 @@
+import { DateNumber } from './api/api.types';
 import { TableHeader, DivOptions, SpanOptions, ButtonOptions, InputOptions } from './common.types';
 import { instances } from './components/components';
 import Menu from './components/menu';
@@ -126,4 +127,31 @@ export function shuffleArray<T>(array: Array<T>) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
+}
+
+export function updateObjDate(dateObj: DateNumber | undefined, dateValue: number): DateNumber {
+  const currentDate = new Date();
+  const date = currentDate.toISOString().split('T')[0];
+  if (!dateObj) {
+    dateObj = {};
+  }
+  if (date in dateObj) {
+    // такая дата есть в массиве с АПИ, обновляем
+    dateObj[date] = dateValue + dateObj[date];
+  } else {
+    dateObj[date] = dateValue;
+  }
+  return dateObj;
+}
+
+export function getTodayCount(dateObj: DateNumber | undefined): number {
+  const currentDate = new Date();
+  const date = currentDate.toISOString().split('T')[0];
+  if (!dateObj) {
+    return 0;
+  }
+  if (date in dateObj) {
+    return dateObj[date];
+  }
+  return 0;
 }

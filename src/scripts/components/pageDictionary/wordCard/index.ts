@@ -1,8 +1,8 @@
 import BaseComponent from '../../base';
-import { createButton, createDiv } from '../../../utils';
+import { createButton, createDiv, createSpan, updateObjDate } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 import { getState } from '../../../state';
-import { UserWord } from '../../../api/api.types';
+import { Statistics, UserWord } from '../../../api/api.types';
 import constants from '../../../app.constants';
 
 export default class WordsCard extends BaseComponent {
@@ -76,6 +76,7 @@ export default class WordsCard extends BaseComponent {
       if (typeof userWord !== 'number') {
         this.wordBody.difficulty = userWord.difficulty;
         this.wordBody.optional = userWord.optional;
+        (this.elem.querySelector('.text-statistic') as HTMLSpanElement).textContent = `${this.wordBody.optional.correctAnswersAllTime || 0}/${this.wordBody.optional.answersAllTime || 0}`;
         this.changeStatus();
 
       } else {
@@ -100,6 +101,7 @@ export default class WordsCard extends BaseComponent {
     contorls.append(this.createButtonBlock('visibility', 'Показать/скрыть перевод'));
     contorls.append(this.createButtonBlock('difficult', 'Добавить/убрать из списка сложных слов'));
     contorls.append(this.createButtonBlock('learned', 'Добавить/убрать из списка выученных слов'));
+    contorls.append(this.createButtonBlock('statistic', 'Количество правильных ответов в играх', '0/0'));
 
     this.img.classList.add('wordCard__img');
     ruHolder.append(createDiv({ className: 'bricks' }));
@@ -122,7 +124,7 @@ export default class WordsCard extends BaseComponent {
 
   }
 
-  private createButtonBlock(type: string, hint: string): HTMLDivElement {
+  private createButtonBlock(type: string, hint: string, text?: string): HTMLDivElement {
     const block = createDiv({ className: `wordCard__button-block button-block ${type}` });
     block.setAttribute('title', hint);
 
@@ -130,7 +132,11 @@ export default class WordsCard extends BaseComponent {
     block.append(createDiv({ className: 'button-block__circle left-bottom' }));
     block.append(createDiv({ className: 'button-block__circle right-top' }));
     block.append(createDiv({ className: 'button-block__circle right-bottom' }));
-    block.append(createButton({ className: `button-block__button icon-button btn-${type}`, action: `${type}` }));
+    if (text) {
+      block.append(createSpan({ className: `button-block__text icon-button text-${type}`, text: text }));
+    } else {
+      block.append(createButton({ className: `button-block__button icon-button btn-${type}`, action: `${type}` }));
+    }
 
     return block;
   }
@@ -179,6 +185,9 @@ export default class WordsCard extends BaseComponent {
 
   private toggleDifficult(): void {
     this.wordBody.difficulty = this.wordBody.difficulty === 'common' ? 'difficult' : 'common';
+    if (this.wordBody.difficulty === 'difficult') {
+      this.wordBody.optional.learned = false;
+    }
     apiService.updateUserWord(this.userId, this.wordId, this.wordBody);
     this.changeStatus();
   }
@@ -188,9 +197,30 @@ export default class WordsCard extends BaseComponent {
     if (this.wordBody.optional.learned) {
       this.wordBody.difficulty = 'common';
     }
+    this.updateStatistic(this.wordBody.optional.learned);
     apiService.updateUserWord(this.userId, this.wordId, this.wordBody);
     this.changeStatus();
     this.wordStatusChange(this.wordBody.optional.learned);
+  }
+
+  private async updateStatistic(learned: boolean): Promise<void> {
+    const apiStatistic = await apiService.getUserStatistics(this.userId);
+    const defaultStatistic: Statistics = {
+      learnedWords: 0,
+      optional: {
+        learnedWordsPerDate: updateObjDate(undefined, 0),
+      },
+    };
+    const statistic = typeof apiStatistic !== 'number' ? apiStatistic : defaultStatistic;
+    console.log(statistic);
+    const change = learned ? 1 : -1;
+    statistic.learnedWords = statistic.learnedWords as number + change;
+    statistic.optional.learnedWordsPerDate = updateObjDate(statistic.optional.learnedWordsPerDate, change);
+    if (statistic.id) {
+      delete statistic.id;
+    }
+    console.log(statistic);
+    return apiService.updateUserStatistics(this.userId, statistic).then();
   }
 
   private wordStatusChange(add: boolean): void {
