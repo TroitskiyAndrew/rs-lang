@@ -275,7 +275,6 @@ export default class AudioGame extends BaseComponent {
     if (!this.wordsFromAPI.questionWords) return;
     this.currentQuestionCard = this.wordsFromAPI.questionWords[this.questionNumber];
 
-    // console.log('currentQuestionCard', this.currentQuestionCard);
     // картинка
     this.implementPicture();
     // аудио звук

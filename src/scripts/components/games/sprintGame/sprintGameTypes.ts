@@ -7,7 +7,6 @@ export interface IGameOptions {
 
 export interface IWordParams extends IStatisticAnswer {
   translateCorrectness?: boolean,
-  // _id?: string,
 }
 
 export interface IScoreCounter {

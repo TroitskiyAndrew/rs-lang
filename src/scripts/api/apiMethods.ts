@@ -3,7 +3,6 @@ import { updateState, getState } from '../state';
 import constants from '../app.constants';
 import User from '../components/user';
 
-// export const baseUrl = 'http://127.0.0.1:3000';
 export const baseUrl = 'https://rs-learning-words.herokuapp.com';
 const signIn = `${baseUrl}/signin`;
 const users = `${baseUrl}/users`;
@@ -143,13 +142,8 @@ class ApiResourceService {
       },
     });
 
-    if (rawResponse.status === APISStatus['403']) {
-      // exit from current user, show login? refresh page
-      console.log('REFRESH TOKEN EXPIRED 403 error');
-    }
 
     if (rawResponse.status === APISStatus['200']) {
-      console.log('changing token , status ok "getNewUserTokens"');
 
       const authorization: Authorization = await rawResponse.json();
       const { refreshToken, token } = authorization;
@@ -177,7 +171,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.getAllUserWords(userId);
       } else {
         this.whenRefreshTokenExpired();
@@ -206,7 +199,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.createUserWord(userId, wordId, wordBody);
       } else {
         this.whenRefreshTokenExpired();
@@ -234,7 +226,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.getUserWord(userId, wordId);
       } else {
         this.whenRefreshTokenExpired();
@@ -263,7 +254,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.updateUserWord(userId, wordId, wordBody);
       } else {
         this.whenRefreshTokenExpired();
@@ -290,7 +280,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.deleteUserWord(userId, wordId);
       } else {
         this.whenRefreshTokenExpired();
@@ -322,7 +311,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.getAllUserAggregatedWords(userId, filters, wordsPerPage, group, page);
       } else {
         this.whenRefreshTokenExpired();
@@ -351,7 +339,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.getAggregatedWord(userId, wordId);
       } else {
         this.whenRefreshTokenExpired();
@@ -380,7 +367,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.getUserStatistics(userId);
       } else {
         this.whenRefreshTokenExpired();
@@ -409,7 +395,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.updateUserStatistics(userId, statisticsBody);
       } else {
         this.whenRefreshTokenExpired();
@@ -438,7 +423,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.getUserSettings(userId);
       } else {
         this.whenRefreshTokenExpired();
@@ -467,7 +451,6 @@ class ApiResourceService {
     if (rawResponse.status === APISStatus['401'] || rawResponse.status === APISStatus['402']) {
       const tokenResponse = await this.getNewUserTokens(getState().userId);
       if (typeof (tokenResponse) !== 'number') {
-        console.log('token updated!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         await this.updateUserSettings(userId, settingsBody);
       } else {
         this.whenRefreshTokenExpired();
@@ -485,7 +468,6 @@ class ApiResourceService {
   async whenRefreshTokenExpired() {
     localStorage.clear();
     User.logOutUser();
-    console.log('token didn\'t update! Exit User from REGISTRATION and clear local!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
   }
 
 }

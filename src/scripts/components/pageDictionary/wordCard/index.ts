@@ -211,14 +211,12 @@ export default class WordsCard extends BaseComponent {
       },
     };
     const statistic = typeof apiStatistic !== 'number' ? apiStatistic : defaultStatistic;
-    console.log(statistic);
     const change = learned ? 1 : -1;
     statistic.learnedWords = statistic.learnedWords as number + change;
     statistic.optional.learnedWordsPerDate = updateObjDate(statistic.optional.learnedWordsPerDate, change);
     if (statistic.id) {
       delete statistic.id;
     }
-    console.log(statistic);
     return apiService.updateUserStatistics(this.userId, statistic).then();
   }
 
