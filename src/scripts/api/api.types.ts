@@ -50,7 +50,6 @@ export interface UserWord {
     correctAnswersAllTime?: number,
     answersAllTime?: number,
     newAtDay?: string,
-    learnedAtDay?: string | boolean,
     newFrom?: 'audioGame' | 'sprintGame';
   },
 }
