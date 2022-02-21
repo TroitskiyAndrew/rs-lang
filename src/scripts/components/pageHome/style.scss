@@ -11,9 +11,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  background-color: #28282B;
+  background-color: #28282b;
   font-family: 'F77 Minecraft';
-  
 }
 
 .loading {
@@ -24,7 +23,6 @@
 // ===================================================================
 
 .main-view-container {
-
   display: inherit;
   flex-direction: inherit;
   align-items: inherit;
@@ -64,7 +62,6 @@
 .description-sub-wrapper_p {
   margin: 40px;
   text-align: center;
-  
 }
 
 .star-img {
@@ -97,13 +94,27 @@
 }
 
 @keyframes move-star {
-  0%   {left:0px; top:0px;}
-  25%  {left:calc(100% - 40px); top:0px;}
-  50%  {left:calc(100% - 40px); top:calc(100% - 40px);}
-  75%  {left:0px; top:calc(100% - 40px);}
-  100% {left:0px; top:0px;}
+  0% {
+    left: 0px;
+    top: 0px;
+  }
+  25% {
+    left: calc(100% - 40px);
+    top: 0px;
+  }
+  50% {
+    left: calc(100% - 40px);
+    top: calc(100% - 40px);
+  }
+  75% {
+    left: 0px;
+    top: calc(100% - 40px);
+  }
+  100% {
+    left: 0px;
+    top: 0px;
+  }
 }
-
 
 // 2. Team
 // ===================================================================
@@ -141,13 +152,17 @@
   text-align: center;
 }
 
+.member-wrapper__name {
+  color: #c2c2c2;
+}
+
 .member-wrapper__avatar {
   width: 100px;
   height: 100px;
   border-radius: 50%;
 }
 
-img[class*="member-wrapper__avatar"] {
+img[class*='member-wrapper__avatar'] {
   width: 100px;
   height: 100px;
   border-radius: 50%;
@@ -160,7 +175,8 @@ img[class*="member-wrapper__avatar"] {
 }
 
 .github-svg:hover {
-  filter: invert(27%) sepia(93%) saturate(7466%) hue-rotate(357deg) brightness(104%) contrast(121%);
+  filter: invert(27%) sepia(93%) saturate(7466%) hue-rotate(357deg)
+    brightness(104%) contrast(121%);
 }
 
 // 3. Footer
@@ -176,33 +192,30 @@ img[class*="member-wrapper__avatar"] {
 }
 
 .home-footer__school-link:hover {
-  background-color: #ffdb73;  
+  background-color: #ffdb73;
   -webkit-text-stroke: 0px black;
 }
 
 @media (max-width: 1200px) {
+  // 4. Main-view-adaptivity
+  // ===================================================================
 
-// 4. Main-view-adaptivity
-// ===================================================================
+  .main-view-container__title {
+    font-size: 1.6rem;
+  }
 
-.main-view-container__title {
-  font-size: 1.6rem;
-}
+  .main-view-container__description-wrapper {
+    width: 98%;
+    font-size: 1.1rem;
+  }
 
-.main-view-container__description-wrapper {
-  width: 98%;
-  font-size: 1.1rem;
-}
-
-
-
-// 5. Team-adaptivity
-// ===================================================================
+  // 5. Team-adaptivity
+  // ===================================================================
 
   .team-container {
     max-width: 100%;
   }
-  
+
   .team-container__members-wrapper {
     flex-direction: column;
     align-items: center;
