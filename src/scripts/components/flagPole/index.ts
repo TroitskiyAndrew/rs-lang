@@ -1,17 +1,32 @@
 
-import { createDiv, createSpan, createButton, createInput } from '../../utils';
+import { createDiv, createInput } from '../../utils';
 import constants from '../../app.constants';
 import BaseComponent from '../base';
+import { getState } from '../../state';
 
 export default class FlagPole extends BaseComponent {
 
   value = '';
 
-  flagPole: HTMLInputElement | undefined;
+  groupsCount = 0;
+
+  flagPole: HTMLInputElement = createInput({
+    className: 'flagPole',
+    type: 'range',
+  });
 
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'flagPole';
+  }
+
+  public oninit(): Promise<void> {
+    if (this.elem.dataset.fromDictionary) {
+      this.flagPole.value = String(getState().dictionaryGroup);
+      this.moveFlag();
+    }
+
+    return Promise.resolve();
   }
 
   public createHTML(): void {
@@ -25,12 +40,11 @@ export default class FlagPole extends BaseComponent {
     const flagPoleWrapper = createDiv({
       className: 'flagPole-wrapper',
     });
-    this.flagPole = createInput({
-      className: 'flagPole',
-      type: 'range',
-    });
+    const state = getState();
+    this.groupsCount = constants.maxWordsGroup + (state.userId ? 2 : 0);
+
     this.flagPole.min = constants.minWordsGroup.toString();
-    this.flagPole.max = constants.maxWordsGroup.toString();
+    this.flagPole.max = String(this.groupsCount);
     this.flagPole.step = '1';
     this.flagPole.value = '0';
 
@@ -58,11 +72,19 @@ export default class FlagPole extends BaseComponent {
     const flagHeight = flagPole.offsetWidth;
     const flagDeadZone = 100;
     const flagWorkHeight = flagHeight - flagDeadZone;
-    const flagSection = flagWorkHeight / constants.maxWordsGroup;
+    const flagSection = flagWorkHeight / this.groupsCount;
 
-    for (let i = 0; i <= constants.maxWordsGroup; i++) {
+    for (let i = 0; i <= this.groupsCount; i++) {
       if (numberValue === i) {
-        number.textContent = numberValue + 1 + '';
+        let text = '';
+        if (numberValue <= constants.maxWordsGroup) {
+          text = String(numberValue + 1);
+        } else if (numberValue == constants.maxWordsGroup + 1) {
+          text = 'С';
+        } else {
+          text = 'В';
+        }
+        number.textContent = text;
         number.style.bottom = basicBottomPosition + flagSection * (i) + 'px';
       }
     }
