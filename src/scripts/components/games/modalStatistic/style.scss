@@ -16,7 +16,7 @@
   }
 
   &__button {
-    min-width: 115px;
+    min-width: 150px;
   }
 
   /*   &__play-again {
@@ -30,8 +30,7 @@
     width: 100px;
     height: 70px;
     margin: 0 auto;
-    background: url('/src/assets/img/sprintGame/gif/mario-luigi.gif')
-      center/cover no-repeat;
+    background: url("/src/assets/img/sprintGame/gif/mario-luigi.gif") center/cover no-repeat;
   }
 
   &__content {
@@ -139,7 +138,7 @@
     display: block;
 
     &.icon-button::before {
-      content: '\f144';
+      content: "\f144";
       color: white;
       font-size: 20px;
     }

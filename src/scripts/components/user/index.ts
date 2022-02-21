@@ -98,13 +98,13 @@ export default class User extends BaseComponent {
       className: 'modal-user__warning form-exist__warning',
     });
     this.registrationBtn = createButton({
-      className: 'modal-user__submit registration',
-      text: 'РЕГИСТРАЦИЯ',
+      className: 'modal-user__submit registration common-button',
+      text: 'регистрация',
       action: 'registrate-user',
     });
     this.loginBtn = createButton({
-      className: 'modal-user__submit login',
-      text: 'ВОЙТИ',
+      className: 'modal-user__submit login common-button',
+      text: 'вход',
       action: 'login-user',
     });
     this.changeModalBtnR = createButton({

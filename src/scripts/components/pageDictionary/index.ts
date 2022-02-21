@@ -179,6 +179,7 @@ export default class PageDictionary extends BaseComponent {
       }
       console.log('allLearned');
       this.gamesButtonsControl(true);
+      (this.paginator.querySelector(`[value="${this.currPage}"]`) as HTMLElement).classList.add('_learned');
     }
   }
 
@@ -191,6 +192,7 @@ export default class PageDictionary extends BaseComponent {
       console.log('notAllLearned');
       this.gamesButtonsControl(false);
     }
+    (this.paginator.querySelector(`[value="${this.currPage}"]`) as HTMLElement).classList.remove('_learned');
     this.learnedWordsCount -= 1;
   }
 
@@ -210,7 +212,7 @@ export default class PageDictionary extends BaseComponent {
         newOption.classList.add('_learned');
       }
       newOption.value = String(i);
-      newOption.textContent = `Страница #${i + 1}`;
+      newOption.textContent = `Стр. #${i + 1}`;
       this.pageSelector.append(newOption);
 
     }
