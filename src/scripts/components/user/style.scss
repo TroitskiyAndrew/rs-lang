@@ -1,5 +1,3 @@
-// .logoUser {
-// }
 .logo-user {
   font-size: 35px;
   color: $light-grey;
@@ -16,17 +14,19 @@
   background: #c2c2c2;
   transition: all 0.3s ease 0s;
 }
+
 .modal-user.show {
   left: 50%;
 }
 
 .modal-overlay {
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100%;
   background: rgb(0, 0, 0, 0.4);
   display: none;
 }
+
 .modal-overlay.show {
   display: block;
 }

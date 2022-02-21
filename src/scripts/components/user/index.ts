@@ -3,8 +3,6 @@ import { createSpan, createDiv, createInput, createButton } from '../../utils';
 import { apiService } from '../../api/apiMethods';
 import { updateState, getState } from '../../state';
 import { updateContent } from '../../rooting';
-// import '../../api/testingApiMethods';
-
 export default class User extends BaseComponent {
   logoUser: HTMLElement | undefined;
 
@@ -46,11 +44,11 @@ export default class User extends BaseComponent {
     const lockLogo = document.createElement('i');
     lockLogo.classList.add('fas', 'fa-lock', 'modal-user__lock');
     const modalTitleR = createSpan({
-      text: 'Registration',
+      text: 'Регистрация',
       className: 'modal-user__title registration',
     });
     const modalTitleL = createSpan({
-      text: 'Log in',
+      text: 'Авторизация',
       className: 'modal-user__title login',
     });
     const formName = createDiv({
@@ -59,10 +57,10 @@ export default class User extends BaseComponent {
     this.inputName = createInput({
       className: 'modal-user__input',
       type: 'text',
-      placeholder: 'Name*',
+      placeholder: 'Имя*',
     });
     const nameWarning = createSpan({
-      text: 'Name must contains at least 3 chars',
+      text: 'Имя должно содержать минимум 3 символа',
       className: 'modal-user__warning form-name__warning',
     });
 
@@ -72,10 +70,10 @@ export default class User extends BaseComponent {
     this.inputMail = createInput({
       className: 'modal-user__input',
       type: 'email',
-      placeholder: 'Email*',
+      placeholder: 'Почта*',
     });
     const mailWarning = createSpan({
-      text: 'Email should have correct format',
+      text: 'Email должен иметь корректный формат',
       className: 'modal-user__warning form-mail__warning',
     });
 
@@ -85,10 +83,10 @@ export default class User extends BaseComponent {
     this.inputPassword = createInput({
       className: 'modal-user__input',
       type: 'password',
-      placeholder: 'Password*',
+      placeholder: 'Пароль*',
     });
     const passwordWarning = createSpan({
-      text: 'Password must contains at least 8 chars',
+      text: 'Должно быть не менее 8-ми символов',
       className: 'modal-user__warning form-password__warning',
     });
     const togglePasswordBtn = document.createElement('i');
@@ -96,27 +94,27 @@ export default class User extends BaseComponent {
     togglePasswordBtn.id = 'togglePassword';
 
     const userExistWarning = createSpan({
-      text: 'Such user is already exists, sign in',
+      text: 'Тайкой пользователь уже существует, войдите',
       className: 'modal-user__warning form-exist__warning',
     });
     this.registrationBtn = createButton({
       className: 'modal-user__submit registration',
-      text: 'REGISTRATION',
+      text: 'РЕГИСТРАЦИЯ',
       action: 'registrate-user',
     });
     this.loginBtn = createButton({
       className: 'modal-user__submit login',
-      text: 'SIGN IN',
+      text: 'ВОЙТИ',
       action: 'login-user',
     });
     this.changeModalBtnR = createButton({
       className: 'modal-user__change-modal registration',
-      text: 'Do you have an account? Sign In',
+      text: 'У Вас есть аккаунт? Авторизоваться',
       action: 'change-modal',
     });
     this.changeModalBtnL = createButton({
       className: 'modal-user__change-modal login',
-      text: 'Don\'t have an account? Sign Up',
+      text: 'У Вас нет аккаунта? Зарегистрироваться',
       action: 'change-modal',
     });
 
@@ -165,16 +163,13 @@ export default class User extends BaseComponent {
       const email = this.verifyUser()?.email as string;
       const password = this.verifyUser()?.password as string;
       const name = this.verifyUser()?.name as string;
-
       const createUser = await apiService.createUser({ name, email, password });
-      // console.log('createUser', createUser);
       if (typeof (createUser) !== 'number') {
         this.loginUser();
       } else {
         const existWarning = this.elem.querySelector('.form-exist__warning') as HTMLElement;
-        existWarning.textContent = 'Such user is already exists, sign in';
+        existWarning.textContent = 'Такой пользователь существует, войдите';
         existWarning.classList.add('active');
-        // console.log('such User exists!!!!');
         return;
       }
 
@@ -189,7 +184,6 @@ export default class User extends BaseComponent {
     if (name.length < namLength) {
       inputName.classList.add('active');
       nameWarning.classList.add('active');
-      // console.log('Name is required field ЛОГИН');
       return false;
     } else {
       inputName.classList.remove('active');
@@ -208,7 +202,6 @@ export default class User extends BaseComponent {
     if (reg.test(email) === false) {
       inputMail.classList.add('active');
       mailWarning.classList.add('active');
-      // console.log('Email should have correct format');
       return false;
     } else {
       inputMail.classList.remove('active');
@@ -225,7 +218,6 @@ export default class User extends BaseComponent {
     const minPasswordLength = 8;
     const passwordWarning = this.elem.querySelector('.form-password__warning') as HTMLElement;
     if (password.length < minPasswordLength) {
-      // console.log('Password is too short - should be 8 chars minimum.');
       inputPassword.classList.add('active');
       passwordWarning.classList.add('active');
       return false;
@@ -270,9 +262,8 @@ export default class User extends BaseComponent {
         updateContent(document.querySelector('#page-holder') as HTMLElement, 'pageHome');
       } else {
         const existWarning = this.elem.querySelector('.form-exist__warning') as HTMLElement;
-        existWarning.textContent = 'Incorrect e-mail or password!';
+        existWarning.textContent = 'Не правильная почта или пароль!';
         existWarning.classList.add('active');
-        console.log('Incorrect e-mail or password!');
         return;
       }
 
@@ -306,7 +297,6 @@ export default class User extends BaseComponent {
     localStorage.clear();
     updateContent(document.querySelector('.header__user') as HTMLElement, 'user');
     updateContent(document.querySelector('#page-holder') as HTMLElement, 'pageHome');
-    console.log('Exit User from REGISTRATION and clear local!!');
   }
 
   togglePasswordView(e: Event): void {
