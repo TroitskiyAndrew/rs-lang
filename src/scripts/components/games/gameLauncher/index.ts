@@ -13,7 +13,7 @@ export default class GameLauncher extends BaseComponent {
   }
 
   public oninit(): Promise<void> {
-    pageChenging(createSpan({ text: 'game Launch' }), this.name);
+    pageChenging(createSpan({ text: 'Игры' }), this.name);
 
     updateState({ launchGame: this.options });
 
