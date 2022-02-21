@@ -70,7 +70,7 @@ export default class GameLauncher extends BaseComponent {
       textDescription5.innerText = 'Для выбора уровня сложности подымите флаг)';
 
       const gameAudio = createDiv({
-        className: 'launcher-games__link games__link start-game',
+        className: 'launcher-games__link games__link common-button start-game',
         dataSet: {
           direction: 'audioGame',
         },
@@ -88,7 +88,7 @@ export default class GameLauncher extends BaseComponent {
       textDescription4.innerText = 'Для выбора уровня сложности подымите флаг)';
 
       const gameSprint = createDiv({
-        className: 'launcher-games__link games__link start-game',
+        className: 'launcher-games__link games__link common-button start-game',
         dataSet: {
           direction: 'sprintGame',
         },

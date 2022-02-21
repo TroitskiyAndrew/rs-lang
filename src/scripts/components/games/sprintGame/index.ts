@@ -4,61 +4,73 @@ import { pageChenging, updateContent } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
 import { WordCard } from '../../../api/api.types';
 import { IGameOptions, IWordParams, IScoreCounter } from './sprintGameTypes';
-import { IStatisticAnswer } from '../audioGame/index'
+import { IStatisticAnswer } from '../audioGame/index';
 import { updateState, getState } from '../../../state';
 import constants from '../../../app.constants';
 // import WordsCard from '../../pageDictionary/wordCard';
 
 const GROUP_WORDS_NUMBER = 600;
-const PAGE_WORDS_NUMBER = 20;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
 const MAX_SCORE_MULTIPLYER = 8;
 const TIME_FOR_GAME_MILISECONDS = 60000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 
 let options: IGameOptions;
-let wordsArrToPlay: IStatisticAnswer[] =[];
-let wordsArrToPlayCut: IStatisticAnswer[] =[];
+let wordsArrToPlay: IStatisticAnswer[] = [];
+let wordsArrToPlayCut: IStatisticAnswer[] = [];
 let roundResults: IWordParams[] = [];
 let scoreCounter: IScoreCounter = {
   score: 0,
   multiplyer: 1,
   multiplyerIntermediateCounter: 0,
 };
-let startTimerOnce: boolean = true;
+let startTimerOnce = true;
 let timerId: NodeJS.Timer;
-let menuButton: HTMLButtonElement
-let menuModal: HTMLUListElement
+let menuButton: HTMLButtonElement;
+let menuModal: HTMLUListElement;
 let audioIsPlaying = false;
-let coinCounter: number = 0;
+let coinCounter = 0;
 let wordsOnPageLeft: number | null = null;
 let cutRoundResults = false;
 
 export default class SprintGame extends BaseComponent {
 
-  group: string  = '';
-  page: string = '';
+  group = '';
 
-  startAudioOnce: boolean = true;
+  page = '';
+
+  startAudioOnce = true;
 
   paramsScore: HTMLDivElement | undefined;
+
   paramsTime: HTMLDivElement | undefined;
+
   gamepadWrapper: HTMLDivElement | undefined;
+
   itemWrapper: HTMLDivElement | undefined;
+
   paramsMultiplyerWrapper: HTMLDivElement | undefined;
+
   paramsCoins: HTMLDivElement | undefined;
+
   buttonsWrapper: HTMLDivElement | undefined;
+
   wordsWrapper: HTMLDivElement | undefined;
 
   controlSound: HTMLButtonElement | undefined;
+
   controlResume: HTMLButtonElement | undefined;
+
   buttonB: HTMLButtonElement | undefined;
+
   buttonA: HTMLButtonElement | undefined;
 
   mario: HTMLImageElement | undefined;
 
   audioSprint: HTMLAudioElement = new Audio();
+
   audioCoin: HTMLAudioElement = new Audio();
+
   audioMushroom: HTMLAudioElement = new Audio();
 
   constructor(elem: HTMLElement) {
@@ -67,6 +79,7 @@ export default class SprintGame extends BaseComponent {
   }
 
   public oninit(): Promise<void> {
+    (document.querySelector('footer') as HTMLElement).classList.remove('hidden');
     this.setActions();
     this.addLoading();
     pageChenging(createSpan({ text: 'Спринт Игра' }), this.name);
@@ -89,26 +102,26 @@ export default class SprintGame extends BaseComponent {
 
     this.renderParams(paramsWrapper);
     this.renderMario(marioWrapper);
-    this.renderPipe(pipeWrapper)
+    this.renderPipe(pipeWrapper);
     this.renderGamepad(gamepadWrapper);
     this.renderWords(wordsWrapper);
     this.getWordsArray();
 
     this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
-    
+
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
     sprintWrapper.append(gamepadWrapper);
     sprintWrapper.append(marioWrapper);
     sprintWrapper.append(pipeWrapper);
-    
+
     page.append(sprintWrapper);
     this.fragment.append(page);
   }
 
   private getCoin(size: string) {
     const coin = document.createElement('img');
-    coin.className = `coin-img_${size}`
+    coin.className = `coin-img_${size}`;
     coin.src = '/../../../../assets/img/sprintGame/gif/CoinSMW.gif';
     return coin;
   }
@@ -140,7 +153,7 @@ export default class SprintGame extends BaseComponent {
 
   private async getMenuModal(): Promise<HTMLUListElement> {
     return await document.getElementsByClassName('menu__list')[0] as HTMLUListElement;
-  } 
+  }
 
   private renderParams(paramsWrapper: HTMLDivElement) {
     const paramsLevelWrapper = createDiv({ className: 'params-wrapper__level' });
@@ -153,23 +166,23 @@ export default class SprintGame extends BaseComponent {
     this.paramsTime = paramsTime;
     this.paramsCoins = paramsCoins;
     this.paramsScore = paramsScore;
-    
+
     const star = document.createElement('img');
-    star.className = 'group-img'
+    star.className = 'group-img';
     star.src = '/../../../../assets/img/sprintGame/png/pixel_star_50px.png';
 
     paramsLevelWrapper.append(star);
-    paramsLevelWrapper.innerHTML += `&#215;`;
+    paramsLevelWrapper.innerHTML += '&#215;';
     paramsLevelWrapper.append(this.group);
 
-    paramsTime.innerHTML = `time<br> 60`;
-    
-    paramsCoins.append(this.getCoin('params'))
-    paramsCoins.innerHTML += `&#215; 0`
+    paramsTime.innerHTML = 'time<br> 60';
+
+    paramsCoins.append(this.getCoin('params'));
+    paramsCoins.innerHTML += '&#215; 0';
     paramsScore.textContent = '0';
     paramsCoinsWrapper.append(paramsCoins);
     paramsCoinsWrapper.append(paramsScore);
-    
+
     paramsWrapper.append(paramsLevelWrapper);
     paramsWrapper.append(paramsMultiplyerWrapper);
     paramsWrapper.append(paramsTime);
@@ -178,7 +191,7 @@ export default class SprintGame extends BaseComponent {
 
   private renderMario(marioWrapper: HTMLDivElement) {
     const mario = document.createElement('img');
-    mario.className = 'mario-img'
+    mario.className = 'mario-img';
     this.mario = mario;
     mario.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
 
@@ -193,13 +206,13 @@ export default class SprintGame extends BaseComponent {
     const itemWrapper = createDiv({ className: 'item-wrapper' });
     this.itemWrapper = itemWrapper;
 
-    block.className = 'block-img'
+    block.className = 'block-img';
     block.src = '/../../../../assets/img/sprintGame/png/SMW_Hard_Block.png';
-    for (let i = 0; i < 3; i++) {
-      let newBlock = block.cloneNode();
+    for (let i = 0; i < Number('3'); i++) {
+      const newBlock = block.cloneNode();
       blocksWrapper.append(newBlock);
-    }    
-    pipe.className = 'pipe-img'
+    }
+    pipe.className = 'pipe-img';
     pipe.src = '/../../../../assets/img/sprintGame/png/Warp_Pipe_SMW.png';
 
     pipeWrapper.append(blocksWrapper);
@@ -216,21 +229,21 @@ export default class SprintGame extends BaseComponent {
     const buttonBWrapper = createDiv({ className: 'buttons-wrapper__button-wrapper' });
     const buttonBBack = createDiv({ className: 'buttons-wrapper__back' });
     const buttonBCapture = createDiv({ className: 'buttons-wrapper__capture' });
-    const buttonB = createButton({className: 'buttons-wrapper__button-b', action: 'getNextRandomWords'})
+    const buttonB = createButton({ className: 'buttons-wrapper__button-b', action: 'getNextRandomWords' });
     this.buttonB = buttonB;
     buttonB.innerHTML = '&#215;';
 
     const buttonAWrapper = createDiv({ className: 'buttons-wrapper__button-wrapper' });
     const buttonABack = createDiv({ className: 'buttons-wrapper__back' });
     const buttonACapture = createDiv({ className: 'buttons-wrapper__capture' });
-    const buttonA = createButton({className: 'buttons-wrapper__button-a', action: 'getNextRandomWords'})
+    const buttonA = createButton({ className: 'buttons-wrapper__button-a', action: 'getNextRandomWords' });
     buttonA.innerHTML = '	&#10004;';
     this.buttonA = buttonA;
 
     const controlsBack = createDiv({ className: 'controls-wrapper__back' });
     const controlsCapture = createDiv({ className: 'controls-wrapper__capture' });
     const controlSound = createButton({ className: 'controls-wrapper__select' });
-    const controlResume = createButton({ className: 'controls-wrapper__start' }); 
+    const controlResume = createButton({ className: 'controls-wrapper__start' });
     this.controlSound = controlSound;
     this.controlResume = controlResume;
 
@@ -241,7 +254,7 @@ export default class SprintGame extends BaseComponent {
     controlsBack.append(controlResume);
 
     controlsWrapper.append(buttonsWrapper);
-    
+
     buttonsWrapper.append(buttonBWrapper);
     buttonBWrapper.append(buttonBBack);
     buttonBWrapper.append(buttonBCapture);
@@ -270,46 +283,47 @@ export default class SprintGame extends BaseComponent {
   }
 
   private getGroupAndPage() {
-    console.log(this.options)
+    console.log(this.options);
     if (this.options) {
-      options = JSON.parse (this.options);
-      updateState({optionsSprint: this.options})
-    } 
+      options = JSON.parse(this.options);
+      updateState({ optionsSprint: this.options });
+    }
     if (options) {
       this.group = options.group;
       if (options.page !== undefined) this.page = options.page;
     } else {
-      this.group = JSON.parse (getState().optionsSprint).group;
+      this.group = JSON.parse(getState().optionsSprint).group;
       //if (JSON.parse (getState().optionsSprint).page) this.page = JSON.parse (getState().optionsSprint).page;
     }
   }
 
   private startTimer() {
     if (startTimerOnce) {
-      const getSecondsLeft = () => {
-        const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
-        if (Math.round(delta / 1000) === 0) {
-          this.paramsTime!.innerHTML = `time<br> 0`;
-          cutRoundResults = true;
-          this.stopTimer()
-          this.showModalStatistics()
-        } else {
-          this.paramsTime!.innerHTML = `time<br> ${Math.round(delta / 1000)}`;
-        }
-      }
       const start = Date.now();
-      timerId = setInterval(getSecondsLeft, 1000)
+      const getSecondsLeft = () => {
+        const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start);
+        if (Math.round(delta / Number('1000')) === 0) {
+          (this.paramsTime as HTMLElement).innerHTML = 'time<br> 0';
+          cutRoundResults = true;
+          this.stopTimer();
+          this.showModalStatistics();
+        } else {
+          (this.paramsTime as HTMLElement).innerHTML = `time<br> ${Math.round(delta / Number('1000'))}`;
+        }
+      };
+
+      timerId = setInterval(getSecondsLeft, Number('1000'));
     }
     startTimerOnce = false;
   }
 
   private stopTimer() {
-    clearInterval (timerId)
+    clearInterval(timerId);
   }
 
   private getWordsArray() {
     if (getState().userId) {
-      if (Number(this.group) === 6) {
+      if (Number(this.group) === Number('6')) {
         this.getDifficultWordsArray();
       } else if (this.page === '') {
         this.getWordsArrayFromGroup();
@@ -327,9 +341,9 @@ export default class SprintGame extends BaseComponent {
   private async getDifficultWordsArray() {
     await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}').then(words => {
       (words as WordCard[]).forEach((el) => {
-        this.addElToArray(el)
-      })
-    })
+        this.addElToArray(el);
+      });
+    });
     wordsArrToPlayCut = wordsArrToPlay.slice();
     wordsOnPageLeft = wordsArrToPlay.length;
     this.removeLoading();
@@ -338,7 +352,7 @@ export default class SprintGame extends BaseComponent {
 
   private async getWordsArrayFromGroup() {
     await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
-      words.forEach((el) => this.addElToArray(el))
+      words.forEach((el) => this.addElToArray(el));
     });
     this.removeLoading();
     this.getRandomWords(wordsArrToPlay, GROUP_WORDS_NUMBER);
@@ -346,20 +360,20 @@ export default class SprintGame extends BaseComponent {
 
   private async getWordsArrayFromPages(authorized: boolean) {
     let currentPageToArray: string = this.page;
-    let addPageToArr = async () => {
+    const addPageToArr = async () => {
       if (authorized) {
         await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, Number(this.group), Number(currentPageToArray)).then(words => {
-          (words as WordCard[]).forEach((el) => this.addElToArray(el))
+          (words as WordCard[]).forEach((el) => this.addElToArray(el));
         });
       } else {
         await apiService.getChunkOfWords(Number(currentPageToArray), Number(this.group)).then(words => {
-          (words as WordCard[]).forEach((el) => this.addElToArray(el))
+          (words as WordCard[]).forEach((el) => this.addElToArray(el));
         });
       }
 
       currentPageToArray = String(Number(currentPageToArray) - 1);
       if (Number(currentPageToArray) >= 0) {
-        addPageToArr()
+        addPageToArr();
       } else {
         wordsArrToPlayCut = wordsArrToPlay.slice();
         wordsOnPageLeft = this.getWordsOnPageNumber();
@@ -372,7 +386,7 @@ export default class SprintGame extends BaseComponent {
 
   private getWordsOnPageNumber() {
     let prevEl: number | null = null;
-    let wordsOnPageNumber: number = 0;
+    let wordsOnPageNumber = 0;
     wordsArrToPlayCut.forEach((el, index) => {
       if (index === 0) {
         wordsOnPageNumber = 1;
@@ -380,19 +394,19 @@ export default class SprintGame extends BaseComponent {
         wordsOnPageNumber += 1;
       } else return;
       prevEl = el.page;
-    })
+    });
     return wordsOnPageNumber;
   }
 
   private addElToArray(el: WordCard) {
     if (el._id) el.id = el._id;
-    const elMod: IWordParams =  {
+    const elMod: IWordParams = {
       id: `${el.id}`,
       group: el.group,
       image: `${el.image}`,
       page: el.page,
-      word: `${el.word}`, 
-      wordTranslate: `${el.wordTranslate}`, 
+      word: `${el.word}`,
+      wordTranslate: `${el.wordTranslate}`,
       audio: `${el.audio}`,
       answerCorrectness: false,
     };
@@ -403,16 +417,6 @@ export default class SprintGame extends BaseComponent {
     const word = this.elem.querySelector('.eng-word') as HTMLDivElement;
     const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
     const randomWordNumber = getRandom(0, wordsNumber);
-
-    word!.textContent = wordsArr[randomWordNumber].word;
-    if (Math.random() < 0.5 || wordsNumber === 1) {
-      wordTranslate!.textContent = wordsArr[randomWordNumber].wordTranslate;
-      this.addElementToRoundResults(wordsArr, randomWordNumber, true);
-    } else {
-      wordTranslate!.textContent = wordsArr[getWrongTranslate()].wordTranslate;
-      this.addElementToRoundResults(wordsArr, randomWordNumber, false);
-    }
-
     function getWrongTranslate() {
       const randomWordAnotherNumber = getRandom(0, wordsNumber);
       if (randomWordNumber === randomWordAnotherNumber) {
@@ -420,6 +424,17 @@ export default class SprintGame extends BaseComponent {
       }
       return randomWordAnotherNumber;
     }
+
+    word.textContent = wordsArr[randomWordNumber].word;
+    if (Math.random() < (1 / 2) || wordsNumber === 1) {
+      wordTranslate.textContent = wordsArr[randomWordNumber].wordTranslate;
+      this.addElementToRoundResults(wordsArr, randomWordNumber, true);
+    } else {
+      wordTranslate.textContent = wordsArr[getWrongTranslate()].wordTranslate;
+      this.addElementToRoundResults(wordsArr, randomWordNumber, false);
+    }
+
+
     wordsArrToPlayCut.splice(randomWordNumber, 1);
     if (wordsOnPageLeft) wordsOnPageLeft -= 1;
     this.startTimer();
@@ -438,15 +453,15 @@ export default class SprintGame extends BaseComponent {
       answerCorrectness: false,
     };
   }
-  
+
   private checkAnswer(answer: boolean) {
-    this.elem.querySelector('.params-wrapper__score')
+    this.elem.querySelector('.params-wrapper__score');
     if (answer === roundResults[roundResults.length - 1].translateCorrectness) {
       roundResults[roundResults.length - 1].answerCorrectness = true;
       scoreCounter.score += scoreCounter.multiplyer * MIN_SCORE_FOR_CORRECT_ANSWER;
       scoreCounter.multiplyerIntermediateCounter += 1;
-      
-      if (scoreCounter.multiplyerIntermediateCounter === MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER 
+
+      if (scoreCounter.multiplyerIntermediateCounter === MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER
         && scoreCounter.multiplyer !== MAX_SCORE_MULTIPLYER) {
         scoreCounter.multiplyer = scoreCounter.multiplyer * 2;
         scoreCounter.multiplyerIntermediateCounter = 0;
@@ -456,7 +471,7 @@ export default class SprintGame extends BaseComponent {
         this.addCoin();
         this.playAudioSprint(this.audioCoin, '../../../../assets/sounds/smw_coin.wav', audioIsPlaying);
       }
-      
+
     } else {
       if (scoreCounter.multiplyer > 1) {
         scoreCounter.multiplyer /= 2;
@@ -465,8 +480,9 @@ export default class SprintGame extends BaseComponent {
       }
       roundResults[roundResults.length - 1].answerCorrectness = false;
     }
-    this.paramsScore!.textContent = `${scoreCounter.score}`;
-    if (this.page !== '' && Number(this.group) !== 6) {
+
+    (this.paramsScore as HTMLElement).textContent = `${scoreCounter.score}`;
+    if (this.page !== '' && Number(this.group) !== Number('6')) {
       if (wordsArrToPlayCut.length && wordsOnPageLeft) {
         this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
       } else if (!wordsArrToPlayCut.length) {
@@ -487,34 +503,35 @@ export default class SprintGame extends BaseComponent {
   }
 
   public listenEvents(): void {
+    const menuButtonHandler = () => {
+      this.getMenuModal().then(val => {
+        val.addEventListener('click', menuModalHandler);
+        menuModal = val;
+      });
+
+    };
 
     this.getMenuButton().then(val => {
       val.addEventListener('click', menuButtonHandler);
       menuButton = val;
     });
 
-    let menuButtonHandler = () => {
-      this.getMenuModal().then(val => {
-        val.addEventListener('click', menuModalHandler)
-        menuModal = val;
-      })
-      
-    }
-    let menuModalHandler = () => {
-      menuButton.removeEventListener('click', menuButtonHandler);
-      menuModal.removeEventListener('click' , menuModalHandler);
-      document.removeEventListener('keyup', keyupHandler);
-      this.clearGameParams()
-      this.audioSprint.pause();
-    }
 
-    let keyupHandler = (ev: KeyboardEvent) => {
+    const keyupHandler = (ev: KeyboardEvent) => {
       if (ev.code === 'ArrowRight') {
         this.checkAnswer(true);
       } else if (ev.code === 'ArrowLeft') {
         this.checkAnswer(false);
       }
-    }
+    };
+
+    const menuModalHandler = () => {
+      menuButton.removeEventListener('click', menuButtonHandler);
+      menuModal.removeEventListener('click', menuModalHandler);
+      document.removeEventListener('keyup', keyupHandler);
+      this.clearGameParams();
+      this.audioSprint.pause();
+    };
 
     this.buttonB?.addEventListener('click', this.checkAnswer.bind(this, false));
     this.buttonA?.addEventListener('click', this.checkAnswer.bind(this, true));
@@ -533,7 +550,7 @@ export default class SprintGame extends BaseComponent {
 
   private switchAudio() {
     if (this.startAudioOnce) {
-      this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', true)
+      this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', true);
       this.startAudioOnce = false;
     }
     if (audioIsPlaying) {
@@ -575,24 +592,24 @@ export default class SprintGame extends BaseComponent {
     };
     roundResults = [];
     cutRoundResults = false;
-    this.gamepadWrapper!.style.visibility = 'visible';
-    this.wordsWrapper!.style.visibility = 'visible';
+    (this.gamepadWrapper as HTMLElement).style.visibility = 'visible';
+    (this.wordsWrapper as HTMLElement).style.visibility = 'visible';
     wordsArrToPlayCut = wordsArrToPlay.slice();
 
-    this.mario!.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
-    this.mario!.onload = () => {
-      this.mario!.style.height = '3.6rem';
-      this.mario!.classList.remove('yoshi');
-      this.mario!.classList.remove('small');
-      this.mario!.classList.remove('up');
-      this.mario!.classList.remove('down');
-    }
-    this.itemWrapper!.innerHTML = '';
-    this.paramsMultiplyerWrapper!.innerHTML = '';
-    this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, '0');
-    this.paramsScore!.textContent = `0`;
+    (this.mario as HTMLImageElement).src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
+    (this.mario as HTMLImageElement).onload = () => {
+      (this.mario as HTMLImageElement).style.height = '3.6rem';
+      (this.mario as HTMLImageElement).classList.remove('yoshi');
+      (this.mario as HTMLImageElement).classList.remove('small');
+      (this.mario as HTMLImageElement).classList.remove('up');
+      (this.mario as HTMLImageElement).classList.remove('down');
+    };
+    (this.itemWrapper as HTMLElement).innerHTML = '';
+    (this.paramsMultiplyerWrapper as HTMLElement).innerHTML = '';
+    (this.paramsCoins as HTMLElement).innerHTML = (this.paramsCoins as HTMLElement).innerHTML.replace(/\d+/g, '0');
+    (this.paramsScore as HTMLElement).textContent = '0';
     this.startAudioOnce = true;
-    if (Number(this.group) === 6) {
+    if (this.group === '6') {
       wordsOnPageLeft = wordsArrToPlayCut.length;
       this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
     } else if (this.page === '') {
@@ -609,10 +626,10 @@ export default class SprintGame extends BaseComponent {
   }
 
   private addCoin() {
-    let newCoin = this.getCoin('small').cloneNode() as HTMLImageElement;
-    this.itemWrapper!.append(newCoin);
+    const newCoin = this.getCoin('small').cloneNode() as HTMLImageElement;
+    (this.itemWrapper as HTMLElement).append(newCoin);
     coinCounter += 1;
-    this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, String(coinCounter)) 
+    (this.paramsCoins as HTMLElement).innerHTML = (this.paramsCoins as HTMLElement).innerHTML.replace(/\d+/g, String(coinCounter));
   }
 
   private addItem(itemNumber: number) {
@@ -620,12 +637,12 @@ export default class SprintGame extends BaseComponent {
       case 2:
         this.addItemHandler(this.getMushroom(), 'Mario_SMW', '-1');
         break;
-      case 4:
+      case Number('4'):
         this.addItemHandler(this.getFeather(), 'Navmario', '1');
-      break;
-      case 8:
+        break;
+      case Number('8'):
         this.addItemHandler(this.getEgg(), 'SMW_MarioCapeSpin', '1');
-      break;
+        break;
     }
   }
 
@@ -637,32 +654,32 @@ export default class SprintGame extends BaseComponent {
       case 2:
         this.deleteItemHandler(this.getMushroom(), 'SMW_Mario', '4.6');
         break;
-      case 4:
+      case Number('4'):
         this.deleteItemHandler(this.getFeather(), 'SMWCapeMarioSprite', '4.6');
-      break;
+        break;
     }
   }
 
   private addItemHandler(item: HTMLImageElement, gifName: string, scaleNum: string) {
-    let newItem = item.cloneNode();
-    let newItemParams = item.cloneNode() as HTMLImageElement;
+    const newItem = item.cloneNode();
+    const newItemParams = item.cloneNode() as HTMLImageElement;
 
     newItemParams.classList.add('params');
 
-    this.paramsMultiplyerWrapper!.innerHTML = ''
-    this.itemWrapper!.append(newItem);
+    (this.paramsMultiplyerWrapper as HTMLElement).innerHTML = '';
+    (this.itemWrapper as HTMLElement).append(newItem);
     this.paramsMultiplyerWrapper?.append(newItemParams);
 
-    this.mario!.src = `/../../../../assets/img/sprintGame/gif/${gifName}.gif`;
-    this.mario!.onload = () => {
-      this.mario!.style.transform = `scale(${scaleNum}, 1)`;
+    (this.mario as HTMLImageElement).src = `/../../../../assets/img/sprintGame/gif/${gifName}.gif`;
+    (this.mario as HTMLImageElement).onload = () => {
+      (this.mario as HTMLImageElement).style.transform = `scale(${scaleNum}, 1)`;
       this.mario?.classList.remove('down');
       this.mario?.classList.remove('small');
       this.mario?.classList.add('up');
-    }
+    };
     setTimeout(() => {
       this.getDownItem();
-    }, 3000);
+    }, Number('3000'));
   }
 
   private getDownItem() {
@@ -673,20 +690,20 @@ export default class SprintGame extends BaseComponent {
       case 2:
         this.getDownItemHandler('SMW_Mario', '4.6');
         break;
-      case 4:
+      case Number('4'):
         this.getDownItemHandler('SMWCapeMarioSprite', '4.6');
-      break;
-      case 8:
+        break;
+      case Number('8'):
         this.getDownItemHandler('Green_Yoshi_SMW', '5.6');
-      break;
+        break;
     }
   }
 
   private getDownItemHandler(pngName: string, imgSize: string) {
-    this.mario!.src = `/../../../../assets/img/sprintGame/png/${pngName}.png`
-    this.mario!.onload = () => {
-      this.mario!.style.transform = 'scale(1, 1)';
-      this.mario!.style.height = `${imgSize}rem`
+    (this.mario as HTMLImageElement).src = `/../../../../assets/img/sprintGame/png/${pngName}.png`;
+    (this.mario as HTMLImageElement).onload = () => {
+      (this.mario as HTMLImageElement).style.transform = 'scale(1, 1)';
+      (this.mario as HTMLImageElement).style.height = `${imgSize}rem`;
       this.mario?.classList.remove('up');
       this.mario?.classList.add('down');
       if (imgSize === '5.6') {
@@ -694,8 +711,8 @@ export default class SprintGame extends BaseComponent {
       } else if (imgSize === '3.6') {
         this.mario?.classList.add('small');
       }
-      this.itemWrapper!.innerHTML = '';
-    }
+      (this.itemWrapper as HTMLElement).innerHTML = '';
+    };
   }
 
   private deleteItemHandler(item: HTMLImageElement | null, pngName: string, imgSize: string) {
@@ -703,25 +720,25 @@ export default class SprintGame extends BaseComponent {
     this.mario?.classList.remove('yoshi');
 
     if (item === null) {
-      this.paramsMultiplyerWrapper!.innerHTML = '';
+      (this.paramsMultiplyerWrapper as HTMLElement).innerHTML = '';
     } else {
-      let newItemParams = item.cloneNode() as HTMLImageElement;
+      const newItemParams = item.cloneNode() as HTMLImageElement;
       newItemParams.classList.add('params');
-      this.paramsMultiplyerWrapper!.innerHTML = '';
+      (this.paramsMultiplyerWrapper as HTMLElement).innerHTML = '';
       this.paramsMultiplyerWrapper?.append(newItemParams);
     }
 
-    this.mario!.src = `/../../../../assets/img/sprintGame/png/${pngName}.png`
-    this.mario!.onload = () => {
-      this.mario!.style.transform = 'scale(1, 1)';
-      this.mario!.style.height = `${imgSize}rem`;
+    (this.mario as HTMLImageElement).src = `/../../../../assets/img/sprintGame/png/${pngName}.png`;
+    (this.mario as HTMLImageElement).onload = () => {
+      (this.mario as HTMLImageElement).style.transform = 'scale(1, 1)';
+      (this.mario as HTMLImageElement).style.height = `${imgSize}rem`;
       if (imgSize === '4.6') {
-        this.mario!.style.height = '4.6rem';
+        (this.mario as HTMLImageElement).style.height = '4.6rem';
       } else {
-        this.mario!.style.height = '3.6rem';
+        (this.mario as HTMLImageElement).style.height = '3.6rem';
         this.mario?.classList.add('small');
       }
-    }
+    };
 
   }
 
@@ -736,15 +753,15 @@ export default class SprintGame extends BaseComponent {
     });
     this.elem.append(modalStatistic);
     updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
-    this.gamepadWrapper!.style.visibility = 'hidden';
-    this.wordsWrapper!.style.visibility = 'hidden';
+    (this.gamepadWrapper as HTMLElement).style.visibility = 'hidden';
+    (this.wordsWrapper as HTMLElement).style.visibility = 'hidden';
   }
 
   public giveDataToModalStatistic(): IStatisticAnswer[] {
-    roundResults = roundResults.map(el =>  {
+    roundResults = roundResults.map(el => {
       delete el.translateCorrectness;
-      return el
-    })
+      return el;
+    });
     if (cutRoundResults) roundResults = roundResults.slice(0, roundResults.length - 1);
     this.audioSprint.pause();
     return roundResults;
