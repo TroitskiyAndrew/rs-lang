@@ -308,13 +308,20 @@ export default class SprintGame extends BaseComponent {
   }
 
   private getWordsArray() {
-    if (Number(this.group) === 6) {
-      this.getDifficultWordsArray();
+    if (getState().userId) {
+      if (Number(this.group) === 6) {
+        this.getDifficultWordsArray();
+      } else if (this.page === '') {
+        this.getWordsArrayFromGroup();
+      } else {
+        this.getWordsArrayFromPages(true);
+      }
     } else if (this.page === '') {
-      this.getWordsArrayFromGroup()
+      this.getWordsArrayFromGroup();
     } else {
-      this.getWordsArrayFromPages()
+      this.getWordsArrayFromPages(false);
     }
+
   }
 
   private async getDifficultWordsArray() {
@@ -337,12 +344,19 @@ export default class SprintGame extends BaseComponent {
     this.getRandomWords(wordsArrToPlay, GROUP_WORDS_NUMBER);
   }
 
-  private async getWordsArrayFromPages() {
+  private async getWordsArrayFromPages(authorized: boolean) {
     let currentPageToArray: string = this.page;
     let addPageToArr = async () => {
-      await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, Number(this.group), Number(currentPageToArray)).then(words => {
-        (words as WordCard[]).forEach((el) => this.addElToArray(el))
-      });
+      if (authorized) {
+        await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, Number(this.group), Number(currentPageToArray)).then(words => {
+          (words as WordCard[]).forEach((el) => this.addElToArray(el))
+        });
+      } else {
+        await apiService.getChunkOfWords(Number(currentPageToArray), Number(this.group)).then(words => {
+          (words as WordCard[]).forEach((el) => this.addElToArray(el))
+        });
+      }
+
       currentPageToArray = String(Number(currentPageToArray) - 1);
       if (Number(currentPageToArray) >= 0) {
         addPageToArr()
