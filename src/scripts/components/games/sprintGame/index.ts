@@ -722,7 +722,6 @@ export default class SprintGame extends BaseComponent {
         this.mario?.classList.add('small');
       }
     }
-
   }
 
   private showModalStatistics(): void {
