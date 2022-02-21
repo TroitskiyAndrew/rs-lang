@@ -31,7 +31,6 @@ let menuButton: HTMLButtonElement
 let menuModal: HTMLUListElement
 let audioIsPlaying = false;
 let coinCounter: number = 0;
-let wordsArrNumber: number;
 let wordsOnPageLeft: number | null = null;
 let cutRoundResults = false;
 
@@ -71,7 +70,7 @@ export default class SprintGame extends BaseComponent {
 
   public oninit(): Promise<void> {
     this.setActions();
-    //this.addLoading();
+    this.addLoading();
     pageChenging(createSpan({ text: 'Спринт Игра' }), this.name);
     return Promise.resolve();
   }
@@ -86,8 +85,6 @@ export default class SprintGame extends BaseComponent {
     const wordsWrapper = createDiv({ className: 'words-wrapper' });
     this.gamepadWrapper = gamepadWrapper;
     this.wordsWrapper = wordsWrapper;
-
-    this.addLoading();
 
     this.clearGameParams();
     this.getGroupAndPage();
@@ -591,14 +588,11 @@ export default class SprintGame extends BaseComponent {
       wordsOnPageLeft = wordsArrToPlayCut.length;
       this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
     } else if (this.page === '') {
-
       this.getRandomWords(wordsArrToPlayCut, GROUP_WORDS_NUMBER);
     } else {
       wordsOnPageLeft = this.getWordsOnPageNumber();
       this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
     }
-    // wordsOnPageLeft = wordsArrNumber;
-    // this.getRandomWords(wordsArrToPlayCut, wordsArrNumber);
     this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
   }
 
