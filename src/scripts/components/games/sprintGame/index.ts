@@ -1,13 +1,12 @@
 import BaseComponent from '../../base';
-import { createButton, createDiv, createSpan, getRandom } from '../../../utils';
-import { pageChenging, updateContent } from '../../../rooting';
+import { createButton, createDiv, getRandom } from '../../../utils';
+import { updateContent } from '../../../rooting';
 import { apiService } from '../../../api/apiMethods';
 import { WordCard } from '../../../api/api.types';
 import { IGameOptions, IWordParams, IScoreCounter } from './sprintGameTypes';
 import { IStatisticAnswer } from '../audioGame/index';
 import { updateState, getState } from '../../../state';
 import constants from '../../../app.constants';
-// import WordsCard from '../../pageDictionary/wordCard';
 
 const GROUP_WORDS_NUMBER = 600;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
@@ -282,7 +281,6 @@ export default class SprintGame extends BaseComponent {
   }
 
   private getGroupAndPage() {
-    console.log(this.options);
     if (this.options) {
       options = JSON.parse(this.options);
       updateState({ optionsSprint: this.options });
@@ -292,7 +290,6 @@ export default class SprintGame extends BaseComponent {
       if (options.page !== undefined) this.page = options.page;
     } else {
       this.group = JSON.parse(getState().optionsSprint).group;
-      //if (JSON.parse (getState().optionsSprint).page) this.page = JSON.parse (getState().optionsSprint).page;
     }
   }
 
@@ -716,7 +713,6 @@ export default class SprintGame extends BaseComponent {
   }
 
   private deleteItemHandler(item: HTMLImageElement | null, pngName: string, imgSize: string) {
-    //this.mario?.classList.remove('up');
     this.mario?.classList.remove('yoshi');
 
     if (item === null) {
@@ -771,6 +767,3 @@ export default class SprintGame extends BaseComponent {
     return scoreCounter.score;
   }
 }
-
-//TODO:
-// 1) LOADER

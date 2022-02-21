@@ -152,15 +152,11 @@
   background: transparent;
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
-    // border: 1px solid #000000;
     height: 32px;
     width: 24px;
-    // border-radius: 3px;
-    // background: #c2bebe;
     cursor: pointer;
     margin-top: 4px;
     margin-left: 2px;
-    // box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
     background-image: url("/src/assets/img/png/mario.png");
     background-size: contain;
     background-repeat: no-repeat;

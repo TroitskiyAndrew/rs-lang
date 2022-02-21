@@ -177,7 +177,6 @@ export default class PageDictionary extends BaseComponent {
         learnedPages.push(this.pageCode);
         updateState({ learnedPages: learnedPages });
       }
-      console.log('allLearned');
       this.gamesButtonsControl(true);
       (this.paginator.querySelector(`[value="${this.currPage}"]`) as HTMLElement).classList.add('_learned');
     }
@@ -189,7 +188,6 @@ export default class PageDictionary extends BaseComponent {
       const index = learnedPages.indexOf(this.pageCode);
       learnedPages.splice(index, 1);
       updateState({ learnedPages: learnedPages });
-      console.log('notAllLearned');
       this.gamesButtonsControl(false);
     }
     (this.paginator.querySelector(`[value="${this.currPage}"]`) as HTMLElement).classList.remove('_learned');

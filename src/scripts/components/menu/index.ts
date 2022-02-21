@@ -38,7 +38,6 @@ export default class Menu extends BaseComponent {
 
       const headerTitle = document.querySelector('.header__page span');
       if (headerTitle && headerTitle.textContent === link.caption) {
-        console.log('changed', link.caption);
         newLink.classList.add('active');
       }
 
