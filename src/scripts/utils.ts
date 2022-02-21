@@ -155,3 +155,9 @@ export function getTodayCount(dateObj: DateNumber | undefined): number {
   }
   return 0;
 }
+
+export function updateLearnedCounterDate(isLearnedBefore: boolean, currentLearned: boolean): 0 | 1 | -1 {
+  if (isLearnedBefore === true && currentLearned === false) return -1;
+  if (isLearnedBefore === false && currentLearned === true) return 1;
+  return 0;
+}

@@ -63,32 +63,38 @@ export default class AudioGame extends BaseComponent {
   public async oninit(): Promise<void> {
     // pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
     // pageChenging(createSpan({}), this.name);
+    if (getState().userId) {
 
-    // получаю с АПИ данные
-    // Если групп 6 (сложные слова), то запрос
-    const hardsWordGroup = 6;
-    if (this.group === hardsWordGroup && this.fromDictionary) {
-      console.log('groupe with hard words');
-      const difficultWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}');
-      console.log('difficultWords', difficultWords);
-      if (typeof (difficultWords) === 'number') return;
-      this.wordsFromAPI.questionWords = difficultWords;
-    } else if (this.fromDictionary) {
-      // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
-      const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, this.group);
-      console.log('notLearnedWords', notLearnedWords);
 
-      if (typeof (notLearnedWords) === 'number') return;
-      if (this.page === undefined) return;
-      const currentPage = this.page;
-      const notLearnedWordsFilteredBePage = notLearnedWords.filter(word => word.page <= currentPage);
-      console.log('notLearnedWords', notLearnedWordsFilteredBePage);
-      const last20Words = notLearnedWordsFilteredBePage.slice(-constants.maxNumberOfQuestionsAudio);
-      console.log('last20Words', last20Words);
-      this.wordsFromAPI.questionWords = last20Words;
+      // получаю с АПИ данные
+      // Если групп 6 (сложные слова), то запрос
+      const hardsWordGroup = 6;
+      if (this.group === hardsWordGroup && this.fromDictionary) {
+        console.log('groupe with hard words');
+        const difficultWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}');
+        console.log('difficultWords', difficultWords);
+        if (typeof (difficultWords) === 'number') return;
+        this.wordsFromAPI.questionWords = difficultWords;
+      } else if (this.fromDictionary) {
+        // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
+        const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, this.group);
+        console.log('notLearnedWords', notLearnedWords);
+
+        if (typeof (notLearnedWords) === 'number') return;
+        if (this.page === undefined) return;
+        const currentPage = this.page;
+        const notLearnedWordsFilteredBePage = notLearnedWords.filter(word => word.page <= currentPage);
+        console.log('notLearnedWords', notLearnedWordsFilteredBePage);
+        const last20Words = notLearnedWordsFilteredBePage.slice(-constants.maxNumberOfQuestionsAudio);
+        console.log('last20Words', last20Words);
+        this.wordsFromAPI.questionWords = last20Words;
+      } else {
+        // если группа от 0 до 5 БЕЗ флага fromDictionary, то все слова со страницы
+        console.log('from games');
+        await this.setAllQuestionWordsToState();
+      }
     } else {
-      // если группа от 0 до 5 БЕЗ флага fromDictionary, то все слова со страницы
-      console.log('from games');
+      console.log('не авторизован');
       await this.setAllQuestionWordsToState();
     }
 
@@ -144,7 +150,7 @@ export default class AudioGame extends BaseComponent {
       this.fromDictionary = options.fromDictionary;
     }
     // todo delete
-    // this.page = 0;
+    this.page = 0;
     // this.group = 0;
     console.log('this.page', this.page);
     console.log('this.group', this.group);

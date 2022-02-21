@@ -1,5 +1,5 @@
 
-import { createDiv, createSpan, createButton, updateObjDate } from '../../../utils';
+import { createDiv, createSpan, createButton, updateObjDate, updateLearnedCounterDate } from '../../../utils';
 import constants from '../../../app.constants';
 import BaseComponent from '../../base';
 import { instances } from '../../components';
@@ -174,7 +174,6 @@ export default class ModalStatistic extends BaseComponent {
 
   private async updateUserWordsAndStatistic(game: AudioGame | SprintGame): Promise<void> {
     await this.updateOrCreateUserWords(game);
-
     await this.updateOrCreateStatistic(game);
   }
 
@@ -209,7 +208,6 @@ export default class ModalStatistic extends BaseComponent {
 
     if (typeof (allUserWords) === 'number') return;
     const learnedWords = allUserWords.filter(word => word.optional?.learned).length;
-    const learnedWordsPerDay = allUserWords.filter(word => word.optional?.learnedAtDay === date).length;
     const newWordsPerDayArray = allUserWords.filter(word => word.optional?.newAtDay === date);
     const newWordsPerDayAudio = newWordsPerDayArray.filter(word => word.optional?.newFrom === 'audioGame').length;
     const newWordsPerDaySprint = newWordsPerDayArray.filter(word => word.optional?.newFrom === 'sprintGame').length;
@@ -222,8 +220,8 @@ export default class ModalStatistic extends BaseComponent {
       // update Statistic
       if (!userStatisticApi.optional || !statistics.optional) return;
 
-      const learnedWordsDateObj = userStatisticApi.optional.learnedWordsPerDate;
-      statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
+      const learnedWordsPerDate = userStatisticApi.optional.learnedWordsPerDate;
+      statistics.optional.learnedWordsPerDate = learnedWordsPerDate;
 
       const newWordsPerDayAudioObj = userStatisticApi.optional.newWordsPerDayAudio;
       statistics.optional.newWordsPerDayAudio = this.updateObjDateLearnedNew(newWordsPerDayAudioObj, date, newWordsPerDayAudio);
@@ -296,12 +294,10 @@ export default class ModalStatistic extends BaseComponent {
           answersAudio: answersPerDayAudio,
           correctAnswersRangeSprint: rightRangeSprint,
           correctAnswersRangeAudio: rightRangeAudio,
+          learnedWordsPerDate: { date: learnedWords },
         },
       };
       if (!statistics.optional) return;
-
-      const learnedWordsDateObj = {};
-      statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
 
       const newWordsPerDayAudioObj = {};
       statistics.optional.newWordsPerDayAudio = this.updateObjDateLearnedNew(newWordsPerDayAudioObj, date, newWordsPerDayAudio);
@@ -321,6 +317,15 @@ export default class ModalStatistic extends BaseComponent {
     const userID = getState().userId;
     const currentDate = new Date();
     const date = currentDate.toISOString().split('T')[0];
+
+    const apiStatistic = await apiService.getUserStatistics(userID);
+    const defaultStatistic: Statistics = {
+      learnedWords: 0,
+      optional: {
+        learnedWordsPerDate: updateObjDate(undefined, 0),
+      },
+    };
+    const statistic = typeof apiStatistic !== 'number' ? apiStatistic : defaultStatistic;
 
     await Promise.all(this.resultArray.map(async (wordObj) => {
       // получаем каждое слово
@@ -346,24 +351,34 @@ export default class ModalStatistic extends BaseComponent {
         };
 
         if (!wordBody.optional || !userWord.optional) return;
+
+        // todo
+        const isLearnedBefore = userWord.optional?.learned ? userWord.optional?.learned : false;
+        let change = 0;
+        // todo end
+        console.log('isLearnedBefore', isLearnedBefore);
+
         if (!wordObj.answerCorrectness) {
           wordBody.optional.rightRange = 0;
           wordBody.optional.learned = false;
-          wordBody.optional.learnedAtDay = false;
+          change = updateLearnedCounterDate(isLearnedBefore, false);
         } else if (wordObj.answerCorrectness) {
           let rightWordRange = userWord.optional.rightRange as number;
           wordBody.optional.rightRange = ++rightWordRange;
 
           if (userWord.difficulty === 'common' && wordBody.optional.rightRange >= constants.wordCommonRightRange) {
             wordBody.optional.learned = true;
-            wordBody.optional.learnedAtDay = userWord.optional?.learnedAtDay ? userWord.optional?.learnedAtDay : date;
+            change = updateLearnedCounterDate(isLearnedBefore, true);
           } else if (userWord.difficulty === 'difficult' && wordBody.optional.rightRange >= constants.wordDifficultRightRange) {
             wordBody.difficulty = 'common';
             wordBody.optional.learned = true;
-            wordBody.optional.learnedAtDay = userWord.optional?.learnedAtDay ? userWord.optional?.learnedAtDay : date;
+            change = updateLearnedCounterDate(isLearnedBefore, true);
+          } else if (userWord.optional?.learned) {
+            wordBody.optional.learned = true;
+            change = updateLearnedCounterDate(isLearnedBefore, true);
           } else {
             wordBody.optional.learned = false;
-            wordBody.optional.learnedAtDay = false;
+            change = updateLearnedCounterDate(isLearnedBefore, false);
           }
 
           let answersCorrectAllTime = userWord.optional.correctAnswersAllTime;
@@ -373,6 +388,15 @@ export default class ModalStatistic extends BaseComponent {
             wordBody.optional.correctAnswersAllTime = 1;
           }
         }
+
+        // todo
+        statistic.optional.learnedWordsPerDate = updateObjDate(statistic.optional.learnedWordsPerDate, change);
+        if (statistic.id) {
+          delete statistic.id;
+        }
+        console.log('change!!!!!!!!', change);
+        await apiService.updateUserStatistics(userID, statistic);
+        // todo end
 
         let answersAmountAllTime = userWord.optional.answersAllTime;
         if (answersAmountAllTime) {
@@ -394,7 +418,6 @@ export default class ModalStatistic extends BaseComponent {
             correctAnswersAllTime: wordObj.answerCorrectness ? 1 : 0,
             answersAllTime: 1,
             newAtDay: date,
-            learnedAtDay: false,
             newFrom: gameFrom,
           },
         };
