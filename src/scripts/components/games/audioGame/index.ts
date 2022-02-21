@@ -1,12 +1,10 @@
 import BaseComponent from '../../base';
-import { updateContent } from '../../../rooting';
+import { pageChenging, updateContent } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 import constants from '../../../app.constants';
 import { WordCard } from '../../../api/api.types';
 import { getState } from '../../../state';
-
-
 interface IState {
   questionWords: WordCard[];
   translateWords: string[];
@@ -54,7 +52,6 @@ export default class AudioGame extends BaseComponent {
 
   fromDictionary: boolean | undefined;
 
-
   constructor(elem: HTMLElement) {
     super(elem);
     this.name = 'audioGame';
@@ -63,9 +60,8 @@ export default class AudioGame extends BaseComponent {
   public async oninit(): Promise<void> {
     // pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
     // pageChenging(createSpan({}), this.name);
+
     if (getState().userId) {
-
-
       // получаю с АПИ данные
       // Если групп 6 (сложные слова), то запрос
       const hardsWordGroup = 6;
@@ -150,7 +146,7 @@ export default class AudioGame extends BaseComponent {
       this.fromDictionary = options.fromDictionary;
     }
     // todo delete
-    this.page = 0;
+    // this.page = 0;
     // this.group = 0;
     console.log('this.page', this.page);
     console.log('this.group', this.group);
