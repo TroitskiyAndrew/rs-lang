@@ -1,6 +1,7 @@
 import BaseComponent from '../base';
 import { createSpan, createDiv, createButton } from '../../utils';
 import { Link } from '../../common.types';
+import { getState } from '../../state';
 
 export default class Menu extends BaseComponent {
   modal: HTMLElement | undefined;
@@ -65,6 +66,13 @@ export default class Menu extends BaseComponent {
   }
 
   public showMenu(): void {
+    const isAuthorized = !!getState().userId;
+    const statisticLink = this.modal?.querySelector('[data-direction="pageStatistics"]') as HTMLElement;
+    if (isAuthorized) {
+      statisticLink.classList.remove('hidden');
+    } else {
+      statisticLink.classList.add('hidden');
+    }
     this.overlay?.classList.add('show');
     this.modal?.classList.add('show');
   }

@@ -1,5 +1,5 @@
 import BaseComponent from '../../base';
-import { pageChenging, updateContent } from '../../../rooting';
+import { updateContent } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 import constants from '../../../app.constants';
@@ -60,6 +60,8 @@ export default class AudioGame extends BaseComponent {
   public async oninit(): Promise<void> {
     // pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
     // pageChenging(createSpan({}), this.name);
+
+    (document.querySelector('footer') as HTMLElement).classList.add('hidden');
 
     if (getState().userId) {
       // получаю с АПИ данные
@@ -127,6 +129,7 @@ export default class AudioGame extends BaseComponent {
     }
     this.showNextQuestion();
 
+
     return Promise.resolve();
   }
 
@@ -187,7 +190,7 @@ export default class AudioGame extends BaseComponent {
       className: 'audio-game__answers audio-answers',
     });
     this.nextBtn = createButton({
-      className: 'audio-game__next games__link',
+      className: 'audio-game__next games__link common-button',
     });
 
     questionsAmount.append(questionCurrentAmount);

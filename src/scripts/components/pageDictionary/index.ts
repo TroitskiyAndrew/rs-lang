@@ -68,8 +68,8 @@ export default class PageDictionary extends BaseComponent {
     this.paginator.append(this.pageSelector);
     this.paginator.append(createButton({ className: 'paginator__button icon-button sega-button nextPage', action: 'nextPage' }));
 
-    this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button', text: 'Аудио', dataSet: { direction: 'audioGame' } }));
-    this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button', text: 'Спринт', dataSet: { direction: 'sprintGame' } }));
+    this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button common-button', text: 'Аудио', dataSet: { direction: 'audioGame' } }));
+    this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button common-button', text: 'Спринт', dataSet: { direction: 'sprintGame' } }));
 
     stepControl.append(createButton({ className: 'stepControl__step icon-button sega-button step-back', action: 'stepBack' }));
     stepControl.append(this.goInput);
