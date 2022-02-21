@@ -13,7 +13,7 @@ const GROUP_WORDS_NUMBER = 600;
 const PAGE_WORDS_NUMBER = 20;
 const MIN_SCORE_FOR_CORRECT_ANSWER = 10;
 const MAX_SCORE_MULTIPLYER = 8;
-const TIME_FOR_GAME_MILISECONDS = 20000;
+const TIME_FOR_GAME_MILISECONDS = 60000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 
 let options: IGameOptions;
@@ -100,11 +100,11 @@ export default class SprintGame extends BaseComponent {
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
+    sprintWrapper.append(gamepadWrapper);
     sprintWrapper.append(marioWrapper);
     sprintWrapper.append(pipeWrapper);
     
     page.append(sprintWrapper);
-    page.append(gamepadWrapper);
     this.fragment.append(page);
   }
 
@@ -411,10 +411,9 @@ export default class SprintGame extends BaseComponent {
       }
       return randomWordAnotherNumber;
     }
-
     wordsArrToPlayCut.splice(randomWordNumber, 1);
     if (wordsOnPageLeft) wordsOnPageLeft -= 1;
-    this.startTimer();
+    // this.startTimer();
   }
 
   private addElementToRoundResults(wordsArr: IWordParams[], randomWordNumber: number, translateCorrectness: boolean) {
