@@ -11,8 +11,12 @@
   z-index: 10;
   padding: 20px;
   transform: translate(-50%, -50%);
-  background: #c2c2c2;
+  background-color: #80c77e;
+  border-radius: 25px;
   transition: all 0.3s ease 0s;
+  #togglePassword::before {
+    color: black;
+  }
 }
 
 .modal-user.show {
@@ -112,5 +116,5 @@
 }
 
 .icon-button.modal-user__logoutBtn:before {
-  content: '\f2f5';
+  content: "\f2f5";
 }
