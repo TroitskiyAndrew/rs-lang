@@ -1,26 +1,82 @@
 .menu__modal {
   @include position;
   position: fixed;
-  z-index: 5;
+  z-index: 10;
   display: none;
-  padding: 20px;
-  background-color: $brand-color;
+  color: white;
+  font-family: "F77 Minecraft";
+  align-items: center;
+  backdrop-filter: blur(6px);
+  background-color: rgba(156, 0, 229, 0.8);
+  border-radius: 25px;
+  padding: 45px;
+
   &.show {
     display: block;
   }
 }
 
+.menu__title {
+  text-align: center;
+  display: block;
+  font-size: 1.8em;
+  color: $text-color;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
 .menu__list {
   list-style-type: none;
   white-space: nowrap;
+  padding: 0;
 }
 
-.menu__button::before {
-  color: $brand-color;
+.menu__list > :not(:last-child) {
+  margin-bottom: 20px;
+}
+
+.menu__link {
+  position: relative;
+  cursor: pointer;
+  padding: 0 0 0 40px;
+  transition: all 0.3s ease 0s;
+
+  &:hover {
+    color: #c2c2c2;
+  }
+
+  span {
+    text-transform: uppercase;
+  }
+}
+
+.menu__button {
+  padding: 10px;
+  margin-right: 20px;
+  &::before {
+    transition: all 0.3s;
+  }
+  &:hover::before {
+    color: $brand-color;
+  }
+}
+
+.menu__link.active {
+  &:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 25px;
+    height: 25px;
+    transform: translate(0, -50%);
+    background: url("/src/assets/img/png/pngfind.com-mario-mushroom-png-228050.png") 0 0 / cover no-repeat;
+  }
 }
 
 .menu__overlay {
-  position: absolute;
+  position: fixed;
+  z-index: 9;
   display: none;
   width: 100%;
   height: 100%;

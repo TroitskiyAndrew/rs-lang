@@ -1,0 +1,154 @@
+.game-modal {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 1);
+  outline: 2px solid white;
+  color: white;
+
+  &__navigation {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px 0;
+  }
+
+  &__button {
+    min-width: 150px;
+  }
+
+  /*   &__play-again {
+    left: 0;
+  } */
+  /*   &__to-games {
+    right: 0;
+  } */
+
+  &__logo-gif {
+    width: 100px;
+    height: 70px;
+    margin: 0 auto;
+    background: url("/src/assets/img/sprintGame/gif/mario-luigi.gif") center/cover no-repeat;
+  }
+
+  &__content {
+    min-width: 500px;
+    max-height: 500px;
+    padding: 20px;
+    overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+      width: 10px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-button {
+      display: none;
+    }
+
+    &::-webkit-scrollbar-track-piece {
+      background-color: white;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      height: 50px;
+      background-color: #999999;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-corner {
+      background-color: #999999;
+    }
+
+    &::-webkit-resizer {
+      background-color: white;
+    }
+  }
+
+  &__info {
+    display: flex;
+
+    &-left {
+      flex: 0 1 50%;
+
+      .progress-ring {
+        position: relative;
+        width: 120px;
+        height: 120px;
+
+        .progress-ring__text {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        .progress-ring__circle {
+          transform-origin: center;
+          transform: rotate(-90deg);
+          transition: all 0.3s ease 0s;
+        }
+      }
+    }
+    &-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 0 1 50%;
+    }
+  }
+
+  @media (max-width: 630px) {
+    width: 100%;
+
+    &__content {
+      min-width: 0;
+      min-height: 400px;
+    }
+  }
+}
+
+.game-modal__words-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .game-modal__words-title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .game-modal__correct-words {
+    margin: 10px 0;
+  }
+  .game-modal__wrong-words {
+    margin: 10px 0;
+  }
+}
+
+.modal-row {
+  display: flex;
+  column-gap: 10px;
+  font-size: 20px;
+  margin-bottom: 5px;
+
+  &__audio {
+    display: block;
+
+    &.icon-button::before {
+      content: "\f144";
+      color: white;
+      font-size: 20px;
+    }
+  }
+
+  &__word {
+    color: #2582e7;
+  }
+
+  &__translation {
+    color: whitesmoke;
+  }
+}

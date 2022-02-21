@@ -10,11 +10,40 @@ button {
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   font-size: 30px;
-  color: white;
 }
 
 .icon-button.menu__button::before {
   content: "\f11b";
+}
+
+.icon-button.step-back::before {
+  content: "\f060";
+}
+
+.icon-button.step-forward::before {
+  content: "\f061";
+}
+
+.icon-button.prevPage::before {
+  content: "\f060";
+}
+
+.icon-button.nextPage::before {
+  content: "\f061";
+}
+
+.icon-button.volume::before {
+  content: "\f028";
+}
+
+.icon-button.btn-visibility::before {
+  content: "\f06e";
+}
+.icon-button.btn-difficult::before {
+  content: "\f059";
+}
+.icon-button.btn-learned::before {
+  content: "\f005";
 }
 
 .icon-button._crossed {
@@ -31,4 +60,18 @@ button {
   font-weight: 900;
   font-size: 1rem;
   color: red;
+}
+
+.common-button {
+  cursor: pointer;
+  background-color: #e5005091;
+  color: white;
+  font-family: "F77 Minecraft";
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+  &:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+  }
 }

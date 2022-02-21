@@ -16,14 +16,18 @@
 @import "components/button";
 @import "../scripts/components/games/audioGame/style.scss";
 @import "../scripts/components/games/sprintGame/style.scss";
+@import "../scripts/components/games/modalStatistic/style.scss";
 @import "../scripts/components/header/style.scss";
 @import "../scripts/components/menu/style.scss";
+@import "../scripts/components/flagPole/style.scss";
 @import "../scripts/components/pageDictionary/style.scss";
 @import "../scripts/components/pageDictionary/wordCard/style.scss";
 @import "../scripts/components/pageGames/style.scss";
-@import "../scripts/components/pageHome/style.scss";
+@import "../scripts/components/games/gameLauncher/style.scss";
 @import "../scripts/components/pageStatistics/style.scss";
 @import "../scripts/components/user/style.scss";
+@import "../scripts/components/pageHome/style.scss";
+@import "../../node_modules/c3/c3.min.css";
 
 // 6. Page-specific styles
 @import "pages/home";

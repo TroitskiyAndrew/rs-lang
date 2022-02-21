@@ -1,3 +1,4 @@
+import { DateNumber } from './api/api.types';
 import { TableHeader, DivOptions, SpanOptions, ButtonOptions, InputOptions } from './common.types';
 import { instances } from './components/components';
 import Menu from './components/menu';
@@ -38,6 +39,11 @@ export function createButton(options: ButtonOptions): HTMLButtonElement {
   if (options.action) {
     button.dataset.action = options.action;
   }
+  if (options.dataSet) {
+    for (const key of Object.keys(options.dataSet)) {
+      button.dataset[key] = options.dataSet[key];
+    }
+  }
   if (options.disabled) {
     button.disabled = true;
   }
@@ -52,6 +58,15 @@ export function createInput(options: InputOptions): HTMLInputElement {
   }
   if (options.type) {
     input.type = options.type;
+  }
+  if (options.placeholder) {
+    input.placeholder = options.placeholder;
+  }
+  if (options.value) {
+    input.value = options.value;
+  }
+  if (options.required) {
+    input.required = options.required;
   }
   return input;
 }
@@ -105,4 +120,44 @@ export function closeMenu(): void {
   const widgetId = menuElem.dataset.widgetId as string;
   const widget = instances[widgetId] as Menu;
   widget.hideMenu();
+}
+
+export function shuffleArray<T>(array: Array<T>) {
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+export function updateObjDate(dateObj: DateNumber | undefined, dateValue: number): DateNumber {
+  const currentDate = new Date();
+  const date = currentDate.toISOString().split('T')[0];
+  if (!dateObj) {
+    dateObj = {};
+  }
+  if (date in dateObj) {
+    // такая дата есть в массиве с АПИ, обновляем
+    dateObj[date] = dateValue + dateObj[date];
+  } else {
+    dateObj[date] = dateValue;
+  }
+  return dateObj;
+}
+
+export function getTodayCount(dateObj: DateNumber | undefined): number {
+  const currentDate = new Date();
+  const date = currentDate.toISOString().split('T')[0];
+  if (!dateObj) {
+    return 0;
+  }
+  if (date in dateObj) {
+    return dateObj[date];
+  }
+  return 0;
+}
+
+export function updateLearnedCounterDate(isLearnedBefore: boolean, currentLearned: boolean): 0 | 1 | -1 {
+  if (isLearnedBefore === true && currentLearned === false) return -1;
+  if (isLearnedBefore === false && currentLearned === true) return 1;
+  return 0;
 }

@@ -17,7 +17,7 @@ export function disposeElem(elem: HTMLElement): void {
   }
 }
 
-export function updateContent(elem: HTMLElement, name: string): void {
+export function updateContent(elem: HTMLElement, name: string, options?: string): void {
   if (components[name] === undefined) {
     return;
   }
@@ -25,6 +25,9 @@ export function updateContent(elem: HTMLElement, name: string): void {
 
   const x = new components[name](elem);
 
+  if (options) {
+    x.options = options;
+  }
   x.init();
 }
 
@@ -46,4 +49,5 @@ export function pageChenging(elem: HTMLElement, page: string): void {
   updateState({ currentPage: page });
   container.innerHTML = '';
   container.append(elem);
+  (document.querySelector('footer') as HTMLElement).classList.remove('hidden');
 }

@@ -16,12 +16,16 @@ export default class BaseComponent {
   public fragment: DocumentFragment;
 
   public actions: {
-    [name: string]: () => void,
+    [name: string]: (ev?: Event) => void,
   };
 
   private isDisposed: boolean;
 
-  private id: string;
+  public id: string;
+
+  public options = '';
+
+  public audioPlayer = new Audio();
 
   constructor(elem: HTMLElement) {
     this.name = '';
@@ -41,6 +45,7 @@ export default class BaseComponent {
     this.elem.innerHTML = '';
     this.elem.dataset.inited = 'true';
     this.addLoading();
+    this.setActions();
     this.createHTML();
     this.pasteHTML();
     const initialization = this.oninit();
@@ -116,7 +121,7 @@ export default class BaseComponent {
 
     const action = target.dataset.action;
     if (action && this.actions[action]) {
-      this.actions[action].call(this);
+      this.actions[action].call(this, ev);
     }
 
 
@@ -128,6 +133,12 @@ export default class BaseComponent {
 
   public remoteControle(): void {
 
+  }
+
+  public playAudio(src: string): void {
+    this.audioPlayer.src = src;
+    this.audioPlayer.currentTime = 0;
+    this.audioPlayer.play();
   }
 
 }

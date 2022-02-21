@@ -1,18 +1,41 @@
+
 type State = {
-  [name: string]: string
+  currentPage: string,
+  dictionaryPage: number,
+  dictionaryGroup: number,
+  userName: string,
+  userEmail: string,
+  userPassword: string,
+  userId: string,
+  token: string,
+  refreshToken: string,
+  launchGame: string,
+  optionsSprint: string,
+  learnedPages: string[],
 };
 
-const defaultState: State = {
+export const defaultState: State = {
   currentPage: 'pageHome',
+  dictionaryPage: 0,
+  dictionaryGroup: 0,
+  userName: '',
+  userEmail: '',
+  userPassword: '',
+  userId: '',
+  token: '',
+  refreshToken: '',
+  launchGame: '',
+  optionsSprint: '',
+  learnedPages: [],
 };
 
 export function getState(): State {
-  const state = localStorage.getItem('rs-lang') ? JSON.parse(localStorage.getItem('rs-lang') as string) : defaultState;
+  const state = localStorage.getItem('rs-lang-12341') ? JSON.parse(localStorage.getItem('rs-lang-12341') as string) : defaultState;
   return state;
 }
 
 export function updateState(newState: Partial<State>): void {
   const state = getState();
   Object.assign(state, newState);
-  localStorage.setItem('rs-lang', JSON.stringify(state));
+  localStorage.setItem('rs-lang-12341', JSON.stringify(state));
 }

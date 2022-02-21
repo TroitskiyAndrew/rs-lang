@@ -1,3 +1,28 @@
 // -----------------------------------------------------------------------------
 // This file contains all @font-face declarations, if any.
 // -----------------------------------------------------------------------------
+
+@font-face {
+  font-family: 'Super Mario World Text Box';
+  src: URL('/src/assets/fonts/SuperMarioWorldTextBoxRegular-Y86j.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Super Mario Brothers Font';
+  src: URL('/src/assets/fonts/SuperMarioBrothers-4nmp.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Super Mario 286(RUS BY LYAJKA)';
+  src: URL('/src/assets/fonts/supermario286rusbylyajka.otf') format('truetype');
+}
+
+@font-face {
+  font-family: 'F77 Minecraft';
+  src: URL('/src/assets/fonts/F77-Minecraft.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Press Start 2P';
+  src: URL('/src/assets/fonts/PressStart2P-Regular.ttf') format('truetype');
+}

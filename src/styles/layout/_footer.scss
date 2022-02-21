@@ -1,24 +1,30 @@
-.footer{
+.footer {
   display: flex;
   align-items: center;
   column-gap: 10px;
-  background-color: black;
+  background-color: #28282b;
   height: 8vh;
   padding: 5px 20px;
   color: white;
   font-size: 1rem;
-  &__item_right{
+  width: 100%;
+  font-family: "F77 Minecraft";
+  &__item_right {
     margin-left: auto;
   }
 
-  a{
+  a {
     display: flex;
     align-items: center;
   }
+
+  @media (max-width: 1024px) {
+    font-size: 0.7rem;
+  }
 }
-#git-logo{
+#git-logo {
   height: 3vh;
 }
-#rss-logo{
+#rss-logo {
   height: 5vh;
 }
