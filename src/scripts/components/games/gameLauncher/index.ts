@@ -62,8 +62,8 @@ export default class GameLauncher extends BaseComponent {
     }
 
     if (this.options === 'audio-game') {
-      titleDescription.textContent = '«Аудиовызов»';
-      textDescription1.innerText = '«Аудиовызов» - это тренировка, которая улучшает восприятие речи на слух.';
+      titleDescription.textContent = 'Аудиовызов';
+      textDescription1.innerText = 'Аудиовызов - это тренировка, которая улучшает восприятие речи на слух.';
       textDescription2.innerText = 'Используйте мышь, чтобы выбрать правильный вариант ответа.';
       textDescription3.innerText = 'Используйте цифровые клавиши от 1 до 4 для выбора ответа.';
       textDescription4.innerText = 'Используйте пробел для подсказки и перехода к следующему слову.';
@@ -81,8 +81,8 @@ export default class GameLauncher extends BaseComponent {
       });
       pageNavigation.append(gameAudio);
     } else if (this.options === 'sprint-game') {
-      titleDescription.textContent = '«Спринт»';
-      textDescription1.innerText = '«Спринт» - Тренирует навык быстрого перевода с английского языка на русский. Вам нужно выбрать соответствует ли перевод предложенному слову.';
+      titleDescription.textContent = 'Спринт';
+      textDescription1.innerText = 'Спринт - Тренирует навык быстрого перевода с английского языка на русский. Вам нужно выбрать соответствует ли перевод предложенному слову.';
       textDescription2.innerText = 'Используйте мышь, чтобы выбрать правильный вариант ответа.';
       textDescription3.innerText = 'Используйте цифровые клавиши 1 или 2 для выбора ответа.';
       textDescription4.innerText = 'Для выбора уровня сложности подымите флаг)';
