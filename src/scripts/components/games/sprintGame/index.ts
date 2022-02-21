@@ -504,6 +504,7 @@ export default class SprintGame extends BaseComponent {
   public listenEvents(): void {
     const menuButtonHandler = () => {
       this.getMenuModal().then(val => {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         val.addEventListener('click', menuModalHandler);
         menuModal = val;
       });
