@@ -66,8 +66,10 @@ button {
   cursor: pointer;
   background-color: rgb(252, 85, 229);
   color: white;
+  font-family: "F77 Minecraft";
   border-radius: 5px;
   padding: 10px;
+  text-align: center;
   &:disabled {
     background-color: grey;
     cursor: not-allowed;

@@ -135,7 +135,7 @@ export default class ModalStatistic extends BaseComponent {
       className: 'game-modal__navigation',
     });
     const againBtn = createButton({
-      className: 'game-modal__button game-modal__play-again games__link',
+      className: 'game-modal__button game-modal__play-again games__link common-button',
       text: 'повторить',
     });
     againBtn.onclick = () => {
@@ -145,7 +145,7 @@ export default class ModalStatistic extends BaseComponent {
     };
 
     const toGamesBtn = createButton({
-      className: 'game-modal__button game-modal__to-games games__link',
+      className: 'game-modal__button game-modal__to-games games__link common-button',
       text: 'к играм',
       dataSet: {
         direction: 'pageGames',
