@@ -143,13 +143,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: baseline;
   gap: 15px;
   padding: 8px;
   border: 1px solid #ffdb73;
   border-radius: 5px;
   max-width: calc((100% - 40px) / 3);
   text-align: center;
+  width: 100%;
 }
 
 .member-wrapper__name {
@@ -177,6 +177,22 @@ img[class*='member-wrapper__avatar'] {
 .github-svg:hover {
   filter: invert(27%) sepia(93%) saturate(7466%) hue-rotate(357deg)
     brightness(104%) contrast(121%);
+}
+
+.member-wrapper__position {
+  min-height: 56px;
+}
+
+.member-wrapper__contribution {
+  text-align: center;
+}
+
+.member-wrapper__contribution > ul > li {
+  list-style-type: none;
+}
+
+.member-wrapper__contribution > ul {
+  padding-inline-start: 0;
 }
 
 // 3. Footer
@@ -214,6 +230,7 @@ img[class*='member-wrapper__avatar'] {
 
   .team-container {
     max-width: 100%;
+    margin: 10px;
   }
 
   .team-container__members-wrapper {
@@ -226,7 +243,7 @@ img[class*='member-wrapper__avatar'] {
   }
 
   .member-wrapper {
-    max-width: 600px;
-    margin: 10px;
+    max-width: 450px;
+    margin: 0px;
   }
 }
