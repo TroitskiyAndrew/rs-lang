@@ -13,15 +13,9 @@ type State = {
   token: string,
   refreshToken: string,
   launchGame: string,
-  aggregatedWords: AggregatedWords;
-  optionsSprint: string
+  optionsSprint: string,
+  learnedPages: string[],
 };
-interface AggregatedWords {
-  page: number;
-  group: number;
-  wordsPerPage: number;
-  filter: string;
-}
 
 export const defaultState: State = {
   currentPage: 'pageHome',
@@ -34,13 +28,8 @@ export const defaultState: State = {
   token: '',
   refreshToken: '',
   launchGame: '',
-  aggregatedWords: {
-    page: 0,
-    group: 1,
-    wordsPerPage: 3,
-    filter: '{"$or":[{"userWord.difficulty":"easy"},{"userWord":null}]}',
-  },
   optionsSprint: '',
+  learnedPages: [],
 };
 
 export function getState(): State {

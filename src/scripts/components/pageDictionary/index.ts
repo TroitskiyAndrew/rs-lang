@@ -24,7 +24,7 @@ export default class PageDictionary extends BaseComponent {
 
   wordElems: HTMLElement[];
 
-  goInput: HTMLInputElement = createInput({ className: 'paginator__mover', type: 'range' });
+  goInput: HTMLInputElement = createInput({ className: 'stepControl__mover', type: 'range' });
 
   paginator: HTMLDivElement = createDiv({ className: 'dictionary__paginator paginator' });
 
@@ -34,7 +34,15 @@ export default class PageDictionary extends BaseComponent {
 
   currPage = 0;
 
+  wordsOnPage = 0;
+
+  learnedWordsCount = 0;
+
+  pageCode = '';
+
   updating = false;
+
+  userId = '';
 
   constructor(elem: HTMLElement) {
     super(elem);
@@ -45,25 +53,27 @@ export default class PageDictionary extends BaseComponent {
 
   public oninit(): Promise<void> {
     pageChenging(createSpan({ text: 'Словарь' }), this.name);
+
     return this.updateDictionary();
   }
 
   public createHTML(): void {
     const stepControl = createDiv({ className: 'dictionary__stepControl stepControl' });
     const contorol = createDiv({ className: 'dictionary__control' });
-    const level = createDiv({ className: 'dictionary__level', dataSet: { widget: 'flagPole' } });
+    const level = createDiv({ className: 'dictionary__level', dataSet: { widget: 'flagPole', fromDictionary: 'true' } });
 
-    this.setPageSelector();
-    this.paginator.append(createButton({ className: 'paginator__button icon-button prevPage', action: 'prevPage' }));
+    this.pageSelector.classList.add('paginator__selector');
+    this.pageSelector.id = 'pageSelector';
+    this.paginator.append(createButton({ className: 'paginator__button icon-button sega-button prevPage', action: 'prevPage' }));
     this.paginator.append(this.pageSelector);
-    this.paginator.append(createButton({ className: 'paginator__button icon-button nextPage', action: 'nextPage' }));
+    this.paginator.append(createButton({ className: 'paginator__button icon-button sega-button nextPage', action: 'nextPage' }));
 
-    this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button', text: 'АудиоСпринт', dataSet: { direction: 'audioGame' } }));
+    this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button', text: 'Аудио', dataSet: { direction: 'audioGame' } }));
     this.gamesButtonsHolder.append(createButton({ className: 'dictionary__game-button', text: 'Спринт', dataSet: { direction: 'sprintGame' } }));
 
-    stepControl.append(createButton({ className: 'stepControl__step icon-button step-back', action: 'stepBack' }));
+    stepControl.append(createButton({ className: 'stepControl__step icon-button sega-button step-back', action: 'stepBack' }));
     stepControl.append(this.goInput);
-    stepControl.append(createButton({ className: 'stepControl__step icon-button step-forward', action: 'stepForward' }));
+    stepControl.append(createButton({ className: 'stepControl__step icon-button sega-button step-forward', action: 'stepForward' }));
 
     contorol.append(this.paginator);
     contorol.append(level);
@@ -83,6 +93,8 @@ export default class PageDictionary extends BaseComponent {
     this.pageSelector.addEventListener('input', this.changePage.bind(this));
     this.page.addEventListener('change-flag', this.groupChangeFromFlag.bind(this));
     this.page.addEventListener('button-pressed', this.marioJump.bind(this));
+    this.page.addEventListener('wordSetLerned', this.wordSetLerned.bind(this));
+    this.page.addEventListener('wordSetNotLerned', this.wordSetNotLerned.bind(this));
   }
 
   public setActions(): void {
@@ -94,25 +106,43 @@ export default class PageDictionary extends BaseComponent {
 
   private updateDictionary(): Promise<void> {
     this.updating = true;
+    this.wordsOnPage = 0;
+    this.learnedWordsCount = 0;
     this.removeWords();
     const state = getState();
+    this.userId = state.userId;
     this.currGroup = state.dictionaryGroup;
     this.currPage = state.dictionaryPage;
-    const wordsList = apiService.getChunkOfWords(this.currPage, this.currGroup);
+    this.pageCode = `g${this.currGroup}p${this.currPage}`;
+    this.updateSelectOption();
+    this.gamesButtonsControl(this.currGroup == constants.learnedGroup);
+    const ms = 1000;
+    const stepTime = `${constants.junmpAnimationTimeDictionary / ms}s`;
+
+    this.mario.style.animationDuration = stepTime;
+    this.backGround.style.transitionDuration = stepTime;
 
     this.updateButtons();
 
-    return wordsList.then((list: WordCard[]): void => {
+    const wordsList = this.currGroup <= constants.maxWordsGroup ? apiService.getChunkOfWords(this.currPage, this.currGroup) :
+      apiService.getAllUserAggregatedWords(this.userId, this.currGroup === constants.difficultGroup ? '{"userWord.difficulty":"difficult"}' : '{"userWord.optional.learned":true}');
+    return wordsList.then((list: WordCard[] | number): void => {
+      if (typeof list === 'number') {
+        return;
+      }
       const words = new DocumentFragment;
+
+      this.wordsOnPage = list.length;
       for (const word of list) {
-        const newWord = createDiv({ className: 'dictionary__word', dataSet: { widget: 'wordsCard', wordId: word.id } });
+        const newWord = createDiv({ className: 'dictionary__word', dataSet: { widget: 'wordsCard', wordId: word.id || word._id as string } });
+        newWord.style.transitionDuration = stepTime;
         updateContent(newWord, newWord.getAttribute('data-widget') as string);
         this.wordElems.push(newWord);
         words.append(newWord);
       }
       this.setGoInput();
       this.setPaginator();
-      this.backGround.style.width = `${this.wordElems.length * constants.hundred}%`;
+      this.backGround.style.width = `${(this.wordElems.length) * constants.hundred}%`;
       this.wordsHolder?.append(words);
       this.go(0);
 
@@ -134,7 +164,55 @@ export default class PageDictionary extends BaseComponent {
       button.dataset.options = JSON.stringify({
         group: this.currGroup,
         page: this.currPage,
+        fromDictionary: true,
       });
+    }
+  }
+
+  private wordSetLerned(): void {
+    this.learnedWordsCount += 1;
+    if (this.learnedWordsCount === this.wordsOnPage) {
+      const learnedPages = getState().learnedPages;
+      if (!learnedPages.includes(this.pageCode)) {
+        learnedPages.push(this.pageCode);
+        updateState({ learnedPages: learnedPages });
+      }
+      console.log('allLearned');
+      this.gamesButtonsControl(true);
+    }
+  }
+
+  private wordSetNotLerned(): void {
+    if (this.learnedWordsCount === this.wordsOnPage) {
+      const learnedPages = getState().learnedPages;
+      const index = learnedPages.indexOf(this.pageCode);
+      learnedPages.splice(index, 1);
+      updateState({ learnedPages: learnedPages });
+      console.log('notAllLearned');
+      this.gamesButtonsControl(false);
+    }
+    this.learnedWordsCount -= 1;
+  }
+
+  private gamesButtonsControl(disable: boolean): void {
+    const buttons: NodeListOf<HTMLButtonElement> = this.gamesButtonsHolder.querySelectorAll('button');
+    for (const button of buttons) {
+      button.disabled = disable;
+    }
+  }
+
+  private updateSelectOption(): void {
+    this.pageSelector.innerHTML = '';
+    for (let i = 0; i <= constants.maxWordsPage; i += 1) {
+      const newOption = document.createElement('option') as HTMLOptionElement;
+      const learnedPages = getState().learnedPages;
+      if (learnedPages.includes(`g${this.currGroup}p${i}`)) {
+        newOption.classList.add('_learned');
+      }
+      newOption.value = String(i);
+      newOption.textContent = `Страница #${i + 1}`;
+      this.pageSelector.append(newOption);
+
     }
   }
 
@@ -186,20 +264,8 @@ export default class PageDictionary extends BaseComponent {
     this.go(value);
   }
 
-  private setPageSelector(): void {
-    this.pageSelector.classList.add('paginator__selector');
-    this.pageSelector.id = 'pageSelector';
-    for (let i = 0; i <= constants.maxWordsPage; i += 1) {
-      const newOption = document.createElement('option') as HTMLOptionElement;
-      newOption.value = String(i);
-      newOption.textContent = `Страница #${i + 1}`;
-      this.pageSelector.append(newOption);
-    }
-
-  }
-
   private setPaginator(): void {
-    if (String(this.currGroup) === '6') {
+    if (this.currGroup > constants.maxWordsGroup) {
       this.paginator.classList.add('hidden');
     } else {
       this.paginator.classList.remove('hidden');
@@ -245,7 +311,7 @@ export default class PageDictionary extends BaseComponent {
 
   private marioJump() {
     this.mario.classList.add('_moving');
-    setTimeout((): void => { this.mario.classList.remove('_moving'); }, Number('1000'));
+    setTimeout((): void => { this.mario.classList.remove('_moving'); }, constants.junmpAnimationTimeDictionary);
   }
 
   private marioTurn(forward: boolean): void {

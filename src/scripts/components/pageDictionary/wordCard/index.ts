@@ -1,8 +1,9 @@
 import BaseComponent from '../../base';
-import { createButton, createDiv } from '../../../utils';
+import { createButton, createDiv, createSpan, updateObjDate } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
-import { WordCard } from '../../../api/api.types';
 import { getState } from '../../../state';
+import { Statistics, UserWord } from '../../../api/api.types';
+import constants from '../../../app.constants';
 
 export default class WordsCard extends BaseComponent {
   wordId = '';
@@ -29,9 +30,16 @@ export default class WordsCard extends BaseComponent {
 
   visibility = false;
 
-  difficult = false;
-
-  studied = false;
+  wordBody: UserWord = {
+    difficulty: 'common',
+    optional: {
+      learned: false,
+      rightRange: 0,
+      word: '',
+      correctAnswersAllTime: 0,
+      answersAllTime: 0,
+    },
+  };
 
 
   constructor(elem: HTMLElement) {
@@ -44,27 +52,42 @@ export default class WordsCard extends BaseComponent {
   }
 
   public async oninit(): Promise<void> {
-    const wordRequest = apiService.getWord(this.wordId);
+    const word = await apiService.getWord(this.wordId);
+    const match = word.image.match(/\d*_\d*/);
 
-    return wordRequest.then((word: WordCard) => {
-      const match = word.image.match(/\d*_\d*/);
+    if (match) {
+      this.file = match[0] as string;
+    }
+    this.word.innerHTML += word.word;
+    this.wordRu.innerHTML += word.wordTranslate;
+    this.meaning.innerHTML += word.textMeaning;
+    this.meaningRu.innerHTML += word.textMeaningTranslate;
+    this.example.innerHTML += word.textExample;
+    this.exampleRu.innerHTML += word.textExampleTranslate;
+    this.transcription.innerHTML += word.transcription;
+    this.img.src = `${baseUrl}/files/${this.file}.jpg`;
 
-      if (match) {
-        this.file = match[0] as string;
+
+    if (this.userId) {
+      this.elem.classList.add('_authorized');
+      const userWord = await apiService.getUserWord(this.userId, this.wordId);
+
+      if (typeof userWord !== 'number') {
+        this.wordBody.difficulty = userWord.difficulty;
+        this.wordBody.optional = userWord.optional;
+        (this.elem.querySelector('.text-statistic') as HTMLSpanElement).textContent = `${this.wordBody.optional.correctAnswersAllTime || 0}/${this.wordBody.optional.answersAllTime || 0}`;
+        this.changeStatus();
+
+      } else {
+        this.wordBody.optional.word = word.word;
+        apiService.createUserWord(this.userId, this.wordId, this.wordBody).then();
       }
 
-      this.word.innerHTML += word.word;
-      this.wordRu.innerHTML += word.wordTranslate;
-      this.meaning.innerHTML += word.textMeaning;
-      this.meaningRu.innerHTML += word.textMeaningTranslate;
-      this.example.innerHTML += word.textExample;
-      this.exampleRu.innerHTML += word.textExampleTranslate;
-      this.transcription.innerHTML += word.transcription;
-
-      this.img.src = `${baseUrl}/files/${this.file}.jpg`;
-
-      this.changeStatus();
-    });
+      if (this.wordBody.optional.learned) {
+        this.wordStatusChange(true);
+      }
+    }
+    return Promise.resolve();
   }
 
   public createHTML(): void {
@@ -76,7 +99,8 @@ export default class WordsCard extends BaseComponent {
 
     contorls.append(this.createButtonBlock('visibility', 'Показать/скрыть перевод'));
     contorls.append(this.createButtonBlock('difficult', 'Добавить/убрать из списка сложных слов'));
-    contorls.append(this.createButtonBlock('studied', 'Добавить/убрать из списка выученных слов'));
+    contorls.append(this.createButtonBlock('learned', 'Добавить/убрать из списка выученных слов'));
+    contorls.append(this.createButtonBlock('statistic', 'Количество правильных ответов в играх', '0/0'));
 
     this.img.classList.add('wordCard__img');
     ruHolder.append(createDiv({ className: 'bricks' }));
@@ -99,7 +123,7 @@ export default class WordsCard extends BaseComponent {
 
   }
 
-  private createButtonBlock(type: string, hint: string): HTMLDivElement {
+  private createButtonBlock(type: string, hint: string, text?: string): HTMLDivElement {
     const block = createDiv({ className: `wordCard__button-block button-block ${type}` });
     block.setAttribute('title', hint);
 
@@ -107,7 +131,11 @@ export default class WordsCard extends BaseComponent {
     block.append(createDiv({ className: 'button-block__circle left-bottom' }));
     block.append(createDiv({ className: 'button-block__circle right-top' }));
     block.append(createDiv({ className: 'button-block__circle right-bottom' }));
-    block.append(createButton({ className: `button-block__button icon-button btn-${type}`, action: `${type}` }));
+    if (text) {
+      block.append(createSpan({ className: `button-block__text icon-button text-${type}`, text: text }));
+    } else {
+      block.append(createButton({ className: `button-block__button icon-button btn-${type}`, action: `${type}` }));
+    }
 
     return block;
   }
@@ -122,7 +150,7 @@ export default class WordsCard extends BaseComponent {
     this.actions.sayMeaning = this.sayMeaning;
     this.actions.visibility = this.toggleVisibility;
     this.actions.difficult = this.toggleDifficult;
-    this.actions.studied = this.toggleStudied;
+    this.actions.learned = this.togglelearned;
   }
 
   private sayWord(): void {
@@ -148,34 +176,56 @@ export default class WordsCard extends BaseComponent {
     // this.changeStatus();
     if (this.visibility) {
       this.sendEvent('button-pressed');
-      setTimeout(this.changeStatus.bind(this), Number('500'));
+      setTimeout(this.changeStatus.bind(this), constants.junmpAnimationTimeDictionary / 2);
     } else {
       this.changeStatus();
     }
   }
 
   private toggleDifficult(): void {
-    this.difficult = !this.difficult;
-    if (this.difficult) {
-      apiService.createUserWord(this.userId, this.wordId, {
-        difficulty: 'difficult',
-      });
-    } else {
-      apiService.deleteUserWord(this.userId, this.wordId);
+    this.wordBody.difficulty = this.wordBody.difficulty === 'common' ? 'difficult' : 'common';
+    if (this.wordBody.difficulty === 'difficult') {
+      this.wordBody.optional.learned = false;
     }
+    apiService.updateUserWord(this.userId, this.wordId, this.wordBody);
     this.changeStatus();
   }
 
-  private toggleStudied(): void {
-    this.studied = !this.studied;
-    if (this.studied) {
-      apiService.createUserWord(this.userId, this.wordId, {
-        difficulty: 'studied',
-      });
-    } else {
-      apiService.deleteUserWord(this.userId, this.wordId);
+  private togglelearned(): void {
+    this.wordBody.optional.learned = !this.wordBody.optional.learned;
+    if (this.wordBody.optional.learned) {
+      this.wordBody.difficulty = 'common';
     }
+    this.updateStatistic(this.wordBody.optional.learned);
+    apiService.updateUserWord(this.userId, this.wordId, this.wordBody);
     this.changeStatus();
+    this.wordStatusChange(this.wordBody.optional.learned);
+  }
+
+  private async updateStatistic(learned: boolean): Promise<void> {
+    const apiStatistic = await apiService.getUserStatistics(this.userId);
+    const defaultStatistic: Statistics = {
+      learnedWords: 0,
+      optional: {
+        learnedWordsPerDate: updateObjDate(undefined, 0),
+      },
+    };
+    const statistic = typeof apiStatistic !== 'number' ? apiStatistic : defaultStatistic;
+    console.log(statistic);
+    const change = learned ? 1 : -1;
+    statistic.learnedWords = statistic.learnedWords as number + change;
+    statistic.optional.learnedWordsPerDate = updateObjDate(statistic.optional.learnedWordsPerDate, change);
+    if (statistic.id) {
+      delete statistic.id;
+    }
+    console.log(statistic);
+    return apiService.updateUserStatistics(this.userId, statistic).then();
+  }
+
+  private wordStatusChange(add: boolean): void {
+    const eventName = `wordSet${add ? '' : 'Not'}Lerned`;
+
+    this.sendEvent(eventName);
   }
 
   private changeStatus(): void {
@@ -186,19 +236,19 @@ export default class WordsCard extends BaseComponent {
       this.elem.classList.remove('_visible-translate');
       (this.elem.querySelector('.button-block.visibility') as HTMLElement).classList.remove('_active');
     }
-    if (this.difficult) {
+    if (this.wordBody.difficulty === 'difficult') {
       this.elem.classList.add('_difficult');
       (this.elem.querySelector('.button-block.difficult') as HTMLElement).classList.add('_active');
     } else {
       this.elem.classList.remove('_difficult');
       (this.elem.querySelector('.button-block.difficult') as HTMLElement).classList.remove('_active');
     }
-    if (this.studied) {
-      this.elem.classList.add('_studied');
-      (this.elem.querySelector('.button-block.studied') as HTMLElement).classList.add('_active');
+    if (this.wordBody.optional.learned) {
+      this.elem.classList.add('_learned');
+      (this.elem.querySelector('.button-block.learned') as HTMLElement).classList.add('_active');
     } else {
-      this.elem.classList.remove('_studied');
-      (this.elem.querySelector('.button-block.studied') as HTMLElement).classList.remove('_active');
+      this.elem.classList.remove('_learned');
+      (this.elem.querySelector('.button-block.learned') as HTMLElement).classList.remove('_active');
     }
   }
 

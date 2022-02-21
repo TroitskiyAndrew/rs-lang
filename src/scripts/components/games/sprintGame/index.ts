@@ -6,6 +6,7 @@ import { WordCard } from '../../../api/api.types';
 import { IGameOptions, IWordParams, IScoreCounter } from './sprintGameTypes';
 import { IStatisticAnswer } from '../audioGame/index'
 import { updateState, getState } from '../../../state';
+import constants from '../../../app.constants';
 // import WordsCard from '../../pageDictionary/wordCard';
 
 const GROUP_WORDS_NUMBER = 600;
@@ -16,8 +17,8 @@ const TIME_FOR_GAME_MILISECONDS = 60000;
 const MAX_SCORE_MULTIPLYER_INTERMEDIATE_COUNTER = 3;
 
 let options: IGameOptions;
-let groupWordsArr: IStatisticAnswer[] =[];
-let groupWordsArrMod: IStatisticAnswer[] =[];
+let wordsArrToPlay: IStatisticAnswer[] =[];
+let wordsArrToPlayCut: IStatisticAnswer[] =[];
 let roundResults: IWordParams[] = [];
 let scoreCounter: IScoreCounter = {
   score: 0,
@@ -30,14 +31,12 @@ let menuButton: HTMLButtonElement
 let menuModal: HTMLUListElement
 let audioIsPlaying = false;
 let coinCounter: number = 0;
-let wordsArrNumber: number;
-let wordsOnPageLeft: number;
+let wordsOnPageLeft: number | null = null;
+let cutRoundResults = false;
 
 export default class SprintGame extends BaseComponent {
 
-  // groupsWrapper: HTMLElement | undefined;
-  // groupsWrapperButton: HTMLButtonElement | undefined;
-  group: string = '';
+  group: string  = '';
   page: string = '';
 
   startAudioOnce: boolean = true;
@@ -59,7 +58,6 @@ export default class SprintGame extends BaseComponent {
   mario: HTMLImageElement | undefined;
 
   audioSprint: HTMLAudioElement = new Audio();
-  audioModal: HTMLAudioElement = new Audio();
   audioCoin: HTMLAudioElement = new Audio();
   audioMushroom: HTMLAudioElement = new Audio();
 
@@ -70,7 +68,7 @@ export default class SprintGame extends BaseComponent {
 
   public oninit(): Promise<void> {
     this.setActions();
-    //this.addLoading();
+    this.addLoading();
     pageChenging(createSpan({ text: 'Спринт Игра' }), this.name);
     return Promise.resolve();
   }
@@ -86,8 +84,6 @@ export default class SprintGame extends BaseComponent {
     this.gamepadWrapper = gamepadWrapper;
     this.wordsWrapper = wordsWrapper;
 
-    this.addLoading();
-
     this.clearGameParams();
     this.getGroupAndPage();
 
@@ -102,10 +98,10 @@ export default class SprintGame extends BaseComponent {
     
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
+    sprintWrapper.append(gamepadWrapper);
     sprintWrapper.append(marioWrapper);
     sprintWrapper.append(pipeWrapper);
-    sprintWrapper.append(gamepadWrapper);
-
+    
     page.append(sprintWrapper);
     this.fragment.append(page);
   }
@@ -166,8 +162,6 @@ export default class SprintGame extends BaseComponent {
     paramsLevelWrapper.innerHTML += `&#215;`;
     paramsLevelWrapper.append(this.group);
 
-    //paramsMultiplyerWrapper.append(multiplyerItem);
-
     paramsTime.innerHTML = `time<br> 60`;
     
     paramsCoins.append(this.getCoin('params'))
@@ -189,7 +183,6 @@ export default class SprintGame extends BaseComponent {
     mario.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
 
     marioWrapper.append(mario);
-    // marioWrapper.append(this.getCoin('medium'));
   }
 
   private renderPipe(pipeWrapper: HTMLDivElement) {
@@ -284,7 +277,7 @@ export default class SprintGame extends BaseComponent {
     } 
     if (options) {
       this.group = options.group;
-      if (options.page) this.page = options.page;
+      if (options.page !== undefined) this.page = options.page;
     } else {
       this.group = JSON.parse (getState().optionsSprint).group;
       //if (JSON.parse (getState().optionsSprint).page) this.page = JSON.parse (getState().optionsSprint).page;
@@ -296,12 +289,11 @@ export default class SprintGame extends BaseComponent {
       const getSecondsLeft = () => {
         const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start)
         if (Math.round(delta / 1000) === 0) {
-          // console.log(0)
           this.paramsTime!.innerHTML = `time<br> 0`;
+          cutRoundResults = true;
           this.stopTimer()
           this.showModalStatistics()
         } else {
-          // console.log(Math.round(delta / 1000))
           this.paramsTime!.innerHTML = `time<br> ${Math.round(delta / 1000)}`;
         }
       }
@@ -316,44 +308,70 @@ export default class SprintGame extends BaseComponent {
   }
 
   private getWordsArray() {
-    if (this.page === '') {
+    if (Number(this.group) === 6) {
+      this.getDifficultWordsArray();
+    } else if (this.page === '') {
       this.getWordsArrayFromGroup()
     } else {
       this.getWordsArrayFromPages()
     }
   }
 
+  private async getDifficultWordsArray() {
+    await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}').then(words => {
+      (words as WordCard[]).forEach((el) => {
+        this.addElToArray(el)
+      })
+    })
+    wordsArrToPlayCut = wordsArrToPlay.slice();
+    wordsOnPageLeft = wordsArrToPlay.length;
+    this.removeLoading();
+    this.getRandomWords(wordsArrToPlay, wordsOnPageLeft);
+  }
+
   private async getWordsArrayFromGroup() {
     await apiService.getChunkOfWordsGroup(Number(this.group)).then(words => {
       words.forEach((el) => this.addElToArray(el))
     });
-    wordsArrNumber = GROUP_WORDS_NUMBER;
-    // wordsOnPageLeft = wordsArrNumber;
     this.removeLoading();
-    this.getRandomWords(groupWordsArr, wordsArrNumber);
+    this.getRandomWords(wordsArrToPlay, GROUP_WORDS_NUMBER);
   }
 
   private async getWordsArrayFromPages() {
     let currentPageToArray: string = this.page;
     let addPageToArr = async () => {
-      await apiService.getChunkOfWords(Number(currentPageToArray), Number(this.group)).then(words => {
-        words.forEach((el) => this.addElToArray(el))
+      await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, Number(this.group), Number(currentPageToArray)).then(words => {
+        (words as WordCard[]).forEach((el) => this.addElToArray(el))
       });
       currentPageToArray = String(Number(currentPageToArray) - 1);
       if (Number(currentPageToArray) >= 0) {
         addPageToArr()
       } else {
-        groupWordsArrMod = groupWordsArr.slice();
+        wordsArrToPlayCut = wordsArrToPlay.slice();
+        wordsOnPageLeft = this.getWordsOnPageNumber();
+        this.getRandomWords(wordsArrToPlay, wordsOnPageLeft);
         this.removeLoading();
-        this.getRandomWords(groupWordsArr, PAGE_WORDS_NUMBER);
       }
     };
     addPageToArr();
-    wordsArrNumber = PAGE_WORDS_NUMBER;
-    wordsOnPageLeft = PAGE_WORDS_NUMBER;
+  }
+
+  private getWordsOnPageNumber() {
+    let prevEl: number | null = null;
+    let wordsOnPageNumber: number = 0;
+    wordsArrToPlayCut.forEach((el, index) => {
+      if (index === 0) {
+        wordsOnPageNumber = 1;
+      } else if (el.page === prevEl) {
+        wordsOnPageNumber += 1;
+      } else return;
+      prevEl = el.page;
+    })
+    return wordsOnPageNumber;
   }
 
   private addElToArray(el: WordCard) {
+    if (el._id) el.id = el._id;
     const elMod: IWordParams =  {
       id: `${el.id}`,
       group: el.group,
@@ -364,23 +382,21 @@ export default class SprintGame extends BaseComponent {
       audio: `${el.audio}`,
       answerCorrectness: false,
     };
-    groupWordsArr.push(elMod);
+    wordsArrToPlay.push(elMod);
   }
 
-  private getRandomWords(groupWordsArr: IWordParams[], wordsNumber: number) {
-
+  private getRandomWords(wordsArr: IWordParams[], wordsNumber: number) {
     const word = this.elem.querySelector('.eng-word') as HTMLDivElement;
     const wordTranslate = this.elem.querySelector('.translated-word') as HTMLDivElement;
     const randomWordNumber = getRandom(0, wordsNumber);
 
-    
-    word!.textContent = groupWordsArr[randomWordNumber].word;
-    if (Math.random() < 0.5) {
-      wordTranslate!.textContent = groupWordsArr[randomWordNumber].wordTranslate;
-      this.addElementToRoundResults(randomWordNumber, true);
+    word!.textContent = wordsArr[randomWordNumber].word;
+    if (Math.random() < 0.5 || wordsNumber === 1) {
+      wordTranslate!.textContent = wordsArr[randomWordNumber].wordTranslate;
+      this.addElementToRoundResults(wordsArr, randomWordNumber, true);
     } else {
-      wordTranslate!.textContent = groupWordsArr[getWrongTranslate()].wordTranslate;
-      this.addElementToRoundResults(randomWordNumber, false);
+      wordTranslate!.textContent = wordsArr[getWrongTranslate()].wordTranslate;
+      this.addElementToRoundResults(wordsArr, randomWordNumber, false);
     }
 
     function getWrongTranslate() {
@@ -390,21 +406,20 @@ export default class SprintGame extends BaseComponent {
       }
       return randomWordAnotherNumber;
     }
-
-    groupWordsArrMod.splice(randomWordNumber, 1);
-    wordsOnPageLeft -= 1;
+    wordsArrToPlayCut.splice(randomWordNumber, 1);
+    if (wordsOnPageLeft) wordsOnPageLeft -= 1;
     this.startTimer();
   }
 
-  private addElementToRoundResults(randomWordNumber: number, translateCorrectness: boolean) {
+  private addElementToRoundResults(wordsArr: IWordParams[], randomWordNumber: number, translateCorrectness: boolean) {
     roundResults[roundResults.length] = {
-      id: `${groupWordsArr[randomWordNumber].id}`,
-      group: groupWordsArr[randomWordNumber].group,
-      image: `${groupWordsArr[randomWordNumber].image}`,
-      page: groupWordsArr[randomWordNumber].page,
-      word: `${groupWordsArr[randomWordNumber].word}`,
-      wordTranslate: `${groupWordsArr[randomWordNumber].wordTranslate}`,
-      audio: `${groupWordsArr[randomWordNumber].audio}`,
+      id: `${wordsArr[randomWordNumber].id}`,
+      group: wordsArr[randomWordNumber].group,
+      image: `${wordsArr[randomWordNumber].image}`,
+      page: wordsArr[randomWordNumber].page,
+      word: `${wordsArr[randomWordNumber].word}`,
+      wordTranslate: `${wordsArr[randomWordNumber].wordTranslate}`,
+      audio: `${wordsArr[randomWordNumber].audio}`,
       translateCorrectness: translateCorrectness,
       answerCorrectness: false,
     };
@@ -437,19 +452,23 @@ export default class SprintGame extends BaseComponent {
       roundResults[roundResults.length - 1].answerCorrectness = false;
     }
     this.paramsScore!.textContent = `${scoreCounter.score}`;
-    // console.log(scoreCounter)
-    if (this.page) {
-      if (groupWordsArrMod.length && wordsOnPageLeft) {
-        this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
-      } else if (!groupWordsArrMod.length) {
+    if (this.page !== '' && Number(this.group) !== 6) {
+      if (wordsArrToPlayCut.length && wordsOnPageLeft) {
+        this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
+      } else if (!wordsArrToPlayCut.length) {
         this.stopTimer();
         this.showModalStatistics();
       } else {
-        wordsOnPageLeft = wordsArrNumber;
-        this.getRandomWords(groupWordsArrMod, wordsOnPageLeft);
+        wordsOnPageLeft = this.getWordsOnPageNumber();
+        this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
       }
+    } else if (wordsOnPageLeft) {
+      this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
+    } else if (wordsOnPageLeft === 0) {
+      this.stopTimer();
+      this.showModalStatistics();
     } else {
-      this.getRandomWords(groupWordsArr, wordsArrNumber);
+      this.getRandomWords(wordsArrToPlay, GROUP_WORDS_NUMBER);
     }
   }
 
@@ -517,11 +536,10 @@ export default class SprintGame extends BaseComponent {
       player.src = src;
       player.play();
     }
-
   }
 
   private clearGameParams() {
-    groupWordsArr = [];
+    wordsArrToPlay = [];
     startTimerOnce = true;
     scoreCounter = {
       score: 0,
@@ -529,6 +547,8 @@ export default class SprintGame extends BaseComponent {
       multiplyerIntermediateCounter: 0,
     };
     roundResults = [];
+    cutRoundResults = false;
+    wordsOnPageLeft = null;
     this.stopTimer();
   }
 
@@ -540,10 +560,11 @@ export default class SprintGame extends BaseComponent {
       multiplyerIntermediateCounter: 0,
     };
     roundResults = [];
+    cutRoundResults = false;
     this.gamepadWrapper!.style.visibility = 'visible';
     this.wordsWrapper!.style.visibility = 'visible';
-    groupWordsArrMod = groupWordsArr.slice();
-    wordsOnPageLeft = wordsArrNumber;
+    wordsArrToPlayCut = wordsArrToPlay.slice();
+
     this.mario!.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
     this.mario!.onload = () => {
       this.mario!.style.height = '3.6rem';
@@ -556,9 +577,16 @@ export default class SprintGame extends BaseComponent {
     this.paramsMultiplyerWrapper!.innerHTML = '';
     this.paramsCoins!.innerHTML = this.paramsCoins!.innerHTML!.replace(/\d+/g, '0');
     this.paramsScore!.textContent = `0`;
-    this.getRandomWords(groupWordsArrMod, wordsArrNumber);
     this.startAudioOnce = true;
-    this.audioModal.pause();
+    if (Number(this.group) === 6) {
+      wordsOnPageLeft = wordsArrToPlayCut.length;
+      this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
+    } else if (this.page === '') {
+      this.getRandomWords(wordsArrToPlayCut, GROUP_WORDS_NUMBER);
+    } else {
+      wordsOnPageLeft = this.getWordsOnPageNumber();
+      this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
+    }
     this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
   }
 
@@ -689,11 +717,11 @@ export default class SprintGame extends BaseComponent {
       dataSet: {
         widget: 'modalStatistic',
         parentId: this.id,
+        audioIsPlaying: String(audioIsPlaying),
       },
     });
     this.elem.append(modalStatistic);
     updateContent(modalStatistic, modalStatistic.getAttribute('data-widget') as string);
-    this.playAudioSprint(this.audioModal, '../../../../assets/sounds/22 - Course Clear Fanfare.mp3', audioIsPlaying);
     this.gamepadWrapper!.style.visibility = 'hidden';
     this.wordsWrapper!.style.visibility = 'hidden';
   }
@@ -703,7 +731,7 @@ export default class SprintGame extends BaseComponent {
       delete el.translateCorrectness;
       return el
     })
-    if (!this.page) roundResults = roundResults.slice(0, roundResults.length - 1);
+    if (cutRoundResults) roundResults = roundResults.slice(0, roundResults.length - 1);
     this.audioSprint.pause();
     return roundResults;
   }
