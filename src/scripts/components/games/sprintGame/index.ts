@@ -105,7 +105,7 @@ export default class SprintGame extends BaseComponent {
     this.renderWords(wordsWrapper);
     this.getWordsArray();
 
-    this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
+    this.playAudioSprint(this.audioSprint, '.../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
 
     sprintWrapper.append(paramsWrapper);
     sprintWrapper.append(wordsWrapper);
@@ -120,28 +120,28 @@ export default class SprintGame extends BaseComponent {
   private getCoin(size: string) {
     const coin = document.createElement('img');
     coin.className = `coin-img_${size}`;
-    coin.src = '/../../../../assets/img/sprintGame/gif/CoinSMW.gif';
+    coin.src = '/.../assets/img/sprintGame/gif/CoinSMW.gif';
     return coin;
   }
 
   private getMushroom() {
     const mushroom = document.createElement('img');
     mushroom.className = 'mushroom-img';
-    mushroom.src = '/../../../../assets/img/sprintGame/png/MushroomSMW.png';
+    mushroom.src = '/.../assets/img/sprintGame/png/MushroomSMW.png';
     return mushroom;
   }
 
   private getFeather() {
     const feather = document.createElement('img');
     feather.className = 'feather-img';
-    feather.src = '/../../../../assets/img/sprintGame/png/Feather.png';
+    feather.src = '/.../assets/img/sprintGame/png/Feather.png';
     return feather;
   }
 
   private getEgg() {
     const egg = document.createElement('img');
     egg.className = 'egg-img';
-    egg.src = '/../../../../assets/img/sprintGame/png/SMW_YoshiEgg_Green.png';
+    egg.src = '/.../assets/img/sprintGame/png/SMW_YoshiEgg_Green.png';
     return egg;
   }
 
@@ -167,7 +167,7 @@ export default class SprintGame extends BaseComponent {
 
     const star = document.createElement('img');
     star.className = 'group-img';
-    star.src = '/../../../../assets/img/sprintGame/png/pixel_star_50px.png';
+    star.src = '/.../assets/img/sprintGame/png/pixel_star_50px.png';
 
     paramsLevelWrapper.append(star);
     paramsLevelWrapper.innerHTML += '&#215;';
@@ -191,7 +191,7 @@ export default class SprintGame extends BaseComponent {
     const mario = document.createElement('img');
     mario.className = 'mario-img';
     this.mario = mario;
-    mario.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
+    mario.src = '/.../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
 
     marioWrapper.append(mario);
   }
@@ -205,13 +205,13 @@ export default class SprintGame extends BaseComponent {
     this.itemWrapper = itemWrapper;
 
     block.className = 'block-img';
-    block.src = '/../../../../assets/img/sprintGame/png/SMW_Hard_Block.png';
+    block.src = '/.../assets/img/sprintGame/png/SMW_Hard_Block.png';
     for (let i = 0; i < Number('3'); i++) {
       const newBlock = block.cloneNode();
       blocksWrapper.append(newBlock);
     }
     pipe.className = 'pipe-img';
-    pipe.src = '/../../../../assets/img/sprintGame/png/Warp_Pipe_SMW.png';
+    pipe.src = '/.../assets/img/sprintGame/png/Warp_Pipe_SMW.png';
 
     pipeWrapper.append(blocksWrapper);
     pipeWrapper.append(pipe);
@@ -461,11 +461,11 @@ export default class SprintGame extends BaseComponent {
         && scoreCounter.multiplyer !== MAX_SCORE_MULTIPLYER) {
         scoreCounter.multiplyer = scoreCounter.multiplyer * 2;
         scoreCounter.multiplyerIntermediateCounter = 0;
-        this.playAudioSprint(this.audioMushroom, '../../../../assets/sounds/smw_1-up.wav', audioIsPlaying);
+        this.playAudioSprint(this.audioMushroom, '.../assets/sounds/smw_1-up.wav', audioIsPlaying);
         this.addItem(scoreCounter.multiplyer);
       } else {
         this.addCoin();
-        this.playAudioSprint(this.audioCoin, '../../../../assets/sounds/smw_coin.wav', audioIsPlaying);
+        this.playAudioSprint(this.audioCoin, '.../assets/sounds/smw_coin.wav', audioIsPlaying);
       }
 
     } else {
@@ -547,7 +547,7 @@ export default class SprintGame extends BaseComponent {
 
   private switchAudio() {
     if (this.startAudioOnce) {
-      this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', true);
+      this.playAudioSprint(this.audioSprint, '.../assets/sounds/1 - Title Bgm.mp3', true);
       this.startAudioOnce = false;
     }
     if (audioIsPlaying) {
@@ -593,7 +593,7 @@ export default class SprintGame extends BaseComponent {
     (this.wordsWrapper as HTMLElement).style.visibility = 'visible';
     wordsArrToPlayCut = wordsArrToPlay.slice();
 
-    (this.mario as HTMLImageElement).src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
+    (this.mario as HTMLImageElement).src = '/.../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
     (this.mario as HTMLImageElement).onload = () => {
       (this.mario as HTMLImageElement).style.height = '3.6rem';
       (this.mario as HTMLImageElement).classList.remove('yoshi');
@@ -615,7 +615,7 @@ export default class SprintGame extends BaseComponent {
       wordsOnPageLeft = this.getWordsOnPageNumber();
       this.getRandomWords(wordsArrToPlayCut, wordsOnPageLeft);
     }
-    this.playAudioSprint(this.audioSprint, '../../../../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
+    this.playAudioSprint(this.audioSprint, '.../assets/sounds/1 - Title Bgm.mp3', audioIsPlaying);
   }
 
   public setActions(): void {
@@ -667,7 +667,7 @@ export default class SprintGame extends BaseComponent {
     (this.itemWrapper as HTMLElement).append(newItem);
     this.paramsMultiplyerWrapper?.append(newItemParams);
 
-    (this.mario as HTMLImageElement).src = `/../../../../assets/img/sprintGame/gif/${gifName}.gif`;
+    (this.mario as HTMLImageElement).src = `/.../assets/img/sprintGame/gif/${gifName}.gif`;
     (this.mario as HTMLImageElement).onload = () => {
       (this.mario as HTMLImageElement).style.transform = `scale(${scaleNum}, 1)`;
       this.mario?.classList.remove('down');
@@ -697,7 +697,7 @@ export default class SprintGame extends BaseComponent {
   }
 
   private getDownItemHandler(pngName: string, imgSize: string) {
-    (this.mario as HTMLImageElement).src = `/../../../../assets/img/sprintGame/png/${pngName}.png`;
+    (this.mario as HTMLImageElement).src = `/.../assets/img/sprintGame/png/${pngName}.png`;
     (this.mario as HTMLImageElement).onload = () => {
       (this.mario as HTMLImageElement).style.transform = 'scale(1, 1)';
       (this.mario as HTMLImageElement).style.height = `${imgSize}rem`;
@@ -724,7 +724,7 @@ export default class SprintGame extends BaseComponent {
       this.paramsMultiplyerWrapper?.append(newItemParams);
     }
 
-    (this.mario as HTMLImageElement).src = `/../../../../assets/img/sprintGame/png/${pngName}.png`;
+    (this.mario as HTMLImageElement).src = `/.../assets/img/sprintGame/png/${pngName}.png`;
     (this.mario as HTMLImageElement).onload = () => {
       (this.mario as HTMLImageElement).style.transform = 'scale(1, 1)';
       (this.mario as HTMLImageElement).style.height = `${imgSize}rem`;

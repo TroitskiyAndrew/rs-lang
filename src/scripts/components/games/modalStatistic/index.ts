@@ -347,11 +347,17 @@ export default class ModalStatistic extends BaseComponent {
         if (!wordBody.optional || !userWord.optional) return;
         const isLearnedBefore = userWord.optional?.learned ? userWord.optional?.learned : false;
         let change = 0;
+        let answersCorrectAllTime = userWord.optional.correctAnswersAllTime;
 
         if (!wordObj.answerCorrectness) {
           wordBody.optional.rightRange = 0;
           wordBody.optional.learned = false;
           change = updateLearnedCounterDate(isLearnedBefore, false);
+          if (answersCorrectAllTime) {
+            wordBody.optional.correctAnswersAllTime = answersCorrectAllTime;
+          } else {
+            wordBody.optional.correctAnswersAllTime = 0;
+          }
         } else if (wordObj.answerCorrectness) {
           let rightWordRange = userWord.optional.rightRange as number;
           wordBody.optional.rightRange = ++rightWordRange;
@@ -371,7 +377,7 @@ export default class ModalStatistic extends BaseComponent {
             change = updateLearnedCounterDate(isLearnedBefore, false);
           }
 
-          let answersCorrectAllTime = userWord.optional.correctAnswersAllTime;
+
           if (answersCorrectAllTime) {
             wordBody.optional.correctAnswersAllTime = ++answersCorrectAllTime;
           } else {
@@ -505,7 +511,7 @@ export default class ModalStatistic extends BaseComponent {
 
   private playAudioModalStatistic(status: boolean): void {
     if (status) {
-      this.audioModalStatistic.src = '../../../../assets/sounds/22 - Course Clear Fanfare.mp3';
+      this.audioModalStatistic.src = '.../assets/sounds/22 - Course Clear Fanfare.mp3';
       this.audioModalStatistic.play();
     }
   }

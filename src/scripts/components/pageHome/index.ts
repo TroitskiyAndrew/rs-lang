@@ -45,7 +45,7 @@ export default class PageHome extends BaseComponent {
     star.className = 'star-img';
     descriptionWrapperParagraph.className = 'description-sub-wrapper_p';
 
-    star.src = '/../../../assets/img/homePage/SMW_Star.gif';
+    star.src = './assets/img/homePage/SMW_Star.gif';
 
     homeTitleWrapper.innerHTML =
       `<h1>
@@ -130,7 +130,7 @@ export default class PageHome extends BaseComponent {
       const contribution = 4;
       switch (index) {
         case 0:
-          el.children[0].append(this.getAvatar('/../../../assets/img/homePage/Troitskiy.jpg', 'Andrew'));
+          el.children[0].append(this.getAvatar('./assets/img/homePage/Troitskiy.jpg', 'Andrew'));
           githubLink = el.children[1].children[0] as HTMLAnchorElement;
           githubLink.href = 'https://github.com/TroitskiyAndrew';
           el.children[person].textContent = 'Андрей Троицкий';
@@ -143,7 +143,7 @@ export default class PageHome extends BaseComponent {
           </ul>`;
           break;
         case 1:
-          el.children[0].append(this.getAvatar('/../../../assets/img/homePage/zozuliak.jpg', 'dmytro'));
+          el.children[0].append(this.getAvatar('./assets/img/homePage/zozuliak.jpg', 'dmytro'));
           githubLink = el.children[1].children[0] as HTMLAnchorElement;
           githubLink.href = 'https://github.com/dmytrozozuliak';
           el.children[person].textContent = 'Дмитрий Зозуляк';
@@ -156,7 +156,7 @@ export default class PageHome extends BaseComponent {
           </ul>`;
           break;
         case 2:
-          el.children[0].append(this.getAvatar('/../../../assets/img/homePage/essonti.png', 'sergei'));
+          el.children[0].append(this.getAvatar('./assets/img/homePage/essonti.png', 'sergei'));
           githubLink = el.children[1].children[0] as HTMLAnchorElement;
           githubLink.href = 'https://github.com/Essonti';
           el.children[person].textContent = 'Сергей Трофимченко';
