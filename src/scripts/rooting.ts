@@ -49,4 +49,5 @@ export function pageChenging(elem: HTMLElement, page: string): void {
   updateState({ currentPage: page });
   container.innerHTML = '';
   container.append(elem);
+  (document.querySelector('footer') as HTMLElement).classList.remove('hidden');
 }

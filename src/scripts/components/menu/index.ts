@@ -1,6 +1,7 @@
 import BaseComponent from '../base';
 import { createSpan, createDiv, createButton } from '../../utils';
 import { Link } from '../../common.types';
+import { getState } from '../../state';
 
 export default class Menu extends BaseComponent {
   modal: HTMLElement | undefined;
@@ -14,12 +15,16 @@ export default class Menu extends BaseComponent {
   }
 
   public createHTML(): void {
-    const listLisnks = document.createElement('ul');
+    const listLinks = document.createElement('ul');
     const menuButton = createButton({ className: 'menu__button icon-button', action: 'showMenu' });
-    listLisnks.classList.add('menu__list');
+    listLinks.classList.add('menu__list');
+    const menuTitle = createSpan({ className: 'menu__title', text: 'меню' });
     this.modal = createDiv({ className: 'menu__modal' });
     this.overlay = createDiv({ className: 'menu__overlay' });
-    this.modal.append(listLisnks);
+
+    this.modal.append(menuTitle);
+    this.modal.append(listLinks);
+
 
     const links: Link[] = [
       { direction: 'pageHome', caption: 'Главная страница' },
@@ -28,11 +33,23 @@ export default class Menu extends BaseComponent {
       { direction: 'pageStatistics', caption: 'Статистика' }];
     for (const link of links) {
       const newLink = document.createElement('li');
-
       newLink.classList.add('menu__link');
       newLink.dataset.direction = link.direction;
+
+      const headerTitle = document.querySelector('.header__page span');
+      if (headerTitle && headerTitle.textContent === link.caption) {
+        console.log('changed', link.caption);
+        newLink.classList.add('active');
+      }
+
+      newLink.addEventListener('click', () => {
+        const linksElements = document.querySelectorAll('.menu__link') as NodeListOf<Element>;
+        linksElements.forEach(linkEl => linkEl.classList.remove('active'));
+        newLink.classList.add('active');
+      });
+
       newLink.append(createSpan({ className: 'menu__name', text: link.caption }));
-      listLisnks.append(newLink);
+      listLinks.append(newLink);
     }
     document.body.append(this.overlay);
     document.body.append(this.modal);
@@ -49,6 +66,13 @@ export default class Menu extends BaseComponent {
   }
 
   public showMenu(): void {
+    const isAuthorized = !!getState().userId;
+    const statisticLink = this.modal?.querySelector('[data-direction="pageStatistics"]') as HTMLElement;
+    if (isAuthorized) {
+      statisticLink.classList.remove('hidden');
+    } else {
+      statisticLink.classList.add('hidden');
+    }
     this.overlay?.classList.add('show');
     this.modal?.classList.add('show');
   }

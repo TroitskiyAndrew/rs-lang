@@ -89,7 +89,6 @@
   height: 185px;
 }
 
-
 .mario-img {
   height: 3.6rem;
   position: absolute;
@@ -104,8 +103,12 @@
 }
 
 @keyframes mario-up-animation {
-  from {top: calc(100% - 74px)}
-  to {top: 0}
+  from {
+    top: calc(100% - 74px);
+  }
+  to {
+    top: 0;
+  }
 }
 
 .mario-img.down {
@@ -115,8 +118,12 @@
 }
 
 @keyframes mario-down-animation {
-  from {top: 0}
-  to {top: calc(100% - 74px)}
+  from {
+    top: 0;
+  }
+  to {
+    top: calc(100% - 74px);
+  }
 }
 
 .mario-img.down.small {
@@ -126,8 +133,12 @@
 }
 
 @keyframes mario-small-down-animation {
-  from {top: 0}
-  to {top: calc(100% - 58px)}
+  from {
+    top: 0;
+  }
+  to {
+    top: calc(100% - 58px);
+  }
 }
 
 .mario-img.down.yoshi {
@@ -137,8 +148,12 @@
 }
 
 @keyframes yoshi-down-animation {
-  from {top: 0}
-  to {top: calc(100% - 90px)}
+  from {
+    top: 0;
+  }
+  to {
+    top: calc(100% - 90px);
+  }
 }
 
 .pipe-wrapper {
@@ -191,10 +206,14 @@
 
 @keyframes coin-animation {
   // from {top: 0;};
-  to {top: calc(100% - 34px)}
+  to {
+    top: calc(100% - 34px);
+  }
 }
 
-.mushroom-img, .feather-img, .egg-img {
+.mushroom-img,
+.feather-img,
+.egg-img {
   position: absolute;
   top: 0;
   left: calc(50% - 20px);
@@ -205,21 +224,27 @@
   animation-fill-mode: forwards;
 }
 
-.mushroom-img.params, .feather-img.params, .egg-img.params {
+.mushroom-img.params,
+.feather-img.params,
+.egg-img.params {
   position: static;
   animation-name: none;
 }
 
 @keyframes item-animation {
-  from {top: 0;};
-  to {top: calc(100% - 40px)}
+  from {
+    top: 0;
+  }
+  to {
+    top: calc(100% - 40px);
+  }
 }
 
 .gamepad-wrapper {
   display: flex;
   justify-content: center;
   text-transform: uppercase;
-  color: #DD3836;
+  color: #dd3836;
   font-weight: 800;
   margin-bottom: 0px;
   gap: 25px;
@@ -232,20 +257,20 @@
 .buttons-wrapper {
   display: flex;
   gap: 15px;
-
 }
 
-.controls-wrapper__back{
+.controls-wrapper__back {
   display: flex;
   justify-content: space-around;
   align-items: center;
   height: 45px;
   border-radius: 5px;
-  background-color: #DADADA;
+  background-color: #dadada;
 }
 
-.controls-wrapper__select, .controls-wrapper__start {
-  background-color: #4E4E4E;
+.controls-wrapper__select,
+.controls-wrapper__start {
+  background-color: #4e4e4e;
   width: 50px;
   height: 15px;
   border-radius: 4px;
@@ -262,7 +287,7 @@
 }
 
 .buttons-wrapper__back {
-  background-color: #DADADA;
+  background-color: #dadada;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -271,12 +296,12 @@
   border-radius: 5px;
 }
 
-.buttons-wrapper__button-a, .buttons-wrapper__button-b {
-  background-color: #DD3836;
+.buttons-wrapper__button-a,
+.buttons-wrapper__button-b {
+  background-color: #dd3836;
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  
 }
 
 .buttons-wrapper__button-a {
@@ -288,7 +313,7 @@
 }
 
 .buttons-wrapper__capture {
-  text-align: end;
+  text-align: center;
 }
 
 .words-wrapper {
@@ -311,7 +336,6 @@
 }
 
 @media (max-width: 1050px) {
-
   .sprint-wrapper {
     background-size: auto 100%;
     background-repeat: no-repeat;
@@ -325,7 +349,6 @@
   .mario-wrapper {
     visibility: hidden;
   }
-
 }
 
 @media (max-width: 420px) {
@@ -348,26 +371,24 @@
   .translated-word {
     font-size: 1.6rem;
   }
-
 }
 
-@media screen and (max-height: 670px) { 
-
-  .pipe-img,.block-img {
+@media screen and (max-height: 670px) {
+  .pipe-img,
+  .block-img {
     visibility: hidden;
   }
-
 }
 
-  // .words-wrapper {
-  //   padding: 15px;
-  //   border-radius: 10px;
-  // }
+// .words-wrapper {
+//   padding: 15px;
+//   border-radius: 10px;
+// }
 
-  // .eng-word,.translated-word {
-  //   opacity: 1;
-  //   z-index: 1;
-  // }
+// .eng-word,.translated-word {
+//   opacity: 1;
+//   z-index: 1;
+// }
 
 // .sprint {
 //   background-color: #6ce8e8;

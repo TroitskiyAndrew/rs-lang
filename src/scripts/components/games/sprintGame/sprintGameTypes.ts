@@ -1,4 +1,4 @@
-import { IStatisticAnswer } from '../audioGame/index'
+import { IStatisticAnswer } from '../audioGame/index';
 
 export interface IGameOptions {
   group: string;
@@ -13,5 +13,5 @@ export interface IWordParams extends IStatisticAnswer {
 export interface IScoreCounter {
   score: number;
   multiplyer: number;
-  multiplyerIntermediateCounter: number; 
+  multiplyerIntermediateCounter: number;
 }

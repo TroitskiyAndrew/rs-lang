@@ -17,13 +17,13 @@ export default class PageGames extends BaseComponent {
     const page = createDiv({ className: 'page games' });
     const pageContainer = createDiv({ className: 'games__container' });
     const gameAudio = createDiv({
-      className: 'games__link', dataSet: {
+      className: 'games__link common-button', dataSet: {
         direction: 'gameLauncher',
         options: 'audio-game',
       },
     });
     const gameSprint = createDiv({
-      className: 'games__link', dataSet: {
+      className: 'games__link common-button', dataSet: {
         direction: 'gameLauncher',
         options: 'sprint-game',
       },
