@@ -8,16 +8,16 @@
   align-items: center;
 
   &__container {
-    width: 80%;
-    height: 80%;
+    width: 100%;
+    height: 100%;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    background: url('/src/assets/img/sprintGame/gif/CoinSMW.gif') no-repeat 0 0 /
-        auto 5%,
-      url('/src/assets/img/sprintGame/gif/goomba.gif') no-repeat 350px 95% /
-        auto 9%,
+    background: url('/src/assets/img/sprintGame/gif/CoinSMW.gif') no-repeat 10px
+        0 / auto 5%,
+      url('/src/assets/img/sprintGame/gif/goomba.gif') no-repeat 55% 95% / auto
+        9%,
       url('/src/assets/img/audioGame/sm1.jpg') no-repeat 0 0 / cover;
   }
 
@@ -34,13 +34,26 @@
 
   &__questionsAmount {
     position: absolute;
-    left: 5%;
-    top: 0;
+    left: 45px;
+    top: 6px;
     font-size: 1.1em;
   }
 
   .audio-game__answers {
     margin: 20px;
+  }
+
+  @media (max-width: 630px) {
+    &__container {
+      justify-content: center;
+      align-items: center;
+    }
+
+    &__content {
+      margin-top: 0;
+      width: 100%;
+      border-radius: 0;
+    }
   }
 }
 
@@ -50,11 +63,15 @@
   align-items: center;
   column-gap: 20px;
 
+  .questionField__image,
+  .questionField__word {
+    width: 180px;
+  }
+
   .questionField__image {
     display: block;
     visibility: hidden;
     opacity: 0;
-    width: 180px;
     height: 120px;
     border-radius: 20px;
     background-position: center;
@@ -75,11 +92,26 @@
   .questionField__word {
     display: block;
     font-size: 28px;
-    width: 180px;
     color: $brand-color;
     visibility: hidden;
     opacity: 0;
     transition: all 0.3s ease 0s;
+    text-align: center;
+  }
+
+  @media (max-width: 630px) {
+    width: 100%;
+
+    .questionField__image,
+    .questionField__word {
+      width: 40%;
+    }
+
+    .questionField__audio {
+      &.icon-button::before {
+        font-size: 80px;
+      }
+    }
   }
 }
 
@@ -117,6 +149,17 @@
     &.disable {
       color: rgba(255, 255, 255, 0.4);
       pointer-events: none;
+    }
+  }
+
+  @media (max-width: 630px) {
+    flex-wrap: wrap;
+
+    .audio-answers__answer {
+      flex-basis: 40%;
+      min-width: 200px;
+      margin: 0 10px;
+      text-align: center;
     }
   }
 }

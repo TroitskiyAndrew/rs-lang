@@ -1,5 +1,5 @@
 import BaseComponent from '../../base';
-import { createButton, createDiv, updateObjDate } from '../../../utils';
+import { createButton, createDiv, createSpan, updateObjDate } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 import { getState } from '../../../state';
 import { Statistics, UserWord } from '../../../api/api.types';
@@ -33,7 +33,6 @@ export default class WordsCard extends BaseComponent {
   wordBody: UserWord = {
     difficulty: 'common',
     optional: {
-      new: false,
       learned: false,
       rightRange: 0,
       word: '',
@@ -76,6 +75,7 @@ export default class WordsCard extends BaseComponent {
       if (typeof userWord !== 'number') {
         this.wordBody.difficulty = userWord.difficulty;
         this.wordBody.optional = userWord.optional;
+        (this.elem.querySelector('.text-statistic') as HTMLSpanElement).textContent = `${this.wordBody.optional.correctAnswersAllTime || 0}/${this.wordBody.optional.answersAllTime || 0}`;
         this.changeStatus();
 
       } else {
@@ -100,6 +100,7 @@ export default class WordsCard extends BaseComponent {
     contorls.append(this.createButtonBlock('visibility', 'Показать/скрыть перевод'));
     contorls.append(this.createButtonBlock('difficult', 'Добавить/убрать из списка сложных слов'));
     contorls.append(this.createButtonBlock('learned', 'Добавить/убрать из списка выученных слов'));
+    contorls.append(this.createButtonBlock('statistic', 'Количество правильных ответов в играх', '0/0'));
 
     this.img.classList.add('wordCard__img');
     ruHolder.append(createDiv({ className: 'bricks' }));
@@ -122,7 +123,7 @@ export default class WordsCard extends BaseComponent {
 
   }
 
-  private createButtonBlock(type: string, hint: string): HTMLDivElement {
+  private createButtonBlock(type: string, hint: string, text?: string): HTMLDivElement {
     const block = createDiv({ className: `wordCard__button-block button-block ${type}` });
     block.setAttribute('title', hint);
 
@@ -130,7 +131,11 @@ export default class WordsCard extends BaseComponent {
     block.append(createDiv({ className: 'button-block__circle left-bottom' }));
     block.append(createDiv({ className: 'button-block__circle right-top' }));
     block.append(createDiv({ className: 'button-block__circle right-bottom' }));
-    block.append(createButton({ className: `button-block__button icon-button btn-${type}`, action: `${type}` }));
+    if (text) {
+      block.append(createSpan({ className: `button-block__text icon-button text-${type}`, text: text }));
+    } else {
+      block.append(createButton({ className: `button-block__button icon-button btn-${type}`, action: `${type}` }));
+    }
 
     return block;
   }

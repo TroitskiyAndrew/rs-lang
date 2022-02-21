@@ -143,3 +143,21 @@ export function updateObjDate(dateObj: DateNumber | undefined, dateValue: number
   }
   return dateObj;
 }
+
+export function getTodayCount(dateObj: DateNumber | undefined): number {
+  const currentDate = new Date();
+  const date = currentDate.toISOString().split('T')[0];
+  if (!dateObj) {
+    return 0;
+  }
+  if (date in dateObj) {
+    return dateObj[date];
+  }
+  return 0;
+}
+
+export function updateLearnedCounterDate(isLearnedBefore: boolean, currentLearned: boolean): 0 | 1 | -1 {
+  if (isLearnedBefore === true && currentLearned === false) return -1;
+  if (isLearnedBefore === false && currentLearned === true) return 1;
+  return 0;
+}
