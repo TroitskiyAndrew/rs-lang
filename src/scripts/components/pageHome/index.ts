@@ -121,6 +121,8 @@ export default class PageHome extends BaseComponent {
   }
 
   private fillMemberContent(teamMembersWrapper: HTMLCollection) {
+
+
     Array.from(teamMembersWrapper, (el, index) => {
       let githubLink: HTMLAnchorElement;
       const person = 2;

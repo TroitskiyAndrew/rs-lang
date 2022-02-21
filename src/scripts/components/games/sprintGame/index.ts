@@ -82,7 +82,6 @@ export default class SprintGame extends BaseComponent {
     (document.querySelector('footer') as HTMLElement).classList.remove('hidden');
     this.setActions();
     this.addLoading();
-    pageChenging(createSpan({ text: 'Спринт Игра' }), this.name);
     return Promise.resolve();
   }
 
