@@ -351,7 +351,7 @@ export default class AudioGame extends BaseComponent {
     if (answer) {
       answerToStatistic.answerCorrectness = true;
       this.answersArray.push(answerToStatistic);
-      this.playAudio('../../../../assets/sounds/smw_coin.wav');
+      this.playAudio('.../assets/sounds/smw_coin.wav');
     } else {
       answerToStatistic.answerCorrectness = false;
       this.answersArray.push(answerToStatistic);
