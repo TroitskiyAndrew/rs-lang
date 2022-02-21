@@ -37,7 +37,7 @@ export default class GameLauncher extends BaseComponent {
       className: 'launcher-games__navigation',
     });
     const backBtn = createDiv({
-      className: 'launcher-games__link games__link ',
+      className: 'launcher-games__link games__link common-button',
       dataSet: {
         direction: 'pageGames',
       },
