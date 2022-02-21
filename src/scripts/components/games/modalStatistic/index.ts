@@ -1,5 +1,5 @@
 
-import { createDiv, createSpan, createButton, updateObjDate } from '../../../utils';
+import { createDiv, createSpan, createButton, updateObjDate, updateLearnedCounterDate } from '../../../utils';
 import constants from '../../../app.constants';
 import BaseComponent from '../../base';
 import { instances } from '../../components';
@@ -155,7 +155,6 @@ export default class ModalStatistic extends BaseComponent {
       this.audioModalStatistic.pause();
     };
 
-
     navigationModal.append(againBtn);
     navigationModal.append(toGamesBtn);
 
@@ -173,26 +172,12 @@ export default class ModalStatistic extends BaseComponent {
     this.fragment.append(modalWindow);
   }
 
-  async updateUserWordsAndStatistic(game: AudioGame | SprintGame) {
+  private async updateUserWordsAndStatistic(game: AudioGame | SprintGame): Promise<void> {
     await this.updateOrCreateUserWords(game);
-
     await this.updateOrCreateStatistic(game);
   }
 
-  /*   updateObjDate(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
-      if (!dateObj) {
-        dateObj = {};
-      }
-      if (date in dateObj) {
-        // такая дата есть в массиве с АПИ, обновляем
-        dateObj[date] = dateValue + dateObj[date];
-      } else {
-        dateObj[date] = dateValue;
-      }
-      return dateObj;
-    } */
-
-  updateObjDateLearnedNew(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
+  private updateObjDateLearnedNew(dateObj: DateNumber | undefined, date: string, dateValue: number): DateNumber {
     if (!dateObj) {
       dateObj = {};
     }
@@ -200,7 +185,7 @@ export default class ModalStatistic extends BaseComponent {
     return dateObj;
   }
 
-  updateGameRightRange(rightRangeAPI: number | undefined): number {
+  private updateGameRightRange(rightRangeAPI: number | undefined): number {
     let rightRange: number;
     // если значения нет, то возвращаем самую длинную серию с текущей игры
     if (!rightRangeAPI) {
@@ -209,40 +194,34 @@ export default class ModalStatistic extends BaseComponent {
     } else {
       rightRange = rightRangeAPI > this.longestRightRange() ? rightRangeAPI : this.longestRightRange();
     }
-
     return rightRange;
   }
 
 
-  async updateOrCreateStatistic(game: AudioGame | SprintGame) {
+  private async updateOrCreateStatistic(game: AudioGame | SprintGame): Promise<void> {
     const userID = getState().userId;
     const currentDate = new Date();
     const date = currentDate.toISOString().split('T')[0];
-
     const userStatisticApi = await apiService.getUserStatistics(userID);
     const allUserWords = await apiService.getAllUserWords(userID);
     console.log('userWord FROM', allUserWords);
 
     if (typeof (allUserWords) === 'number') return;
     const learnedWords = allUserWords.filter(word => word.optional?.learned).length;
-    const learnedWordsPerDay = allUserWords.filter(word => word.optional?.learnedAtDay === date).length;
     const newWordsPerDayArray = allUserWords.filter(word => word.optional?.newAtDay === date);
-    // todo
     const newWordsPerDayAudio = newWordsPerDayArray.filter(word => word.optional?.newFrom === 'audioGame').length;
     const newWordsPerDaySprint = newWordsPerDayArray.filter(word => word.optional?.newFrom === 'sprintGame').length;
-
 
     if (typeof (userStatisticApi) !== 'number') {
       const statistics: Statistics = {
         learnedWords: learnedWords,
         optional: {},
       };
-
       // update Statistic
       if (!userStatisticApi.optional || !statistics.optional) return;
 
-      const learnedWordsDateObj = userStatisticApi.optional.learnedWordsPerDate;
-      statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
+      const learnedWordsPerDate = userStatisticApi.optional.learnedWordsPerDate;
+      statistics.optional.learnedWordsPerDate = learnedWordsPerDate;
 
       const newWordsPerDayAudioObj = userStatisticApi.optional.newWordsPerDayAudio;
       statistics.optional.newWordsPerDayAudio = this.updateObjDateLearnedNew(newWordsPerDayAudioObj, date, newWordsPerDayAudio);
@@ -315,12 +294,10 @@ export default class ModalStatistic extends BaseComponent {
           answersAudio: answersPerDayAudio,
           correctAnswersRangeSprint: rightRangeSprint,
           correctAnswersRangeAudio: rightRangeAudio,
+          learnedWordsPerDate: { date: learnedWords },
         },
       };
       if (!statistics.optional) return;
-
-      const learnedWordsDateObj = {};
-      statistics.optional.learnedWordsPerDate = this.updateObjDateLearnedNew(learnedWordsDateObj, date, learnedWordsPerDay);
 
       const newWordsPerDayAudioObj = {};
       statistics.optional.newWordsPerDayAudio = this.updateObjDateLearnedNew(newWordsPerDayAudioObj, date, newWordsPerDayAudio);
@@ -336,11 +313,19 @@ export default class ModalStatistic extends BaseComponent {
     console.log('userStatisticAFTER', userStatisticAFTER);
   }
 
-  async updateOrCreateUserWords(game: AudioGame | SprintGame): Promise<void> {
+  private async updateOrCreateUserWords(game: AudioGame | SprintGame): Promise<void> {
     const userID = getState().userId;
     const currentDate = new Date();
     const date = currentDate.toISOString().split('T')[0];
-    // const date = '2022-02-14';
+
+    const apiStatistic = await apiService.getUserStatistics(userID);
+    const defaultStatistic: Statistics = {
+      learnedWords: 0,
+      optional: {
+        learnedWordsPerDate: updateObjDate(undefined, 0),
+      },
+    };
+    const statistic = typeof apiStatistic !== 'number' ? apiStatistic : defaultStatistic;
 
     await Promise.all(this.resultArray.map(async (wordObj) => {
       // получаем каждое слово
@@ -366,24 +351,34 @@ export default class ModalStatistic extends BaseComponent {
         };
 
         if (!wordBody.optional || !userWord.optional) return;
+
+        // todo
+        const isLearnedBefore = userWord.optional?.learned ? userWord.optional?.learned : false;
+        let change = 0;
+        // todo end
+        console.log('isLearnedBefore', isLearnedBefore);
+
         if (!wordObj.answerCorrectness) {
           wordBody.optional.rightRange = 0;
           wordBody.optional.learned = false;
-          wordBody.optional.learnedAtDay = false;
+          change = updateLearnedCounterDate(isLearnedBefore, false);
         } else if (wordObj.answerCorrectness) {
           let rightWordRange = userWord.optional.rightRange as number;
           wordBody.optional.rightRange = ++rightWordRange;
 
           if (userWord.difficulty === 'common' && wordBody.optional.rightRange >= constants.wordCommonRightRange) {
             wordBody.optional.learned = true;
-            wordBody.optional.learnedAtDay = userWord.optional?.learnedAtDay ? userWord.optional?.learnedAtDay : date;
+            change = updateLearnedCounterDate(isLearnedBefore, true);
           } else if (userWord.difficulty === 'difficult' && wordBody.optional.rightRange >= constants.wordDifficultRightRange) {
             wordBody.difficulty = 'common';
             wordBody.optional.learned = true;
-            wordBody.optional.learnedAtDay = userWord.optional?.learnedAtDay ? userWord.optional?.learnedAtDay : date;
+            change = updateLearnedCounterDate(isLearnedBefore, true);
+          } else if (userWord.optional?.learned) {
+            wordBody.optional.learned = true;
+            change = updateLearnedCounterDate(isLearnedBefore, true);
           } else {
             wordBody.optional.learned = false;
-            wordBody.optional.learnedAtDay = false;
+            change = updateLearnedCounterDate(isLearnedBefore, false);
           }
 
           let answersCorrectAllTime = userWord.optional.correctAnswersAllTime;
@@ -394,6 +389,15 @@ export default class ModalStatistic extends BaseComponent {
           }
         }
 
+        // todo
+        statistic.optional.learnedWordsPerDate = updateObjDate(statistic.optional.learnedWordsPerDate, change);
+        if (statistic.id) {
+          delete statistic.id;
+        }
+        console.log('change!!!!!!!!', change);
+        await apiService.updateUserStatistics(userID, statistic);
+        // todo end
+
         let answersAmountAllTime = userWord.optional.answersAllTime;
         if (answersAmountAllTime) {
           wordBody.optional.answersAllTime = ++answersAmountAllTime;
@@ -401,9 +405,7 @@ export default class ModalStatistic extends BaseComponent {
           wordBody.optional.answersAllTime = 1;
         }
         console.log('wordBody', wordBody);
-
         await apiService.updateUserWord(userID, wordObj.id, wordBody);
-
       } else {
         // createUserWord
         const defaultWordBody = {
@@ -416,18 +418,15 @@ export default class ModalStatistic extends BaseComponent {
             correctAnswersAllTime: wordObj.answerCorrectness ? 1 : 0,
             answersAllTime: 1,
             newAtDay: date,
-            learnedAtDay: false,
             newFrom: gameFrom,
           },
         };
         await apiService.createUserWord(userID, wordObj.id, defaultWordBody);
       }
-
     }));
-
   }
 
-  drawWord(card: IStatisticAnswer) {
+  private drawWord(card: IStatisticAnswer): HTMLElement {
     const wordRow = createDiv({
       className: 'game-modal__word-row modal-row',
     });
@@ -465,13 +464,12 @@ export default class ModalStatistic extends BaseComponent {
     return wordRow;
   }
 
-  longestRightRange() {
+  private longestRightRange(): number {
     const array = this.resultArray.map(word => word.answerCorrectness);
     let length: number;
     if (!array.some(e => e === true)) {
       return length = 0;
     }
-
     const res: boolean[] = array.reduce((a, c) => {
       if (a.length && a[a.length - 1][0] === c) {
         a[a.length - 1].push(c);
@@ -488,7 +486,7 @@ export default class ModalStatistic extends BaseComponent {
     return length;
   }
 
-  createProgress(percent: number): HTMLElement {
+  private createProgress(percent: number): HTMLElement {
     const width = 120;
     const height = width;
     const strokeWidth = 4;
@@ -496,7 +494,6 @@ export default class ModalStatistic extends BaseComponent {
     const cy = cx;
     const radius = width / 2 - strokeWidth * 2;
     const strokeColor = '#64B5F6';
-
     const progressBar = createDiv({
       className: 'progress-ring',
     });
@@ -511,27 +508,20 @@ export default class ModalStatistic extends BaseComponent {
     progressBar.innerHTML = `<svg width='${width}' height='${height}'>
       <circle class="progress-ring__circle" stroke="${strokeColor}" stroke-width="${strokeWidth}" cx="${cx}" cy="${cy}" r="${radius}" fill="transparent" stroke-dasharray="${circumference} ${circumference}" stroke-dashoffset="${offset}" />
       </svg>`;
-
     progressBar.append(progressText);
-
     return progressBar;
   }
 
-  public listenEvents(): void {
-
-  }
-
-  close(parent: HTMLElement) {
+  private close(parent: HTMLElement): void {
     this.dispose();
     parent.removeChild(this.elem);
   }
 
-  private playAudioModalStatistic(status: boolean) {
+  private playAudioModalStatistic(status: boolean): void {
     if (status) {
       this.audioModalStatistic.src = '../../../../assets/sounds/22 - Course Clear Fanfare.mp3';
       this.audioModalStatistic.play();
     }
   }
-
 
 }

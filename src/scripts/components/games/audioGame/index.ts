@@ -2,7 +2,6 @@ import BaseComponent from '../../base';
 import { updateContent } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
-// import { updateState, getState } from '../../../state';
 import constants from '../../../app.constants';
 import { WordCard } from '../../../api/api.types';
 import { getState } from '../../../state';
@@ -64,32 +63,38 @@ export default class AudioGame extends BaseComponent {
   public async oninit(): Promise<void> {
     // pageChenging(createSpan({ text: 'Аудио Игра' }), this.name);
     // pageChenging(createSpan({}), this.name);
+    if (getState().userId) {
 
-    // получаю с АПИ данные
-    // Если групп 6 (сложные слова), то запрос
-    const hardsWordGroup = 6;
-    if (this.group === hardsWordGroup && this.fromDictionary) {
-      console.log('groupe with hard words');
-      const difficultWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}');
-      console.log('difficultWords', difficultWords);
-      if (typeof (difficultWords) === 'number') return;
-      this.wordsFromAPI.questionWords = difficultWords;
-    } else if (this.fromDictionary) {
-      // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
-      const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, this.group);
-      console.log('notLearnedWords', notLearnedWords);
 
-      if (typeof (notLearnedWords) === 'number') return;
-      if (this.page === undefined) return;
-      const currentPage = this.page;
-      const notLearnedWordsFilteredBePage = notLearnedWords.filter(word => word.page <= currentPage);
-      console.log('notLearnedWords', notLearnedWordsFilteredBePage);
-      const last20Words = notLearnedWordsFilteredBePage.slice(-constants.maxNumberOfQuestionsAudio);
-      console.log('last20Words', last20Words);
-      this.wordsFromAPI.questionWords = last20Words;
+      // получаю с АПИ данные
+      // Если групп 6 (сложные слова), то запрос
+      const hardsWordGroup = 6;
+      if (this.group === hardsWordGroup && this.fromDictionary) {
+        console.log('groupe with hard words');
+        const difficultWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.difficulty":"difficult"}');
+        console.log('difficultWords', difficultWords);
+        if (typeof (difficultWords) === 'number') return;
+        this.wordsFromAPI.questionWords = difficultWords;
+      } else if (this.fromDictionary) {
+        // else if! если группа от 0 до 5 с флагом fromDictionary, то все слова НЕ выученные, если их меньше 20, то с предыдущей страницы
+        const notLearnedWords = await apiService.getAllUserAggregatedWords(getState().userId, '{"userWord.optional.learned":false}', constants.maxWordsOnPage, this.group);
+        console.log('notLearnedWords', notLearnedWords);
+
+        if (typeof (notLearnedWords) === 'number') return;
+        if (this.page === undefined) return;
+        const currentPage = this.page;
+        const notLearnedWordsFilteredBePage = notLearnedWords.filter(word => word.page <= currentPage);
+        console.log('notLearnedWords', notLearnedWordsFilteredBePage);
+        const last20Words = notLearnedWordsFilteredBePage.slice(-constants.maxNumberOfQuestionsAudio);
+        console.log('last20Words', last20Words);
+        this.wordsFromAPI.questionWords = last20Words;
+      } else {
+        // если группа от 0 до 5 БЕЗ флага fromDictionary, то все слова со страницы
+        console.log('from games');
+        await this.setAllQuestionWordsToState();
+      }
     } else {
-      // если группа от 0 до 5 БЕЗ флага fromDictionary, то все слова со страницы
-      console.log('from games');
+      console.log('не авторизован');
       await this.setAllQuestionWordsToState();
     }
 
@@ -131,30 +136,22 @@ export default class AudioGame extends BaseComponent {
 
   private definePageAndGroup(): void {
     const options = this.options ? JSON.parse(this.options) : {};
-    console.log('options', options);
-
     this.page = getRandom(constants.minWordsPage, constants.maxWordsPage);
     if (options.page !== undefined) {
       this.page = options.page;
     }
 
-    console.log('this.page after getRandom', this.page);
-
-
     this.group = getRandom(constants.minWordsGroup, constants.maxWordsGroup);
     if (options.group !== undefined) {
       this.group = +options.group;
     }
-    console.log('this.group after getRandom', this.group);
-
 
     if (options.fromDictionary) {
       this.fromDictionary = options.fromDictionary;
     }
     // todo delete
-    // this.page = 0;
+    this.page = 0;
     // this.group = 0;
-
     console.log('this.page', this.page);
     console.log('this.group', this.group);
     console.log('this.fromDictionary', this.fromDictionary);
@@ -228,7 +225,6 @@ export default class AudioGame extends BaseComponent {
     };
   }
 
-
   private keyFunctionality(e: KeyboardEvent): void {
     if (this.focusedGame) {
       if (!this.totalQuestions) return;
@@ -250,7 +246,7 @@ export default class AudioGame extends BaseComponent {
     if (!this.enableKeyAnswer) return;
     const answerDiv = document.querySelector(`[data-audio="answer-${pos}"]`) as HTMLElement;
     if (!answerDiv.textContent) return;
-    const answerFromDiv = answerDiv.textContent.split('. ');
+    const answerFromDiv = answerDiv.textContent.split('.');
     const correctAnswer = this.currentQuestionCard.wordTranslate;
     if (!correctAnswer) return;
     if (answerFromDiv[1] === correctAnswer) {
@@ -342,8 +338,8 @@ export default class AudioGame extends BaseComponent {
         className: 'audio-answers__answer',
         dataSet: { audio: `answer-${i + 1}` },
       });
-      answerDiv.textContent = `${i + 1}. ${answers[i]}`;
-      const answerFromDiv = answerDiv.textContent.split('. ');
+      answerDiv.textContent = `${i + 1}.${answers[i]}`;
+      const answerFromDiv = answerDiv.textContent.split('.');
 
       answerDiv.addEventListener('click', () => {
         if (answerFromDiv[1] === correctAnswer) {
@@ -381,7 +377,7 @@ export default class AudioGame extends BaseComponent {
     }
     allDivAnswers.forEach(divAnswer => {
       if (divAnswer.textContent) {
-        const answerFromDiv = divAnswer.textContent.split('. ');
+        const answerFromDiv = divAnswer.textContent.split('.');
         const correctAnswer = this.currentQuestionCard.wordTranslate;
         if (!correctAnswer) return;
         if (answerFromDiv[1] === correctAnswer) {
@@ -457,7 +453,6 @@ export default class AudioGame extends BaseComponent {
       dataSet: {
         widget: 'modalStatistic',
         parentId: this.id,
-        // options: 'some options from AUDIO game',
       },
     });
     this.elem.append(modalStatistic);
@@ -468,9 +463,7 @@ export default class AudioGame extends BaseComponent {
     return this.answersArray;
   }
 
-  public playAgain() {
-    console.log('this.answersArray play again', this.answersArray);
-
+  public playAgain(): void {
     this.questionNumber = 0;
     this.currentQuestionCard = {};
     this.answersArray = [];
