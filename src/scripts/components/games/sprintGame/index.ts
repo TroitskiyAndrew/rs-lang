@@ -36,8 +36,6 @@ let cutRoundResults = false;
 
 export default class SprintGame extends BaseComponent {
 
-  // groupsWrapper: HTMLElement | undefined;
-  // groupsWrapperButton: HTMLButtonElement | undefined;
   group: string  = '';
   page: string = '';
 
@@ -164,8 +162,6 @@ export default class SprintGame extends BaseComponent {
     paramsLevelWrapper.innerHTML += `&#215;`;
     paramsLevelWrapper.append(this.group);
 
-    //paramsMultiplyerWrapper.append(multiplyerItem);
-
     paramsTime.innerHTML = `time<br> 60`;
     
     paramsCoins.append(this.getCoin('params'))
@@ -187,7 +183,6 @@ export default class SprintGame extends BaseComponent {
     mario.src = '/../../../../assets/img/sprintGame/png/SMWSmallMarioSprite.png';
 
     marioWrapper.append(mario);
-    // marioWrapper.append(this.getCoin('medium'));
   }
 
   private renderPipe(pipeWrapper: HTMLDivElement) {
@@ -413,7 +408,7 @@ export default class SprintGame extends BaseComponent {
     }
     wordsArrToPlayCut.splice(randomWordNumber, 1);
     if (wordsOnPageLeft) wordsOnPageLeft -= 1;
-    // this.startTimer();
+    this.startTimer();
   }
 
   private addElementToRoundResults(wordsArr: IWordParams[], randomWordNumber: number, translateCorrectness: boolean) {
