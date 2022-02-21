@@ -93,9 +93,9 @@ export default class AudioGame extends BaseComponent {
       this.wordsFromAPI.questionWords = [];
       // проверка на количество слов в массиве, если меньше 5, то модалка с ошибкой!
       const questionField = this.elem.querySelector('.audio-game__answers') as HTMLElement;
-      questionField.textContent = 'Минимум 5 слов требуется для игры.';
+      questionField.textContent = 'Для игры необходио минимум 5 невыученных слов.';
       const nextBtn = this.nextBtn as HTMLElement;
-      nextBtn.textContent = 'Выйти';
+      nextBtn.textContent = 'выход';
       nextBtn.onclick = () => {
         if (this.fromDictionary) {
           updateContent(document.querySelector('#page-holder') as HTMLElement, 'pageDictionary');

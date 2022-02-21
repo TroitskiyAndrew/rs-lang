@@ -15,7 +15,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-image: url('/src/assets/img/background-gameLauncher.jpg');
+    background-image: url("/src/assets/img/background-gameLauncher.jpg");
     background-repeat-y: no-repeat;
     background-size: cover;
     background-position: -280px 0;
@@ -46,6 +46,7 @@
     .game-description__title {
       text-align: center;
       font-size: 1.4em;
+      font-family: "F77 Minecraft";
     }
     .game-description__text {
       margin: 20px;
