@@ -16,7 +16,7 @@
 }
 
 .menu__overlay {
-  position: absolute;
+  position: fixed;
   z-index: 9;
   display: none;
   width: 100%;

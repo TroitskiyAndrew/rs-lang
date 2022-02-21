@@ -1,7 +1,14 @@
 .header {
   @include flex($jc: flex-start);
   width: 100%;
+  background-color: #28282b;
+  color: white;
+  font-family: "F77 Minecraft";
   &__user {
     margin-left: auto;
+    text-align: center;
+  }
+  *::before {
+    color: white;
   }
 }
