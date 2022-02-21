@@ -132,10 +132,13 @@ export default class PageHome extends BaseComponent {
           githubLink = el.children[1].children[0] as HTMLAnchorElement;
           githubLink.href = 'https://github.com/TroitskiyAndrew';
           el.children[person].textContent = 'Андрей Троицкий';
-          el.children[role].innerHTML = 'Frontend Engineer';
-          el.children[contribution].innerHTML = `Структура приложения, все основные компоненты.
-          Страница словаря с карточками.
-          Страница статистики.`;
+          el.children[role].innerHTML = 'Frontend Engineer<br>Team lead';
+          el.children[contribution].innerHTML = `
+          <ul>
+            <li>Структура приложения, все основные компоненты</li>
+            <li>Страница словаря с карточками</li>
+            <li>Страница статистики</li>
+          </ul>`;
           break;
         case 1:
           el.children[0].append(this.getAvatar('/../../../assets/img/homePage/zozuliak.jpg', 'dmytro'));
@@ -143,9 +146,12 @@ export default class PageHome extends BaseComponent {
           githubLink.href = 'https://github.com/dmytrozozuliak';
           el.children[person].textContent = 'Дмитрий Зозуляк';
           el.children[role].textContent = 'Frontend Engineer';
-          el.children[contribution].textContent = `Авторизация пользователя.
-          Методы API.
-          Игра Аудиовызов.`;
+          el.children[contribution].innerHTML = `
+          <ul>
+            <li>Авторизация пользователя</li>
+            <li>Методы API</li>
+            <li>Игра "Аудиовызов"</li>
+          </ul>`;
           break;
         case 2:
           el.children[0].append(this.getAvatar('/../../../assets/img/homePage/essonti.png', 'sergei'));
@@ -153,9 +159,12 @@ export default class PageHome extends BaseComponent {
           githubLink.href = 'https://github.com/Essonti';
           el.children[person].textContent = 'Сергей Трофимченко';
           el.children[role].textContent = 'Frontend Engineer';
-          el.children[contribution].textContent = `Дизайн.
-          Игра спринт.
-          Главная страница.`;
+          el.children[contribution].innerHTML = `
+          <ul>
+            <li>Дизайн</li>
+            <li>Игра "Спринт"</li>
+            <li>Главная страница</li>
+          </ul>`;
           break;
       }
     });

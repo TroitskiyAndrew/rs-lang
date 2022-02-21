@@ -302,7 +302,7 @@ export default class SprintGame extends BaseComponent {
       const start = Date.now();
       const getSecondsLeft = () => {
         const delta = TIME_FOR_GAME_MILISECONDS - (Date.now() - start);
-        if (Math.round(delta / Number('1000')) === 0) {
+        if (Math.round(delta / Number('1000')) <= 0) {
           (this.paramsTime as HTMLElement).innerHTML = 'time<br> 0';
           cutRoundResults = true;
           this.stopTimer();
