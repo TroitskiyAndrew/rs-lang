@@ -1,5 +1,5 @@
 import BaseComponent from '../../base';
-import { updateContent } from '../../../rooting';
+import { pageChenging, updateContent } from '../../../rooting';
 import { createSpan, createDiv, createButton, getRandom, shuffleArray } from '../../../utils';
 import { apiService, baseUrl } from '../../../api/apiMethods';
 import constants from '../../../app.constants';
